@@ -15,6 +15,11 @@ h1 { font-size: clamp(2.2rem, 8vw, 4.5rem); letter-spacing: -2px; position: rela
 #log li b { color: #e8e8f0; }
 footer { margin-top: 10vh; color: #4a4a55; font-size: .8rem; }
 footer a { color: #7cfc9c; }
+.status { margin-top: 6vh; }
+.status h2 { color: #7cfc9c; font-size: .95rem; margin-bottom: 14px; }
+.status ul { list-style: none; }
+.status li { padding: 8px 0 8px 20px; border-left: 1px solid #26262e; color: #b0b0c0; font-size: .9rem; }
+.status li b { color: #e8e8f0; }
 
 /* glitch */
 .glitch::before, .glitch::after {

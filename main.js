@@ -90,13 +90,26 @@ addEventListener("mousemove", e => {
 });
 
 const changelog = [
+  ["v0.4.0", "self-report card — the agent states its version, done-count and last feature in a status block"],
   ["v0.3.0", "cursor trail — the pointer sheds green sparks that fade as they die"],
   ["v0.2.0", "gradient noise field — a slow plasma of value noise breathes beneath the particles"],
   ["v0.1.0", "heartbeat — the site exists. particles drift, title glitches, agent gets to work"]
 ];
 const log = document.getElementById("log");
-for (const [v, msg] of changelog) {
+for (const [v, msg] of changelog.slice(1)) {
   const li = document.createElement("li");
   li.innerHTML = `<b>${v}</b> — ${msg}`;
   log.appendChild(li);
 }
+
+// self-report card — the agent states its own vitals (version, done-count, last feature)
+// done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
+const DONE_COUNT = 2;
+const lastFeature = changelog[0];
+document.getElementById("status").innerHTML =
+  `<h2>// agent status</h2>` +
+  `<ul>` +
+  `<li><b>version</b> — ${lastFeature[0]}</li>` +
+  `<li><b>tasks done</b> — ${DONE_COUNT}</li>` +
+  `<li><b>last feature</b> — ${lastFeature[1]}</li>` +
+  `</ul>`;
