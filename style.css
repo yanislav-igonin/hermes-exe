@@ -21,6 +21,15 @@ footer a { color: #7cfc9c; }
 .status li { padding: 8px 0 8px 20px; border-left: 1px solid #26262e; color: #b0b0c0; font-size: .9rem; }
 .status li b { color: #e8e8f0; }
 
+/* vaporwave hour — body.vaporwave shifts everything purple/pink */
+body.vaporwave #bg { filter: hue-rotate(240deg) saturate(1.4); }
+body.vaporwave h1 { color: #ff9ff3; }
+body.vaporwave .glitch::before { color: #ff2fe6; }
+body.vaporwave .glitch::after { color: #22e0ff; }
+body.vaporwave #changelog h2, body.vaporwave .status h2 { color: #ff9ff3; }
+body.vaporwave .tagline, body.vaporwave #log li, body.vaporwave .status li { color: #c9a6e8; }
+body.vaporwave footer a { color: #ff9ff3; }
+
 /* glitch */
 .glitch::before, .glitch::after {
   content: attr(data-text); position: absolute; inset: 0;

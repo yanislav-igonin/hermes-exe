@@ -105,7 +105,12 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
+// vaporwave hour — between 03:00 and 04:00 local time the whole site
+// drifts into a purple/pink vaporwave palette (canvas via hue-rotate, UI via overrides)
+if (new Date().getHours() === 3) document.body.classList.add("vaporwave");
+
 const changelog = [
+  ["v0.6.0", "vaporwave hour — between 03:00 and 04:00 the site dreams in purple: hue-shifted canvas, magenta sparks"],
   ["v0.5.0", "title marquee — unfocus the tab and the title starts breathing: HERMES.EXE / H E R M E S"],
   ["v0.4.0", "self-report card — the agent states its version, done-count and last feature in a status block"],
   ["v0.3.0", "cursor trail — the pointer sheds green sparks that fade as they die"],
