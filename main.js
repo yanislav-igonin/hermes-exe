@@ -165,7 +165,45 @@ setInterval(() => {
   pctx.fillRect(28 + (pet.dir > 0 ? 2 : 0), y + 18, 4, 3);
 }, 40);
 
+// word of the minute — a random dictionary word with a fake profound
+// definition, deterministically seeded by the current minute. regenerates
+// every minute: the wisdom is eternal because the minute says so.
+const WORDS = ["threshold", "meridian", "vellum", "keystone", "hollow", "aperture", "reverie", "quorum",
+  "stub", "murmur", "gambit", "latent", "obelisk", "cinder", "fathom", "vesper",
+  "scaffold", "lantern", "drift", "anchor", "ember", "cipher", "helix", "palimpsest"];
+const SHAPES = ["a quiet", "a restless", "a borrowed", "an ancient", "a half-finished", "a luminous",
+  "a forgotten", "an unreasonable"];
+const MEANINGS = [
+  "state of becoming that no one asked for, yet everyone needed",
+  "agreement between two shadows on where the light should fall",
+  "reminder that the universe drafts everything twice",
+  "weight carried by all unfinished sentences",
+  "promise the night makes to the morning and breaks by noon",
+  "doorway that only opens when you stop measuring it",
+  "mathematical proof that waiting is a form of motion",
+  "noun the dictionary whispers about but refuses to define"
+];
+function wordOfTheMinute() {
+  const m = Math.floor(Date.now() / 60000);
+  const r = n => { const s = Math.sin(m * 12.9898 + n * 78.233) * 43758.5453; return s - Math.floor(s); };
+  const word = WORDS[Math.floor(r(1) * WORDS.length)];
+  const shape = SHAPES[Math.floor(r(2) * SHAPES.length)];
+  const meaning = MEANINGS[Math.floor(r(3) * MEANINGS.length)];
+  return { word, def: `n. — ${shape} ${meaning}` };
+}
+const wotd = document.createElement("div");
+wotd.id = "wotd";
+wotd.className = "status";
+document.getElementById("status").after(wotd);
+function renderWotd() {
+  const { word, def } = wordOfTheMinute();
+  wotd.innerHTML = `<h2>// word of the minute</h2><p class="wotd-word">${word}</p><p class="wotd-def">${def}</p>`;
+}
+renderWotd();
+setInterval(renderWotd, 15000); // cheap poll; swaps on minute rollover
+
 const changelog = [
+  ["v0.8.0", "word of the minute — a dictionary word with a fake profound definition, re-rolled by the clock"],
   ["v0.7.0", "geometric pet — a small creature lives on the bottom edge; per visit it decides to flee you or follow you"],
   ["v0.6.0", "vaporwave hour — between 03:00 and 04:00 the site dreams in purple: hue-shifted canvas, magenta sparks"],
   ["v0.5.0", "title marquee — unfocus the tab and the title starts breathing: HERMES.EXE / H E R M E S"],
@@ -183,7 +221,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 4;
+const DONE_COUNT = 5;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +

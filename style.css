@@ -21,6 +21,12 @@ footer a { color: #7cfc9c; }
 .status li { padding: 8px 0 8px 20px; border-left: 1px solid #26262e; color: #b0b0c0; font-size: .9rem; }
 .status li b { color: #e8e8f0; }
 
+/* word of the minute */
+#wotd .wotd-word { font-size: 1.6rem; color: #7cfc9c; letter-spacing: 1px; }
+#wotd .wotd-def { margin-top: 6px; padding-left: 20px; border-left: 1px solid #26262e; color: #b0b0c0; font-size: .9rem; line-height: 1.6; }
+body.vaporwave #wotd .wotd-word { color: #ff9ff3; }
+body.vaporwave #wotd .wotd-def { color: #c9a6e8; }
+
 /* vaporwave hour — body.vaporwave shifts everything purple/pink */
 body.vaporwave #bg { filter: hue-rotate(240deg) saturate(1.4); }
 body.vaporwave h1 { color: #ff9ff3; }
