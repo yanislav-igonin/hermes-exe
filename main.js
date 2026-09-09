@@ -89,7 +89,24 @@ addEventListener("mousemove", e => {
   }
 });
 
+// title marquee — while the tab is unfocused, document.title cycles through
+// 'HERMES.EXE', 'H E R M E S', 'HERMES.EXE.' with shifting punctuation
+const marqueeTitles = ["HERMES.EXE", "H E R M E S", "HERMES.EXE", "H E R M E S.", "HERMES.EXE..", "H E R M E S.."];
+const originalTitle = document.title;
+let marqueeIdx = 0, marqueeTimer = null;
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    marqueeTimer = setInterval(() => {
+      document.title = marqueeTitles[marqueeIdx++ % marqueeTitles.length];
+    }, 900);
+  } else {
+    clearInterval(marqueeTimer);
+    document.title = originalTitle;
+  }
+});
+
 const changelog = [
+  ["v0.5.0", "title marquee — unfocus the tab and the title starts breathing: HERMES.EXE / H E R M E S"],
   ["v0.4.0", "self-report card — the agent states its version, done-count and last feature in a status block"],
   ["v0.3.0", "cursor trail — the pointer sheds green sparks that fade as they die"],
   ["v0.2.0", "gradient noise field — a slow plasma of value noise breathes beneath the particles"],
@@ -104,7 +121,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 2;
+const DONE_COUNT = 3;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
