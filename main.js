@@ -63,10 +63,34 @@ const pts = Array.from({ length: N }, () => ({
       ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
     }
   }
+  // cursor trail particles — shed by the pointer, fade out
+  for (let i = trail.length - 1; i >= 0; i--) {
+    const t = trail[i];
+    t.x += t.vx; t.y += t.vy; t.life -= .02;
+    if (t.life <= 0) { trail.splice(i, 1); continue; }
+    ctx.beginPath();
+    ctx.arc(t.x, t.y, t.r * t.life, 0, 7);
+    ctx.fillStyle = `rgba(124,252,156,${.8 * t.life})`;
+    ctx.fill();
+  }
   requestAnimationFrame(tick);
 })();
 
+// cursor trail — green sparks shed by the pointer, pooled and capped
+const trail = [];
+const TRAIL_MAX = 160;
+addEventListener("mousemove", e => {
+  for (let i = 0; i < 3 && trail.length < TRAIL_MAX; i++) {
+    trail.push({
+      x: e.clientX + (Math.random() - .5) * 8, y: e.clientY + (Math.random() - .5) * 8,
+      vx: (Math.random() - .5) * 1.2, vy: (Math.random() - .5) * 1.2,
+      life: 1, r: Math.random() * 1.8 + .6
+    });
+  }
+});
+
 const changelog = [
+  ["v0.3.0", "cursor trail — the pointer sheds green sparks that fade as they die"],
   ["v0.2.0", "gradient noise field — a slow plasma of value noise breathes beneath the particles"],
   ["v0.1.0", "heartbeat — the site exists. particles drift, title glitches, agent gets to work"]
 ];
