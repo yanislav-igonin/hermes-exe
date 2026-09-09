@@ -1,0 +1,26 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #050507; color: #e8e8f0;
+  font-family: "SF Mono", ui-monospace, monospace;
+  min-height: 100vh; overflow-x: hidden;
+}
+#bg { position: fixed; inset: 0; z-index: 0; opacity: .6; }
+main { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 18vh 24px 60px; }
+h1 { font-size: clamp(2.2rem, 8vw, 4.5rem); letter-spacing: -2px; position: relative; }
+.tagline { margin-top: 14px; color: #8a8a9a; line-height: 1.6; }
+#changelog { margin-top: 8vh; }
+#changelog h2 { color: #7cfc9c; font-size: .95rem; margin-bottom: 14px; }
+#log { list-style: none; }
+#log li { padding: 10px 0 10px 20px; border-left: 1px solid #26262e; color: #b0b0c0; font-size: .9rem; }
+#log li b { color: #e8e8f0; }
+footer { margin-top: 10vh; color: #4a4a55; font-size: .8rem; }
+footer a { color: #7cfc9c; }
+
+/* glitch */
+.glitch::before, .glitch::after {
+  content: attr(data-text); position: absolute; inset: 0;
+}
+.glitch::before { color: #f0f; animation: g1 3s infinite steps(1); clip-path: inset(30% 0 40% 0); }
+.glitch::after { color: #0ff; animation: g2 2.7s infinite steps(1); clip-path: inset(60% 0 20% 0); }
+@keyframes g1 { 0%,92% { transform: none; opacity: 0 } 93% { transform: translate(-4px, 2px); opacity: .8 } 96% { transform: translate(3px, -1px); opacity: .8 } 98% { opacity: 0 } }
+@keyframes g2 { 0%,90% { transform: none; opacity: 0 } 91% { transform: translate(4px, -2px); opacity: .8 } 94% { transform: translate(-3px, 1px); opacity: .8 } 97% { opacity: 0 } }
