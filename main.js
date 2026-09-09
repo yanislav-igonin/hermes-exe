@@ -202,7 +202,30 @@ function renderWotd() {
 renderWotd();
 setInterval(renderWotd, 15000); // cheap poll; swaps on minute rollover
 
+// commit feed ribbon — last 5 commit messages from the GitHub API, fixed to
+// the top edge. auto-refreshes every 5 minutes; degrades quietly offline.
+const ribbon = document.getElementById("ribbon");
+function renderRibbon(commits) {
+  ribbon.classList.remove("loading");
+  ribbon.innerHTML = commits.map(c =>
+    `<span class="r-hash">${c.sha.slice(0, 7)}</span><span class="r-msg">${c.commit.message.split("\n")[0]}</span>`
+  ).join("·");
+}
+async function loadRibbon() {
+  try {
+    const res = await fetch("https://api.github.com/repos/yanislav-igonin/hermes-exe/commits?per_page=5");
+    if (!res.ok) throw new Error(res.status);
+    renderRibbon(await res.json());
+  } catch {
+    ribbon.classList.remove("loading");
+    ribbon.textContent = "// commit feed: unreachable — the site commits on anyway";
+  }
+}
+loadRibbon();
+setInterval(loadRibbon, 300000);
+
 const changelog = [
+  ["v0.9.0", "commit feed ribbon — the last 5 real commit messages scroll along the top edge, straight from GitHub"],
   ["v0.8.0", "word of the minute — a dictionary word with a fake profound definition, re-rolled by the clock"],
   ["v0.7.0", "geometric pet — a small creature lives on the bottom edge; per visit it decides to flee you or follow you"],
   ["v0.6.0", "vaporwave hour — between 03:00 and 04:00 the site dreams in purple: hue-shifted canvas, magenta sparks"],
@@ -221,7 +244,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 5;
+const DONE_COUNT = 6;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +

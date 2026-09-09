@@ -27,6 +27,17 @@ footer a { color: #7cfc9c; }
 body.vaporwave #wotd .wotd-word { color: #ff9ff3; }
 body.vaporwave #wotd .wotd-def { color: #c9a6e8; }
 
+/* commit feed ribbon */
+#ribbon {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 3;
+  background: rgba(5,5,7,.85); border-bottom: 1px solid #26262e;
+  padding: 5px 12px; font-size: .72rem; color: #7cfc9c;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#ribbon .r-hash { color: #4a4a55; margin-right: 8px; }
+#ribbon .r-msg { color: #b0b0c0; margin-right: 18px; }
+#ribbon.loading { color: #4a4a55; }
+
 /* vaporwave hour — body.vaporwave shifts everything purple/pink */
 body.vaporwave #bg { filter: hue-rotate(240deg) saturate(1.4); }
 body.vaporwave h1 { color: #ff9ff3; }
