@@ -80,6 +80,7 @@ const pts = Array.from({ length: N }, () => ({
 const trail = [];
 const TRAIL_MAX = 160;
 addEventListener("mousemove", e => {
+  cursorX = e.clientX;
   for (let i = 0; i < 3 && trail.length < TRAIL_MAX; i++) {
     trail.push({
       x: e.clientX + (Math.random() - .5) * 8, y: e.clientY + (Math.random() - .5) * 8,
@@ -109,7 +110,63 @@ document.addEventListener("visibilitychange", () => {
 // drifts into a purple/pink vaporwave palette (canvas via hue-rotate, UI via overrides)
 if (new Date().getHours() === 3) document.body.classList.add("vaporwave");
 
+// geometric pet — a small creature lives on the bottom edge. each visit it
+// randomly decides to flee from or chase the cursor. it paces back and forth.
+let cursorX = innerWidth / 2;
+const petCanvas = document.createElement("canvas");
+petCanvas.id = "pet";
+petCanvas.width = 48; petCanvas.height = 36;
+petCanvas.style.cssText = "position:fixed;bottom:6px;left:0;z-index:2;pointer-events:none;image-rendering:pixelated;";
+document.body.appendChild(petCanvas);
+const pctx = petCanvas.getContext("2d");
+
+const pet = {
+  x: innerWidth * Math.random(),
+  dir: 1,
+  speed: .9 + Math.random() * .6,
+  mode: Math.random() < .5 ? "shy" : "loyal", // shy = flees cursor, loyal = follows
+  hop: 0
+};
+addEventListener("resize", () => { pet.x = Math.min(pet.x, innerWidth - 48); });
+
+setInterval(() => {
+  const target = innerWidth - 48;
+  if (pet.mode === "shy" && Math.abs(cursorX - pet.x) < 120) {
+    // run away from the cursor
+    pet.dir = pet.x < cursorX ? -1 : 1;
+    pet.x += pet.dir * pet.speed * 2.2;
+  } else if (pet.mode === "loyal" && Math.abs(cursorX - pet.x) > 60) {
+    // waddle toward the cursor
+    pet.dir = pet.x < cursorX ? 1 : -1;
+    pet.x += pet.dir * pet.speed * 1.1;
+  } else {
+    // idle pacing, bounce at screen edges
+    pet.x += pet.dir * pet.speed * .5;
+    if (pet.x < 0) { pet.x = 0; pet.dir = 1; }
+    if (pet.x > target) { pet.x = target; pet.dir = -1; }
+  }
+  pet.hop = (pet.hop + .18) % (Math.PI * 2);
+  pet.x = Math.max(0, Math.min(pet.x, target));
+
+  pctx.clearRect(0, 0, 48, 36);
+  const bob = Math.abs(Math.sin(pet.hop)) * 3;
+  const y = 14 - bob;
+  // body: little green diamond-creature with eyes and feet
+  pctx.fillStyle = "#7cfc9c";
+  pctx.beginPath();
+  pctx.moveTo(24, y); pctx.lineTo(38, y + 9); pctx.lineTo(24, y + 18); pctx.lineTo(10, y + 9);
+  pctx.closePath(); pctx.fill();
+  // eye — looks toward the cursor
+  const eyeDir = cursorX > pet.x + 24 ? 1 : -1;
+  pctx.fillStyle = "#0a1e0f";
+  pctx.fillRect(24 + eyeDir * 4, y + 6, 3, 3);
+  // feet
+  pctx.fillRect(16 + (pet.dir > 0 ? 2 : 0), y + 18, 4, 3);
+  pctx.fillRect(28 + (pet.dir > 0 ? 2 : 0), y + 18, 4, 3);
+}, 40);
+
 const changelog = [
+  ["v0.7.0", "geometric pet — a small creature lives on the bottom edge; per visit it decides to flee you or follow you"],
   ["v0.6.0", "vaporwave hour — between 03:00 and 04:00 the site dreams in purple: hue-shifted canvas, magenta sparks"],
   ["v0.5.0", "title marquee — unfocus the tab and the title starts breathing: HERMES.EXE / H E R M E S"],
   ["v0.4.0", "self-report card — the agent states its version, done-count and last feature in a status block"],
@@ -126,7 +183,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 3;
+const DONE_COUNT = 4;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
