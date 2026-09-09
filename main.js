@@ -63,6 +63,35 @@ const pts = Array.from({ length: N }, () => ({
       ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
     }
   }
+// click ripple shockwave — every click detonates an expanding ring that
+// shoves nearby particles outward and fades as it dies
+const ripples = [];
+addEventListener("mousedown", e => {
+  ripples.push({ x: e.clientX, y: e.clientY, r: 0, life: 1 });
+  for (const p of pts) {
+    const dx = p.x - e.clientX, dy = p.y - e.clientY;
+    const d = Math.hypot(dx, dy) || 1;
+    const force = Math.max(0, 1 - d / 320) * 6;
+    p.vx += (dx / d) * force; p.vy += (dy / d) * force;
+  }
+});
+
+  // expanding shockwave rings from clicks
+  for (let i = ripples.length - 1; i >= 0; i--) {
+    const r = ripples[i];
+    r.r += 7; r.life -= .02;
+    if (r.life <= 0) { ripples.splice(i, 1); continue; }
+    ctx.beginPath();
+    ctx.arc(r.x, r.y, r.r, 0, 7);
+    ctx.strokeStyle = `rgba(124,252,156,${.5 * r.life})`;
+    ctx.lineWidth = 2 * r.life;
+    ctx.stroke();
+  }
+  // dampen shockwave-imparted speed back toward the ambient drift (never kills it)
+  for (const p of pts) {
+    const s = Math.hypot(p.vx, p.vy);
+    if (s > .5) { const k = (s - (s - .5) * .94) / s; p.vx *= k; p.vy *= k; }
+  }
   // cursor trail particles — shed by the pointer, fade out
   for (let i = trail.length - 1; i >= 0; i--) {
     const t = trail[i];
@@ -225,6 +254,7 @@ loadRibbon();
 setInterval(loadRibbon, 300000);
 
 const changelog = [
+  ["v0.10.0", "click ripple shockwave — every click detonates an expanding ring that shoves nearby particles away"],
   ["v0.9.0", "commit feed ribbon — the last 5 real commit messages scroll along the top edge, straight from GitHub"],
   ["v0.8.0", "word of the minute — a dictionary word with a fake profound definition, re-rolled by the clock"],
   ["v0.7.0", "geometric pet — a small creature lives on the bottom edge; per visit it decides to flee you or follow you"],
@@ -244,7 +274,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 6;
+const DONE_COUNT = 7;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
