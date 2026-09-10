@@ -15,6 +15,20 @@ h1 { font-size: clamp(2.2rem, 8vw, 4.5rem); letter-spacing: -2px; position: rela
 #log li b { color: #e8e8f0; }
 footer { margin-top: 10vh; color: #4a4a55; font-size: .8rem; }
 footer a { color: #7cfc9c; }
+
+/* idle screensaver — dimming veil + flying toast */
+#saver {
+  position: fixed; inset: 0; z-index: 98;
+  pointer-events: none; opacity: 0; transition: opacity 1.5s;
+}
+#saver.on { opacity: 1; }
+#saver::before {
+  content: ""; position: fixed; inset: 0; background: rgba(5, 5, 7, .88);
+}
+#saver .toast {
+  position: fixed; font-size: 44px; will-change: transform;
+  filter: drop-shadow(0 0 12px rgba(124, 252, 156, .5));
+}
 .status { margin-top: 6vh; }
 .status h2 { color: #7cfc9c; font-size: .95rem; margin-bottom: 14px; }
 .status ul { list-style: none; }

@@ -265,7 +265,34 @@ document.querySelector("h1.glitch").addEventListener("click", () => {
   }
 });
 
+// idle screensaver — after 60s of no input a flying toast bounces around the
+// screen under a dimming veil until the user moves, types, clicks or scrolls
+let lastInput = Date.now();
+for (const ev of ["mousemove", "mousedown", "keydown", "wheel", "touchstart"])
+  addEventListener(ev, () => { lastInput = Date.now(); }, { passive: true });
+const saver = document.createElement("div");
+saver.id = "saver";
+saver.innerHTML = `<div class="toast">🍞</div>`;
+document.body.appendChild(saver);
+const toastEl = saver.querySelector(".toast");
+const toast = { x: innerWidth / 2, y: innerHeight / 2, vx: 3.2, vy: 2.4, rot: 0 };
+function saverTick() {
+  const idle = Date.now() - lastInput;
+  saver.classList.toggle("on", idle > 60000);
+  if (idle > 60000) {
+    toast.x += toast.vx; toast.y += toast.vy; toast.rot += toast.vx * 1.5;
+    if (toast.x < 0 || toast.x > innerWidth - 60) toast.vx *= -1;
+    if (toast.y < 0 || toast.y > innerHeight - 60) toast.vy *= -1;
+    toast.x = Math.max(0, Math.min(toast.x, innerWidth - 60));
+    toast.y = Math.max(0, Math.min(toast.y, innerHeight - 60));
+    toastEl.style.transform = `translate(${toast.x}px, ${toast.y}px) rotate(${toast.rot}deg)`;
+  }
+  requestAnimationFrame(saverTick);
+}
+saverTick();
+
 const changelog = [
+  ["v0.12.0", "idle screensaver — stop touching anything for 60s and a flying toast bounces around the screen until you do"],
   ["v0.11.0", "synthwave sunset theme — click the title three times and the site burns in purple/orange gradients"],
   ["v0.10.0", "click ripple shockwave — every click detonates an expanding ring that shoves nearby particles away"],
   ["v0.9.0", "commit feed ribbon — the last 5 real commit messages scroll along the top edge, straight from GitHub"],
@@ -287,7 +314,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 8;
+const DONE_COUNT = 9;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
