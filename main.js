@@ -1738,6 +1738,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.116.0", "migrating geese — every ~2-3 min a small V-formation of birds crosses the upper page, each flapping on its own rhythm while the formation lazily reorders; the lead bird occasionally drops a fading honk glyph, then the flock sails away off-screen like the migration was never there"],
   ["v0.115.0", "message in a bottle — every ~2-4 min a small glass bottle with a rolled note inside bobs across the bottom of the page, rocking gently on invisible waves; the note briefly surfaces to be read, then the bottle washes away off-screen like the sea was never there"],
   ["v0.114.0", "bioluminescent jellyfish — every ~2-3 min a soft glowing jellyfish rises from the bottom of the page, pulsing as it climbs with a trailing fringe of glyph tendrils dissolving behind it, then fades back into the deep like the tide was never there"],
   ["v0.113.0", "satellite transit — every ~60-100s a tiny satellite glides slowly across the upper page, its nav light blinking, leaving a fading dotted trail of orbit dots that dissolve behind it like the orbit was never occupied"],
@@ -3941,4 +3942,63 @@ addEventListener("dblclick", e => {
     setTimeout(transit, 60000 + Math.random() * 40000);
   }
   setTimeout(transit, 20000 + Math.random() * 25000);
+})();
+
+// migrating geese: every ~2-3 min a small V-formation of birds crosses the
+// upper part of the page, each flapping on its own rhythm while the formation
+// lazily reorders; the lead bird occasionally drops a fading honk glyph, then
+// the flock sails away off-screen like the migration was never there
+(function migratingGeese() {
+  const HONKS = ["~", "\\", "ˇ"];
+  function fly() {
+    const dir = Math.random() < .5 ? 1 : -1;
+    const baseY = innerHeight * (.08 + Math.random() * .2);
+    const speed = 42 + Math.random() * 26; // px/s, unhurried southing
+    const birds = [];
+    const N = 5 + Math.floor(Math.random() * 4);
+    for (let i = 0; i < N; i++) {
+      const b = document.createElement("div");
+      b.className = "goose";
+      b.textContent = "Ç";
+      document.body.appendChild(b);
+      birds.push({ el: b, wing: Math.random() * Math.PI * 2, wingRate: 5 + Math.random() * 4, jx: 0, jy: 0 });
+    }
+    let t = 0, lastHonk = 0;
+    const x0 = dir === 1 ? -220 : innerWidth + 220;
+    const glide = () => {
+      t += 1 / 60;
+      const leadX = x0 + dir * speed * t;
+      let visible = false;
+      birds.forEach((b, i) => {
+        // V-formation offsets; the slots slowly drift so the shape lazily reorders
+        const rank = (i + 1) / 2 | 0, side = i % 2 ? 1 : -1;
+        const lag = rank * 26 + Math.sin(t * .35 + i * 1.7) * 14;
+        const lift = rank * 15 + Math.sin(t * .5 + i * 2.3) * 10;
+        const wobble = Math.sin(t * .8 + i) * 5;
+        const x = leadX - dir * lag + wobble;
+        const y = baseY + side * lift + wobble * .6;
+        b.wing += b.wingRate / 60;
+        b.el.style.left = x + "px";
+        b.el.style.top = y + "px";
+        b.el.style.transform = "scaleX(" + dir + ") rotate(" + (Math.sin(b.wing) * 8).toFixed(1) + "deg)";
+        if (x > -40 && x < innerWidth + 40) visible = true;
+      });
+      // the lead bird honks
+      if (visible && t - lastHonk > 2.5 + Math.random() * 4) {
+        lastHonk = t;
+        const h = document.createElement("span");
+        h.className = "goose-honk";
+        h.textContent = HONKS[Math.floor(Math.random() * HONKS.length)];
+        h.style.left = leadX + "px";
+        h.style.top = baseY + "px";
+        document.body.appendChild(h);
+        setTimeout(() => h.remove(), 3500);
+      }
+      if (visible) requestAnimationFrame(glide);
+      else birds.forEach(b => b.el.remove());
+    };
+    requestAnimationFrame(glide);
+    setTimeout(fly, 120000 + Math.random() * 60000);
+  }
+  setTimeout(fly, 12000 + Math.random() * 20000);
 })();

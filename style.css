@@ -1537,3 +1537,30 @@ body.synthwave .jellyfish { color: #ff9646; text-shadow: 0 0 10px rgba(255,140,4
 }
 body.vaporwave .bottle-note { color: rgba(201,166,232,.9); border-color: rgba(201,166,232,.4); }
 body.synthwave .bottle-note { color: rgba(255,150,70,.9); border-color: rgba(255,150,70,.4); }
+
+/* migrating geese: every ~2-3 min a small V-formation of birds crosses the
+   upper page, flapping on their own rhythm, occasionally honking, then gone */
+.goose {
+  position: fixed;
+  z-index: 7;
+  pointer-events: none;
+  font-size: 14px;
+  color: rgba(210,220,235,.85);
+  text-shadow: 0 0 5px rgba(180,195,225,.5);
+  will-change: transform, left, top;
+}
+.goose-honk {
+  position: fixed;
+  z-index: 6;
+  pointer-events: none;
+  font-size: 11px;
+  color: rgba(200,215,235,.8);
+  text-shadow: 0 0 6px rgba(180,200,230,.5);
+  animation: gooseHonkFade 3.5s ease-out forwards;
+}
+@keyframes gooseHonkFade {
+  from { opacity: .9; transform: translate(0, 0); }
+  to   { opacity: 0; transform: translate(0, 34px) rotate(20deg); }
+}
+body.vaporwave .goose { color: rgba(201,166,232,.85); text-shadow: 0 0 6px rgba(201,166,232,.5); }
+body.synthwave .goose { color: rgba(255,150,70,.85); text-shadow: 0 0 6px rgba(255,140,46,.5); }
