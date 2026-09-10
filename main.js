@@ -1283,8 +1283,50 @@ addEventListener("mousemove", e => {
   }, 1000);
 })();
 
+// ascii snail — every ~3 min a small snail crawls along the very bottom of the
+// page at its own lazy pace, leaving a fading slime trail of glyphs behind it,
+// then exits the far edge like it was never in a hurry at all.
+(function snailSighting() {
+  function crawl() {
+    const el = document.createElement("pre");
+    el.className = "snail";
+    el.textContent = "  ,@\"";
+    document.body.appendChild(el);
+    const dir = Math.random() < .5 ? 1 : -1;
+    const speed = 24 + Math.random() * 18; // px per second — a snail's pace
+    const y = innerHeight - 44 - Math.random() * 16;
+    const start = performance.now();
+    const dur = (innerWidth + 160) / speed * 1000;
+    const SLIME = "·˙:∙ꞏ";
+    let lastSlime = 0;
+    (function step(now) {
+      const t = (now - start) / 1000;
+      const x = dir > 0 ? -80 + t * speed : innerWidth + 80 - t * speed;
+      // gentle inchworm bob: it hurries, but only by snail standards
+      const inch = Math.sin(t * 2.4) * 2;
+      el.style.transform = `translate(${x}px, ${y + inch}px) scaleX(${dir})`;
+      if (now - lastSlime > 320) {
+        lastSlime = now;
+        const s = document.createElement("span");
+        s.className = "snail-slime";
+        s.textContent = SLIME[Math.random() * SLIME.length | 0];
+        s.style.left = (x + (dir > 0 ? -6 : 16)) + "px";
+        s.style.top = (y + 14) + "px";
+        document.body.appendChild(s);
+        requestAnimationFrame(() => s.classList.add("fade"));
+        setTimeout(() => s.remove(), 4200);
+      }
+      if (t * 1000 < dur) requestAnimationFrame(step);
+      else el.remove();
+    })(start);
+    setTimeout(crawl, 160000 + Math.random() * 90000);
+  }
+  setTimeout(crawl, 50000 + Math.random() * 40000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.91.0", "ascii snail — every ~3 min a small snail crawls along the very bottom of the page at its own lazy pace, leaving a fading slime trail of glyphs behind it, then exits the far edge like it was never in a hurry at all"],
   ["v0.90.0", "ascii whale — every ~2 min a giant ascii whale surfaces at the bottom of the page, glides across it bobbing on a lazy sine while exhaling a glyph spray, then dives out of view like it was never there"],
   ["v0.89.0", "typo poltergeist — every ~60s a random word on the page briefly shows a transposed-letter typo, like an invisible editor's slip of the finger, then heals back to the correct spelling as if the typo was never typed"],
   ["v0.88.0", "meteor shower — every ~75s a handful of shooting stars streak across the sky at random angles: each one burns a bright trail that fades behind it, then vanishes before you can wish on it"],

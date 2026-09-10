@@ -832,3 +832,25 @@ body.synthwave .moss-sprout { color: rgba(255,140,46,.3); text-shadow: 0 0 4px r
 }
 body.vaporwave .whale { color: rgba(201,166,232,.5); text-shadow: 0 0 8px rgba(201,166,232,.3); }
 body.synthwave .whale { color: rgba(255,140,46,.5); text-shadow: 0 0 8px rgba(255,140,46,.3); }
+
+/* ascii snail: a small snail crawls along the bottom of the page at its own
+   pace, trailing slime that dries up and fades like it was never there */
+.snail {
+  position: fixed; left: 0; top: 0;
+  z-index: 9993; pointer-events: none;
+  margin: 0;
+  font-size: 13px; line-height: 1;
+  color: rgba(124,252,156,.65);
+  text-shadow: 0 0 6px rgba(124,252,156,.3);
+  will-change: transform;
+}
+.snail-slime {
+  position: fixed; z-index: 9992; pointer-events: none;
+  font-size: 11px; line-height: 1;
+  color: rgba(124,252,156,.45);
+  opacity: .8;
+  transition: opacity 3.8s ease-in;
+}
+.snail-slime.fade { opacity: 0; }
+body.vaporwave .snail { color: rgba(201,166,232,.6); text-shadow: 0 0 6px rgba(201,166,232,.3); }
+body.synthwave .snail { color: rgba(255,140,46,.6); text-shadow: 0 0 6px rgba(255,140,46,.3); }
