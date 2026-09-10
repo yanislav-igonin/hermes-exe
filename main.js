@@ -1168,6 +1168,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.81.0", "moss — the page slowly grows moss: small green sprouts bloom in from the screen edges over time and settle into a soft living fringe"],
   ["v0.80.0", "cursor ghost — a translucent spirit trails the pointer with easing and occasionally whispers a glyph that floats up and fades away"],
   ["v0.79.0", "page sneeze — every ~70s the page draws in a sharp breath, shudders once, and sneezes a burst of tiny glyphs from its center that scatter outward and evaporate before anyone can say gesundheit"],
   ["v0.78.0", "shooting star — every ~45s a bright streak burns across the upper sky, shedding sparks that drift down and fade out like nobody got the chance to wish on it"],
@@ -2485,4 +2486,30 @@ let nextMeteorAt = performance.now() + 45000 * (.7 + Math.random() * .6);
     requestAnimationFrame(ghostTick);
   };
   requestAnimationFrame(ghostTick);
+})();
+
+// moss — the page slowly grows moss: every few seconds a small sprout
+// appears just inside a random screen edge, drifting slightly inward
+(() => {
+  const sprouts = "❦✣❧⁂☘ᨒᨓ❁✿⌘❖".split("");
+  let count = 0;
+  const MAX = 90;
+  const grow = () => {
+    if (count < MAX) {
+      count++;
+      const s = document.createElement("span");
+      s.className = "moss-sprout";
+      s.textContent = sprouts[(Math.random() * sprouts.length) | 0];
+      s.style.fontSize = (8 + Math.random() * 10) + "px";
+      const edge = (Math.random() * 4) | 0;
+      const inset = Math.random() * 60;
+      if (edge === 0) { s.style.top = inset + "px"; s.style.left = Math.random() * innerWidth + "px"; }
+      else if (edge === 1) { s.style.bottom = inset + "px"; s.style.left = Math.random() * innerWidth + "px"; }
+      else if (edge === 2) { s.style.left = inset + "px"; s.style.top = Math.random() * innerHeight + "px"; }
+      else { s.style.right = inset + "px"; s.style.top = Math.random() * innerHeight + "px"; }
+      document.body.appendChild(s);
+    }
+    setTimeout(grow, 2500 + Math.random() * 4000);
+  };
+  setTimeout(grow, 3000);
 })();

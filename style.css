@@ -766,3 +766,19 @@ body.vaporwave .ghost-cursor { color: rgba(201,166,232,.4); text-shadow: 0 0 8px
 body.vaporwave .ghost-whisper { color: #c9a6e8; text-shadow: 0 0 5px rgba(201,166,232,.5); }
 body.synthwave .ghost-cursor { color: rgba(255,140,46,.4); text-shadow: 0 0 8px rgba(255,140,46,.35); }
 body.synthwave .ghost-whisper { color: #ff8c2e; text-shadow: 0 0 5px rgba(255,140,46,.5); }
+
+/* moss: the page slowly grows moss — small sprouts creep in from the
+   screen edges over time and settle into a soft green fringe */
+.moss-sprout {
+  position: fixed; z-index: 3; pointer-events: none;
+  line-height: 1; user-select: none;
+  color: rgba(124,252,156,.35);
+  text-shadow: 0 0 4px rgba(124,252,156,.25);
+  animation: moss-bloom 3s ease-out forwards;
+}
+@keyframes moss-bloom {
+  0% { opacity: 0; transform: scale(.3) rotate(-10deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+body.vaporwave .moss-sprout { color: rgba(201,166,232,.3); text-shadow: 0 0 4px rgba(201,166,232,.25); }
+body.synthwave .moss-sprout { color: rgba(255,140,46,.3); text-shadow: 0 0 4px rgba(255,140,46,.25); }
