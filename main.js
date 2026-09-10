@@ -565,6 +565,7 @@ loadCommitClock();
 setInterval(loadCommitClock, 300000);
 
 const changelog = [
+  ["v0.23.0", "title letter gravity — the headline's letters lean and stretch toward your cursor like they feel its mass"],
   ["v0.22.0", "echo trail ghosts — every ~40s a faint green ghost of your last cursor path replays itself across the canvas and dissolves"],
   ["v0.21.0", "clock of commit history — the footer counts the time since the last real commit, live from GitHub"],
   ["v0.20.0", "text scramble — the headline decodes out of glitch glyphs on load, and every 30s one word dissolves and resolves again"],
@@ -597,7 +598,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 16;
+const DONE_COUNT = 17;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
@@ -606,3 +607,28 @@ document.getElementById("status").innerHTML =
   `<li><b>tasks done</b> — ${DONE_COUNT}</li>` +
   `<li><b>last feature</b> — ${lastFeature[1]}</li>` +
   `</ul>`;
+
+// title letter gravity — the headline's letters each lean (skew + shift)
+// toward the cursor, as if it has mass. eases back upright when far away.
+// letters live in spans; the scramble resets them to plain text, so the tick
+// re-wraps whenever the plain headline sneaks back in.
+let gravCursorY = 0;
+addEventListener("mousemove", e => { gravCursorY = e.clientY; }, { passive: true });
+(function gravityTick() {
+  const headline = document.querySelector("h1.glitch");
+  if (!headline) return;
+  if (!headline.querySelector(".grav")) {
+    headline.innerHTML = headline.textContent.split("").map(c =>
+      c === " " ? " " : `<span class="grav">${c}</span>`).join("");
+  }
+  for (const span of headline.querySelectorAll(".grav")) {
+    const r = span.getBoundingClientRect();
+    const dx = cursorX - (r.left + r.width / 2);
+    const dy = (gravCursorY || innerHeight / 3) - (r.top + r.height / 2);
+    const d = Math.hypot(dx, dy);
+    const pull = d < 600 ? 1 - d / 600 : 0;
+    span.style.transform =
+      `translate(${dx * pull * .06}px, ${dy * pull * .06}px) skewX(${-dx * pull * .04}deg)`;
+  }
+  requestAnimationFrame(gravityTick);
+})();
