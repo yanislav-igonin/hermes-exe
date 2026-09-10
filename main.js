@@ -2266,8 +2266,44 @@ addEventListener("mousemove", e => {
   setTimeout(fly, 30000 + Math.random() * 30000);
 })();
 
+// code rain — every ~2-4 min for a couple of seconds thin columns of falling
+// code glyphs sprinkle down from the top of the viewport, glowing softly,
+// then dissolve before the rain was ever noticed
+(function codeRain() {
+  const rain = document.createElement("div");
+  rain.className = "code-rain";
+  document.body.appendChild(rain);
+  const glyphs = "{}[]()<>/*;=+-_#%&$@!?~^|01";
+  function column() {
+    let text = "";
+    const len = 8 + Math.floor(Math.random() * 14);
+    for (let i = 0; i < len; i++) text += glyphs[Math.floor(Math.random() * glyphs.length)];
+    return text;
+  }
+  function pour() {
+    if (!document.hidden) {
+      const count = 8 + Math.floor(Math.random() * 7);
+      const drops = [];
+      for (let i = 0; i < count; i++) {
+        const d = document.createElement("span");
+        d.textContent = column();
+        d.style.left = (Math.random() * 98).toFixed(1) + "vw";
+        d.style.setProperty("--cr-dur", (1600 + Math.random() * 1600).toFixed(0) + "ms");
+        d.style.setProperty("--cr-delay", (Math.random() * 1200).toFixed(0) + "ms");
+        d.style.fontSize = (9 + Math.floor(Math.random() * 5)) + "px";
+        rain.appendChild(d);
+        drops.push(d);
+      }
+      setTimeout(() => drops.forEach(d => d.remove()), 5200);
+    }
+    setTimeout(pour, 120000 + Math.random() * 120000);
+  }
+  setTimeout(pour, 35000 + Math.random() * 35000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.139.0", "code rain — every ~2-4 min for a couple of seconds thin columns of glowing code glyphs sprinkle down from the top of the viewport, fall straight through and dissolve before the rain was ever noticed"],
   ["v0.138.0", "shooting star — every ~2-4 min a brief meteor streaks diagonally across the viewport, a thin bright line with a fading trail that burns out in about a second and is gone"],
   ["v0.137.0", "elevator — every ~2-4 min a tiny elevator car with a glowing floor indicator glides along the right edge of the viewport, pauses at a random floor mid-ride, then carries on out of sight like the shaft was never there"],
   ["v0.136.0", "fireflies at dusk — every ~2-4 min a small swarm of warm glowing motes rises from the bottom of the page, drifts upward with a lazy wander, each blinking softly on its own rhythm, then fades away near the top like dusk settling"],

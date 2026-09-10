@@ -1763,6 +1763,28 @@ body.synthwave #ghost-typewriter { color: #ff8c2e; text-shadow: 0 0 8px rgba(255
   100% { transform: translateY(var(--el-to, 112vh)); opacity: 0; }
 }
 
+/* code rain — thin columns of glowing code glyphs sprinkling down from the top */
+.code-rain {
+  position: fixed; inset: 0; z-index: 9995;
+  pointer-events: none; overflow: hidden;
+}
+.code-rain span {
+  position: absolute;
+  top: -26vh;
+  font-family: monospace; line-height: 1.15;
+  color: rgba(140, 255, 190, .9);
+  text-shadow: 0 0 4px rgba(120, 255, 170, .6);
+  white-space: pre;
+  opacity: 0;
+  animation: code-rain-fall var(--cr-dur, 2400ms) linear var(--cr-delay, 0ms) forwards;
+}
+@keyframes code-rain-fall {
+  0%   { opacity: 0; transform: translateY(0); }
+  10%  { opacity: .85; }
+  85%  { opacity: .5; }
+  100% { opacity: 0; transform: translateY(130vh); }
+}
+
 /* dew drop — a tiny droplet condenses on the top edge of the viewport, hangs
    there swelling, then slides down the glass like morning condensation */
 .dew-drop {
