@@ -2477,6 +2477,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.150.0", "wind chime — every ~2-4 min a tiny wind chime dangles down from the top edge of the page, swaying in the breeze as its little tubes knock together and drop the occasional fading note glyph, then the wind dies and it vanishes like it was never hung"],
   ["v0.149.0", "shooting star — every ~1-2 min a meteor streaks diagonally across the upper sky with a tapering glowing trail, flares once, and vanishes like the wish was never made"],
   ["v0.148.0", "hot air balloon — every ~2-4 min a small hot air balloon with a striped canopy and a tiny basket drifts diagonally across the page on a gentle breeze, bobbing with the wind, then floats off-screen like the flight was never planned"],
   ["v0.147.0", "wandering firefly — every ~50-90s a lone firefly with a softly pulsing glow wanders across the page, pausing now and then as if it lost its way, then blinks out like it was never there"],
@@ -5393,4 +5394,40 @@ addEventListener("dblclick", e => {
     setTimeout(streak, 60000 + Math.random() * 60000);
   }
   setTimeout(streak, 15000 + Math.random() * 25000);
+})();
+
+// wind chime — every ~2-4 min a tiny wind chime dangles down from the top
+// edge of the page, swaying in the breeze as its little tubes knock together
+// and drop the occasional fading note glyph, then the wind dies and it
+// vanishes like it was never hung
+(function windChime() {
+  function chime() {
+    if (!document.hidden) {
+      const el = document.createElement("div");
+      el.className = "wind-chime";
+      el.style.setProperty("--wc-x", innerWidth * (.1 + Math.random() * .8) + "px");
+      const dur = 9000 + Math.random() * 5000;
+      el.style.setProperty("--wc-dur", dur + "ms");
+      const tubes = el.appendChild(document.createElement("div"));
+      tubes.className = "wc-tubes";
+      for (let i = 0; i < 4; i++) {
+        const t = tubes.appendChild(document.createElement("i"));
+        t.style.setProperty("--wc-i", i);
+      }
+      document.body.appendChild(el);
+      const dropNote = setInterval(() => {
+        if (!el.isConnected) return clearInterval(dropNote);
+        const n = document.createElement("span");
+        n.className = "wc-note";
+        n.textContent = Math.random() < .5 ? "♪" : "♫";
+        n.style.setProperty("--wc-nx", Math.random() * 60 - 30 + "px");
+        tubes.appendChild(n);
+        setTimeout(() => n.remove(), 2600);
+      }, 1400 + Math.random() * 900);
+      setTimeout(() => { el.classList.add("wc-gone"); }, dur - 1200);
+      setTimeout(() => { el.remove(); clearInterval(dropNote); }, dur + 600);
+    }
+    setTimeout(chime, 120000 + Math.random() * 120000);
+  }
+  setTimeout(chime, 20000 + Math.random() * 30000);
 })();
