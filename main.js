@@ -897,6 +897,7 @@ document.addEventListener("mouseleave", () => afterEl.classList.add("hidden"));
 
 // changelog
 const changelog = [
+  ["v0.52.0", "noise dial — press n and a compact readout scrolls through a stream of random noise-level hex values, lurches between extremes a few times, settles on one, and fades out like nothing was ever measured"],
   ["v0.51.0", "cursed autosave — every ~50s a toast insists it is 'Saving…' your work, the ellipsis grinds for a while, then it gives up and admits there was nothing to save"],
   ["v0.50.0", "CRT power-off — every ~90s the whole page dies like an old monitor: everything collapses into a bright horizontal beam, blinks out, then powers back on"],
   ["v0.49.0", "ghost search — press / and a fake 'search this page' overlay appears: it types out its own existential query, counts up results before landing on '0 results — the page contains nothing', then dissolves like it never existed"],
@@ -1435,3 +1436,34 @@ setInterval(() => {
     }
   }, 450);
 }, 50000);
+
+// noise dial — press n and a compact readout in the corner scrolls through a
+// stream of random hex noise-level values, lurches between extremes a few
+// times, settles on one, and fades out like nothing was ever measured.
+addEventListener("keydown", e => {
+  if (e.key !== "n") return;
+  if (e.target instanceof Element && e.target.matches("input, textarea")) return;
+  if (document.getElementById("noise-dial")) return;
+  const el = document.createElement("div");
+  el.id = "noise-dial";
+  document.body.appendChild(el);
+  el.classList.add("show");
+  const hex = v => v.toString(16).padStart(2, "0").toUpperCase();
+  let tick = 0;
+  const t = setInterval(() => {
+    tick++;
+    // lurch between extremes early, calm down as it settles
+    const wild = tick < 5 ? Math.random() : Math.max(0, .35 - tick * .05);
+    const extreme = Math.random() < wild;
+    const level = Math.floor(extreme ? (Math.random() < .5 ? Math.random() * 24 : 232 + Math.random() * 24)
+      : 40 + Math.random() * 216);
+    el.textContent = `noise floor 0x${hex(level)}`;
+    if (tick >= 14) {
+      clearInterval(t);
+      setTimeout(() => {
+        el.classList.remove("show");
+        setTimeout(() => el.remove(), 400);
+      }, 900);
+    }
+  }, 130);
+});

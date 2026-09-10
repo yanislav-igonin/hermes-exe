@@ -195,6 +195,18 @@ body.synthwave #sneeze-toast { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 14
 body.vaporwave #autosave-toast { color: #c9a6e8; }
 body.synthwave #autosave-toast { color: #ff8c2e; }
 
+/* noise dial — a readout that scrolls random hex noise levels, then settles */
+#noise-dial {
+  position: fixed; top: 14px; right: 14px; z-index: 9998;
+  font-size: .78rem; color: #7cfc9c; font-family: monospace;
+  opacity: 0; transition: opacity .3s; pointer-events: none;
+  text-shadow: 0 0 8px rgba(124, 252, 156, .5);
+  text-align: right;
+}
+#noise-dial.show { opacity: .9; }
+body.vaporwave #noise-dial { color: #c9a6e8; text-shadow: 0 0 8px rgba(201, 166, 232, .5); }
+body.synthwave #noise-dial { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 140, 46, .5); }
+
 /* leftover console.log — a debug line leaks into the footer, then vanishes */
 #debug-leak {
   color: #4a4a55; font-size: .78rem; font-family: monospace;
