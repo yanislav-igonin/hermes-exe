@@ -1577,8 +1577,48 @@ addEventListener("mousemove", e => {
   setTimeout(sweep, 45000 + Math.random() * 45000);
 })();
 
+// firefly congregation — every ~60-100s a small swarm of fireflies gathers at
+// a random point on the page, orbits it lazily with individual blinking, then
+// scatters and fades like the summer night was never there
+(function fireflyCongregation() {
+  const layer = document.createElement("div");
+  layer.className = "firefly-swarm";
+  document.body.appendChild(layer);
+  function convene() {
+    const count = 6 + Math.floor(Math.random() * 5);
+    const cx = 10 + Math.random() * 80;   // percent of viewport
+    const cy = 10 + Math.random() * 70;
+    const gather = 2600 + Math.random() * 1800;
+    const orbit = 7000 + Math.random() * 5000;
+    layer.style.setProperty("--ff-x", cx.toFixed(1) + "vw");
+    layer.style.setProperty("--ff-y", cy.toFixed(1) + "vh");
+    layer.style.setProperty("--ff-gather", gather.toFixed(0) + "ms");
+    layer.style.setProperty("--ff-orbit", orbit.toFixed(0) + "ms");
+    layer.innerHTML = "";
+    for (let i = 0; i < count; i++) {
+      const fly = document.createElement("span");
+      fly.className = "firefly";
+      const ang = Math.random() * Math.PI * 2;
+      const rad = 60 + Math.random() * 130;          // orbit radius, px
+      const delay = Math.random() * 600;             // stagger the gathering
+      fly.style.setProperty("--ff-a", ang.toFixed(2) + "rad");
+      fly.style.setProperty("--ff-r", rad.toFixed(0) + "px");
+      fly.style.setProperty("--ff-delay", delay.toFixed(0) + "ms");
+      fly.style.setProperty("--ff-dur", (2600 + Math.random() * 2200).toFixed(0) + "ms");
+      fly.style.setProperty("--ff-blink", (1400 + Math.random() * 1600).toFixed(0) + "ms");
+      fly.style.setProperty("--ff-blink-delay", (Math.random() * 2500).toFixed(0) + "ms");
+      layer.appendChild(fly);
+    }
+    layer.classList.add("ff-on");
+    setTimeout(() => layer.classList.remove("ff-on"), gather + orbit + 1500);
+    setTimeout(convene, 60000 + Math.random() * 40000);
+  }
+  setTimeout(convene, 18000 + Math.random() * 20000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.107.0", "firefly congregation — every ~60-100s a small swarm of fireflies gathers at a random point on the page, orbits it lazily with each one blinking on its own rhythm, then scatters into the dark like the summer night was never there"],
   ["v0.106.0", "eclipse umbra — every ~2-3 min a soft dark umbra sweeps diagonally across the page, carrying a bright ring of corona at its leading edge; the light dims while it passes, the particles flare like lanterns in the shadow, then the sun returns as if nothing was ever occluded"],
   ["v0.105.0", "aurora ribbon — every ~40-80s a soft green band of light unfurls across the top of the page, undulating on layered sine waves and occasionally flaring brighter, then dissolving back into the dark like the sky was never lit"],
   ["v0.104.0", "sigil snowfall — every ~45-90s a brief chaotic gust shakes loose a flurry of tiny hermes sigils that falls diagonally across the page, melting on impact with the bottom edge like they were never typed"],

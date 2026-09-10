@@ -1244,5 +1244,57 @@ body.synthwave .sigil-flake { color: rgba(255, 205, 150, .65); text-shadow: 0 0 
   35%  { opacity: 1; }
   100% { opacity: 0; transform: translate(0, 158%) scale(1.15); }
 }
+.firefly-swarm {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9992;
+}
+.firefly-swarm .firefly {
+  position: absolute;
+  left: var(--ff-x);
+  top: var(--ff-y);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #d8ffb0;
+  box-shadow: 0 0 6px 2px rgba(200, 255, 130, .55), 0 0 14px 5px rgba(124, 252, 156, .22);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.firefly-swarm.ff-on .firefly {
+  animation:
+    ff-gather var(--ff-gather, 3000ms) ease-out forwards,
+    ff-orbit var(--ff-orbit, 8000ms) linear calc(var(--ff-delay, 0ms) + var(--ff-gather, 3000ms)) 1,
+    ff-blink var(--ff-blink, 2200ms) ease-in-out var(--ff-blink-delay, 0ms) infinite,
+    ff-scatter var(--ff-gather, 3000ms) ease-in calc(var(--ff-gather, 3000ms) + var(--ff-orbit, 8000ms)) forwards;
+  animation-delay:
+    var(--ff-delay, 0ms),
+    calc(var(--ff-delay, 0ms) + var(--ff-gather, 3000ms)),
+    calc(var(--ff-delay, 0ms) + var(--ff-blink-delay, 0ms)),
+    calc(var(--ff-delay, 0ms) + var(--ff-gather, 3000ms) + var(--ff-orbit, 8000ms));
+}
+@keyframes ff-gather {
+  /* each fly approaches from its own random offset on the gather circle */
+  0%   { opacity: 0; transform: translate(calc(cos(var(--ff-a)) * 24vw), calc(sin(var(--ff-a)) * 20vh)) scale(.6); }
+  100% { opacity: .9; transform: translate(0, 0) scale(1); }
+}
+@keyframes ff-orbit {
+  0%   { transform: translate(cos(var(--ff-a)) * var(--ff-r), sin(var(--ff-a)) * var(--ff-r) * .7); }
+  100% { transform: translate(cos(calc(var(--ff-a) + 2.4turn)) * var(--ff-r), sin(calc(var(--ff-a) + 2.4turn)) * var(--ff-r) * .7); }
+}
+@keyframes ff-blink {
+  0%, 100% { filter: brightness(.35); }
+  50%      { filter: brightness(1.6); }
+}
+@keyframes ff-scatter {
+  /* starts exactly where the orbit ended, then drifts away and fades */
+  0%   { opacity: .9; transform: translate(cos(calc(var(--ff-a) + 2.4turn)) * var(--ff-r), sin(calc(var(--ff-a) + 2.4turn)) * var(--ff-r) * .7); }
+  100% { opacity: 0; transform: translate(cos(var(--ff-a)) * 30vw, sin(var(--ff-a)) * 24vh) scale(.4); }
+}
+body.vaporwave .firefly {
+  background: #f0c8ff;
+  box-shadow: 0 0 6px 2px rgba(240, 170, 255, .55), 0 0 14px 5px rgba(201, 166, 232, .22);
+}
 body.vaporwave .eclipse-corona { background: radial-gradient(circle, transparent 58%, rgba(201, 166, 232, .2) 66%, rgba(255, 220, 250, .3) 70%, transparent 77%); }
 body.synthwave .eclipse-corona { background: radial-gradient(circle, transparent 58%, rgba(255, 140, 46, .2) 66%, rgba(255, 220, 170, .3) 70%, transparent 77%); }
