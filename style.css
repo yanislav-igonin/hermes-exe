@@ -1066,3 +1066,38 @@ body.vaporwave .pixel-ghost .boo { color: rgba(235, 220, 255, .7); }
 body.synthwave .pixel-ghost { color: rgba(255, 205, 150, .85); text-shadow: 0 0 8px rgba(255, 140, 46, .7); }
 body.synthwave .pixel-ghost .boo { color: rgba(255, 205, 150, .7); }
 
+/* glitch koi */
+.koi {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 9996;
+  pointer-events: none;
+  font-size: 16px;
+  line-height: 1;
+  opacity: .65;
+  filter: hue-rotate(160deg) saturate(.7);
+  text-shadow: 0 0 6px rgba(120, 200, 255, .35);
+  will-change: transform;
+}
+.koi.koi-glitch {
+  filter: none;
+  opacity: .9;
+  text-shadow: 2px 0 rgba(255, 0, 80, .7), -2px 0 rgba(0, 255, 230, .7);
+}
+.koi-ripple {
+  position: fixed;
+  z-index: 9995;
+  pointer-events: none;
+  color: rgba(140, 210, 255, .5);
+  font-size: 9px;
+  animation: koi-fade 1.4s ease-out forwards;
+}
+@keyframes koi-fade {
+  from { opacity: .7; transform: scale(.7); }
+  to { opacity: 0; transform: scale(1.8) translateY(6px); }
+}
+body.vaporwave .koi { filter: hue-rotate(0deg); text-shadow: 0 0 8px rgba(201, 166, 232, .6); }
+body.synthwave .koi { filter: hue-rotate(300deg); text-shadow: 0 0 8px rgba(255, 140, 46, .6); }
+body.vaporwave .koi-ripple, body.synthwave .koi-ripple { color: rgba(255, 205, 170, .5); }
+

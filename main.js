@@ -1495,6 +1495,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.102.0", "glitch koi — every ~80-130s a koi crosses the pond at the bottom of the page on a lazy sine, trailing fading ripple glyphs; once per crossing it flickers into a corrupted rgb-split glitch shape for a beat, then swims on like the pond was never stocked"],
   ["v0.101.0", "pixel ghost — every ~60-90s a little pixel ghost rises from near the bottom of the page, floats up with a lazy sway, says a brief \"boo!\" somewhere mid-drift, then fades out like it never had anyone to haunt"],
   ["v0.100.0", "wishing star — every ~45-90s a single bright shooting star streaks diagonally across the page trailing fading glyph sparks; the last spark blinks out into a tiny wish glyph (*) before the sky forgets the whole thing"],
   ["v0.99.0", "paper plane — every ~70-110s a paper plane glides across the page on a lazy bobbing arc, sometimes banking into a barrel roll mid-flight; it leaves a faint dashed contrail behind it and exits the far edge like nobody ever folded it"],
@@ -3392,4 +3393,51 @@ addEventListener("dblclick", e => {
     setTimeout(ghost, 60000 + Math.random() * 30000);
   }
   setTimeout(ghost, 25000 + Math.random() * 25000);
+})();
+
+// glitch koi — every ~80-130s a koi crosses the pond (bottom of the page) on a
+// lazy sine, trailing fading ripple glyphs; now and then it flickers into a
+// corrupted glitch shape for a beat before swimming on like the pond was never there
+(function () {
+  function koi() {
+    const dir = Math.random() < .5 ? 1 : -1;
+    const el = document.createElement("span");
+    el.className = "koi";
+    el.textContent = "🐟";
+    const y0 = innerHeight - (40 + Math.random() * 70);
+    const speed = 70 + Math.random() * 40;
+    const bobAmp = 10 + Math.random() * 16;
+    const bobFreq = .5 + Math.random() * .5;
+    const start = performance.now();
+    const totalMs = (innerWidth + 120) / speed * 1000;
+    document.body.appendChild(el);
+    let glitched = false;
+    (function swim(now) {
+      const t = (now - start) / 1000;
+      const prog = (now - start) / totalMs;
+      if (prog >= 1) { el.remove(); return; }
+      const x = dir === 1 ? -50 + prog * (innerWidth + 100) : innerWidth + 50 - prog * (innerWidth + 100);
+      const y = y0 + Math.sin(t * bobFreq * Math.PI * 2) * bobAmp;
+      el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scaleX(${dir})`;
+      // ripples trail behind it
+      if (Math.random() < .35) {
+        const ripple = document.createElement("span");
+        ripple.className = "koi-ripple";
+        ripple.textContent = "◦";
+        ripple.style.left = (x - dir * (10 + Math.random() * 18)).toFixed(0) + "px";
+        ripple.style.top = (y + (Math.random() * 10 - 5)).toFixed(0) + "px";
+        document.body.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 1400);
+      }
+      // once per crossing, the koi glitches for a beat
+      if (!glitched && prog > .3 && prog < .7 && Math.random() < .008) {
+        glitched = true;
+        el.classList.add("koi-glitch");
+        setTimeout(() => el.classList.remove("koi-glitch"), 260);
+      }
+      requestAnimationFrame(swim);
+    })(start);
+    setTimeout(koi, 80000 + Math.random() * 50000);
+  }
+  setTimeout(koi, 18000 + Math.random() * 25000);
 })();
