@@ -170,6 +170,19 @@ body.synthwave #power-flicker { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 1
   transition: color .4s;
 }
 
+/* site sneeze — the whole page shivers, an achoo toast pops, then it recovers */
+body.sneezing #bg, body.sneezing main { transform: translate(2px, -1px); }
+body.sneezing footer { transform: translate(-2px, 1px); }
+#sneeze-toast {
+  position: fixed; bottom: 14px; left: 14px; z-index: 9998;
+  font-size: .78rem; color: #7cfc9c; font-family: monospace;
+  opacity: 0; transition: opacity .2s; pointer-events: none;
+  text-shadow: 0 0 8px rgba(124, 252, 156, .5);
+}
+#sneeze-toast.show { opacity: .9; }
+body.vaporwave #sneeze-toast { color: #c9a6e8; text-shadow: 0 0 8px rgba(201, 166, 232, .5); }
+body.synthwave #sneeze-toast { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 140, 46, .5); }
+
 /* leftover console.log — a debug line leaks into the footer, then vanishes */
 #debug-leak {
   color: #4a4a55; font-size: .78rem; font-family: monospace;

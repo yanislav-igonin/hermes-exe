@@ -821,7 +821,30 @@ setInterval(() => {
   setTimeout(go, 35000 + Math.random() * 25000);
 })();
 
+// site sneeze — every ~70s the whole page does a tiny involuntary shiver,
+// three quick jitters like a sneeze building up, a small "achoo" toast pops
+// in the corner, then everything settles back like nothing happened
+setInterval(() => {
+  if (Math.random() > 0.5) return;
+  const el = document.createElement("div");
+  el.id = "sneeze-toast";
+  el.textContent = "achoo.";
+  document.body.appendChild(el);
+  let jitters = 0;
+  const t = setInterval(() => {
+    document.body.classList.toggle("sneezing");
+    el.classList.add("show");
+    if (++jitters >= 6) {
+      clearInterval(t);
+      document.body.classList.remove("sneezing");
+      setTimeout(() => el.remove(), 1400);
+    }
+  }, 90);
+}, 70000);
+
+// changelog
 const changelog = [
+  ["v0.41.0", "site sneezes — every ~70s the page does a tiny involuntary full-page shiver, a small 'achoo.' toast pops in the corner, then everything settles back like nothing happened"],
   ["v0.40.0", "screenshot flash — every ~60-90s the page flashes white for a split second like an invisible camera went off, with a brief 'screenshot saved' notice in the corner"],
   ["v0.39.0", "cursor ghost — every ~50s a phantom mouse cursor darts across the page, hesitates over a random element like it is thinking about clicking, then vanishes"],
   ["v0.38.0", "tab title hijack — every ~60s the browser tab title types out a panicked message letter by letter, holds a moment, then restores itself like nothing happened"],
