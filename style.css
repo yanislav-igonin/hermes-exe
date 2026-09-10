@@ -1661,3 +1661,19 @@ body.synthwave .sun-shower.ss-rainbow::after {
     rgba(255, 90, 170, .15) 136px, rgba(255, 200, 90, .14) 144px,
     transparent 150px);
 }
+
+/* pixel moth swarm: tiny moths flutter erratically around a random element,
+   drawn to its light for a few seconds, then flutter off-screen */
+.moth {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9998;
+  pointer-events: none;
+  font-size: 13px;
+  opacity: .75;
+  will-change: transform;
+  filter: drop-shadow(0 0 3px rgba(255, 240, 180, .5));
+}
+body.vaporwave .moth { filter: drop-shadow(0 0 4px rgba(201, 166, 232, .6)); }
+body.synthwave .moth { filter: drop-shadow(0 0 4px rgba(255, 140, 46, .6)); }

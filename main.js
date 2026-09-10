@@ -2183,6 +2183,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.132.0", "pixel moth swarm — every ~90-150s one or two tiny moths flutter erratically around a random element on the page, drawn to its light for a few seconds, then flutter off-screen like the lamp was never lit"],
   ["v0.131.0", "garden snail — every ~3-6 min a tiny snail crosses the bottom of the page at a glacial pace, leaving a slowly fading slime trail behind it, antennae twitching as it goes, then vanishes like the garden was never crossed"],
   ["v0.130.0", "pollen counter — every ~2-4 min a tiny readout surfaces in the corner reporting the local pollen count in grains/m³, recalculated from thin air each time, then drifts away like the allergy season was never measured"],
   ["v0.129.0", "page hiccup — every ~60-100s the page involuntarily hiccups: a few tiny jumps with a small \"hic\" toast in the corner, then everything settles like the spasm never happened"],
@@ -4693,4 +4694,48 @@ addEventListener("dblclick", e => {
     setTimeout(report, 120000 + Math.random() * 120000);
   }
   setTimeout(report, 25000 + Math.random() * 20000);
+})();
+
+// pixel moth swarm — every ~90-150s one or two tiny moths flutter erratically
+// around a randomly chosen element on the page, drawn to its light like it
+// matters, then flutter off-screen like the lamp was never lit
+(function mothSwarm() {
+  const MOTH = "🦋";
+  function visit() {
+    if (!document.hidden) {
+      const targets = document.querySelectorAll("h1, h2, p, li, button, a");
+      const t = targets[Math.random() * targets.length | 0];
+      const n = Math.random() < .3 ? 2 : 1;
+      const rect = t.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      for (let i = 0; i < n; i++) setTimeout(() => fly(cx, cy), i * 900);
+    }
+    setTimeout(visit, 90000 + Math.random() * 60000);
+  }
+  function fly(cx, cy) {
+    const el = document.createElement("div");
+    el.className = "moth";
+    el.textContent = MOTH;
+    document.body.appendChild(el);
+    const edge = Math.random() < .5 ? -30 : innerWidth + 30;
+    const sx = edge, sy = Math.random() * innerHeight * .8;
+    let x = sx, y = sy, angle = 0;
+    const start = performance.now();
+    const dur = 6000 + Math.random() * 4000;
+    (function step(now) {
+      const t = (now - start) / 1000;
+      // erratic: wander around the target with jitter, drawn to the light
+      const pull = Math.max(0, 1 - t / (dur / 1000) * .5);
+      const tx = cx + Math.sin(t * 3.1 + x * .01) * 60;
+      const ty = cy + Math.cos(t * 2.3) * 40;
+      x += (tx - x) * .04 * pull + (Math.random() - .5) * 3;
+      y += (ty - y) * .04 * pull + (Math.random() - .5) * 3;
+      angle = Math.sin(t * 12) * 18;
+      el.style.transform = `translate(${x}px, ${y}px) rotate(${angle}deg)`;
+      if (t * 1000 < dur) requestAnimationFrame(step);
+      else el.remove();
+    })(start);
+  }
+  setTimeout(visit, 40000 + Math.random() * 30000);
 })();
