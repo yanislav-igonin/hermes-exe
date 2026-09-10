@@ -895,8 +895,46 @@ document.addEventListener("mouseleave", () => afterEl.classList.add("hidden"));
   requestAnimationFrame(afterimageTick);
 })();
 
+// ghost cursor echo — press e and a ghost cursor replays your last 1.5s of
+// mouse movement a beat later as a fading translucent trail, then evaporates.
+const ghostEchoEcho = { pts: [], on: false };
+addEventListener("mousemove", e => {
+  const now = performance.now();
+  ghostEchoEcho.pts.push([e.clientX, e.clientY, now]);
+  while (ghostEchoEcho.pts.length && now - ghostEchoEcho.pts[0][2] > 1500) ghostEchoEcho.pts.shift();
+});
+addEventListener("keydown", e => {
+  if (e.key !== "e") return;
+  if (e.target instanceof Element && e.target.matches("input, textarea")) return;
+  if (ghostEchoEcho.on || ghostEchoEcho.pts.length < 4) return;
+  ghostEchoEcho.on = true;
+  const start = performance.now();
+  const el = document.createElement("div");
+  el.id = "ghost-echo";
+  el.textContent = "▷";
+  document.body.appendChild(el);
+  const t = setInterval(() => {
+    const age = performance.now() - start; // replay lags 1.5s behind the real cursor
+    const cutoff = age - 1500;
+    const ahead = ghostEcho.pts.filter(p => p[2] <= age);
+    const p = ahead.length ? ahead[ahead.length - 1] : null;
+    if (p) {
+      el.style.opacity = (0.55 * Math.max(0, 1 - cutoff / 2200)).toFixed(2);
+      el.style.left = p[0] + "px";
+      el.style.top = p[1] + "px";
+    }
+    if (cutoff > 2200) {
+      clearInterval(t);
+      el.classList.add("fade");
+      setTimeout(() => el.remove(), 600);
+      ghostEchoEcho.on = false;
+    }
+  }, 40);
+});
+
 // changelog
 const changelog = [
+  ["v0.58.0", "ghost cursor echo — press e and a translucent ghost cursor replays your last 1.5s of mouse movement a beat behind you, then fades out like it was never there"],
   ["v0.57.0", "glitch key — press g and the whole page rgb-splits and tears for a moment while a corner readout dumps random corrupted memory fragments, then everything reassembles like nothing was ever broken"],
   ["v0.56.0", "self-diagnostics scan — press x and a corner readout runs a fake system check: stats count up with ASCII bars, one of them suddenly crashes to 0% with a FAULT flag, panics, recovers, then the whole report fades out like nothing was ever diagnosed"],
   ["v0.55.0", "fortune decoder — press f and a corner readout types out a hex-stamped machine fortune: coordinates, an entropy byte, then a dubious prophecy, before fading out like nothing was ever foretold"],

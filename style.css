@@ -195,6 +195,16 @@ body.synthwave #sneeze-toast { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 14
 body.vaporwave #autosave-toast { color: #c9a6e8; }
 body.synthwave #autosave-toast { color: #ff8c2e; }
 
+/* ghost cursor echo — a translucent replay of your own cursor, one beat behind */
+#ghost-echo {
+  position: fixed; z-index: 9997; transform: translate(-50%, -50%);
+  font-size: 1rem; color: #7cfc9c; font-family: monospace;
+  opacity: 0; pointer-events: none;
+  text-shadow: 0 0 10px rgba(124, 252, 156, .7);
+  transition: opacity .5s;
+}
+#ghost-echo.fade { opacity: 0 !important; }
+
 /* noise dial — a readout that scrolls random hex noise levels, then settles */
 #noise-dial {
   position: fixed; top: 14px; right: 14px; z-index: 9998;
