@@ -335,3 +335,19 @@ body.synthwave #fake-404 .code { text-shadow: 0 0 14px rgba(255,140,46,.5); }
 @keyframes modemblink { 50% { opacity: .35; } }
 body.vaporwave #modem-connect { color: #c9a6e8; text-shadow: 0 0 8px rgba(201,166,232,.5); }
 body.synthwave #modem-connect { color: #ff8c2e; text-shadow: 0 0 8px rgba(255,140,46,.5); }
+
+/* ghost search — a fake search overlay summoned by / that finds nothing */
+#ghost-search {
+  position: fixed; top: 20%; left: 50%; transform: translateX(-50%);
+  z-index: 9997; width: min(420px, 80vw); display: none;
+  background: rgba(4, 14, 8, .92); border: 1px solid rgba(124,252,156,.4);
+  box-shadow: 0 0 24px rgba(124,252,156,.15); padding: 14px 16px;
+  font-family: monospace; color: #7cfc9c;
+}
+#ghost-search.show { display: block; animation: gsfade .2s; }
+@keyframes gsfade { from { opacity: 0; } to { opacity: 1; } }
+#ghost-search .gs-prompt { opacity: .6; margin-right: 8px; }
+#ghost-search .gs-caret { animation: modemblink .8s steps(1) infinite; margin-left: 2px; }
+#ghost-search .gs-status { margin-top: 10px; font-size: .8rem; opacity: .75; }
+body.vaporwave #ghost-search { color: #c9a6e8; border-color: rgba(201,166,232,.4); }
+body.synthwave #ghost-search { color: #ff8c2e; border-color: rgba(255,140,46,.4); }

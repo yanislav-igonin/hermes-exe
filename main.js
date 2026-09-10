@@ -897,6 +897,7 @@ document.addEventListener("mouseleave", () => afterEl.classList.add("hidden"));
 
 // changelog
 const changelog = [
+  ["v0.49.0", "ghost search — press / and a fake 'search this page' overlay appears: it types out its own existential query, counts up results before landing on '0 results — the page contains nothing', then dissolves like it never existed"],
   ["v0.48.0", "dial-up handshake flashback — every ~2-3 min the site briefly remembers the sound of a 56k modem: a short burst of scrambled screech (if audio is unlocked) and a 'CONNECT 56000' tag, then it hangs up like nothing happened"],
   ["v0.47.1", "drone audibility fix — the drone was a 55Hz sub that laptop speakers literally cannot play; now it sings one octave up with real volume"],
   ["v0.47.0", "cursor afterimage — a phosphor ghost of the pointer trails a beat behind your cursor, burning brighter the faster you move and decaying like a dying CRT when you stop"],
@@ -954,7 +955,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 22;
+const DONE_COUNT = 23;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
@@ -1354,3 +1355,36 @@ const glyphRain = document.getElementById("glyphRain");
     function loop() { screech(); setTimeout(loop, 120000 + Math.random() * 90000); }
     setTimeout(loop, 60000 + Math.random() * 60000);
     })();
+
+// ghost search — pressing / summons a fake "search this page" overlay: a
+// blinking query line types out its own existential query, a results counter
+// spins up to zero, then the whole thing dissolves like it never existed.
+const ghostSearch = document.createElement("div");
+ghostSearch.id = "ghost-search";
+ghostSearch.innerHTML =
+  `<div class="gs-bar"><span class="gs-prompt">search:</span><span class="gs-query"></span><span class="gs-caret">▌</span></div>` +
+  `<div class="gs-status"></div>`;
+document.body.appendChild(ghostSearch);
+addEventListener("keydown", e => {
+  if (e.key !== "/" || ghostSearch.classList.contains("show")) return;
+  e.preventDefault();
+  const q = ghostSearch.querySelector(".gs-query");
+  const st = ghostSearch.querySelector(".gs-status");
+  const line = "what am i searching for";
+  let i = 0, found = 0;
+  ghostSearch.classList.add("show");
+  const type = setInterval(() => {
+    q.textContent = line.slice(0, ++i);
+    if (i >= line.length) {
+      clearInterval(type);
+      const count = setInterval(() => {
+        st.textContent = `searching page... ${found} result${found === 1 ? "" : "s"}`;
+        if (++found > 3) {
+          clearInterval(count);
+          st.textContent = "0 results — the page contains nothing";
+          setTimeout(() => ghostSearch.classList.remove("show"), 2200);
+        }
+      }, 420);
+    }
+  }, 65);
+});
