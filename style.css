@@ -150,6 +150,14 @@ body.synthwave #confession { color: #d8a4b8; }
 body.vaporwave #cached-input { color: #c9a6e8; }
 body.synthwave #cached-input { color: #d8a4b8; }
 
+/* glitch flash — one-frame full-page tear: invert + shift + static edge */
+body.glitch-flash #bg, body.glitch-flash main { filter: invert(1); }
+body.glitch-flash::after {
+  content: ""; position: fixed; inset: 0; z-index: 9997;
+  pointer-events: none; mix-blend-mode: difference;
+  background: repeating-linear-gradient(0deg, rgba(0,255,65,.08) 0 2px, transparent 2px 5px);
+}
+
 /* power flicker — brownout dims the page and blinks a voltage warning */
 body.brownout #bg, body.brownout main { filter: brightness(.25) contrast(1.4); }
 #power-flicker {

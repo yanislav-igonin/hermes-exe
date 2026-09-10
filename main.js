@@ -821,6 +821,32 @@ setInterval(() => {
   }, 120 + Math.random() * 160);
 }, 70000);
 
+// glitch flash — every ~50s the whole page glitches out for a frame: a quick
+// inverted, offset rgb-split snap of static, then the picture snaps back like
+// the tube never slipped
+setInterval(() => {
+  if (Math.random() > 0.6) return;
+  document.body.classList.add("glitch-flash");
+  const shifts = [
+    () => { document.body.style.transform = "translateX(6px)"; },
+    () => { document.body.style.filter = "invert(1)"; },
+    () => { document.body.style.transform = "translate(-4px, 2px) skewX(1.5deg)"; },
+    () => { document.body.style.filter = "invert(1) hue-rotate(90deg)"; }
+  ];
+  let i = 0;
+  const t = setInterval(() => {
+    if (i < shifts.length) {
+      shifts[i]();
+    } else {
+      clearInterval(t);
+      document.body.style.transform = "";
+      document.body.style.filter = "";
+      document.body.classList.remove("glitch-flash");
+    }
+    i++;
+  }, 50 + Math.random() * 40);
+}, 50000);
+
 // leftover console.log — every ~80s the site briefly leaks a line of its own
 // fake debug output into the footer, then deletes it like it never happened.
 const DEBUG_LINES = [
@@ -1198,6 +1224,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.83.0", "glitch flash — every ~50s the whole page glitches out for a split second: a quick inverted, offset snap of static tears across the screen, then the picture snaps back like the tube never slipped"],
   ["v0.82.0", "wind gust — every ~40s a gust sweeps across the background: particles get shoved sideways for a moment while a few ascii leaves tumble through, then the air settles like nothing ever blew through"],
   ["v0.81.0", "moss — the page slowly grows moss: small green sprouts bloom in from the screen edges over time and settle into a soft living fringe"],
   ["v0.80.0", "cursor ghost — a translucent spirit trails the pointer with easing and occasionally whispers a glyph that floats up and fades away"],
