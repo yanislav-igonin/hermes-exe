@@ -897,6 +897,7 @@ document.addEventListener("mouseleave", () => afterEl.classList.add("hidden"));
 
 // changelog
 const changelog = [
+  ["v0.53.0", "glitchy tab title flicker — every ~90s the browser tab title briefly corrupts into a scramble of glitch glyphs, then snaps back to the real title as if nothing happened"],
   ["v0.52.0", "noise dial — press n and a compact readout scrolls through a stream of random noise-level hex values, lurches between extremes a few times, settles on one, and fades out like nothing was ever measured"],
   ["v0.51.0", "cursed autosave — every ~50s a toast insists it is 'Saving…' your work, the ellipsis grinds for a while, then it gives up and admits there was nothing to save"],
   ["v0.50.0", "CRT power-off — every ~90s the whole page dies like an old monitor: everything collapses into a bright horizontal beam, blinks out, then powers back on"],
@@ -1467,3 +1468,21 @@ addEventListener("keydown", e => {
     }
   }, 130);
 });
+
+// glitchy tab title flicker — every ~90s the tab title briefly corrupts into a
+// scramble of glitch glyphs (like the headline's own decay leaking out), holds
+// a beat, then snaps back to the real title as if nothing happened.
+(function titleFlicker() {
+  const original = document.title;
+  const FLICK_GLYPHS = "アイウエオカキクケコ▓░▒#%&$@!?0123456789";
+  function flicker() {
+    document.title = original.split("").map(c =>
+      c === " " ? c : FLICK_GLYPHS[Math.random() * FLICK_GLYPHS.length | 0]
+    ).join("");
+    setTimeout(() => {
+      document.title = original;
+      setTimeout(flicker, 75000 + Math.random() * 45000);
+    }, 140 + Math.random() * 200);
+  }
+  setTimeout(flicker, 40000 + Math.random() * 30000);
+})();
