@@ -106,6 +106,18 @@ body.vaporwave #godtoast, body.synthwave #godtoast { border-color: #ff9ff3; colo
 #drunkToggle.on { border-color: #7cfc9c; color: #7cfc9c; }
 main.swaying { will-change: transform; }
 
+/* terminal confession — one-line self-aware agent confessions, typed letter
+   by letter in the bottom-left corner every ~90s, fading after 10s */
+#confession {
+  position: fixed; left: 14px; bottom: 12px; z-index: 4;
+  max-width: 40vw; color: #4a4a55; font-size: .72rem;
+  opacity: 0; transition: opacity 1.2s; pointer-events: none;
+  font-family: inherit;
+}
+#confession.show { opacity: 1; }
+body.vaporwave #confession { color: #c9a6e8; }
+body.synthwave #confession { color: #d8a4b8; }
+
 /* glitch */
 .glitch::before, .glitch::after {
   content: attr(data-text); position: absolute; inset: 0;
