@@ -2477,6 +2477,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.154.0", "meteor streak — every ~30-90s a shooting star crosses the top of the page, a glowing point dragging a fading comet tail, burning out mid-flight like it was never there"],
   ["v0.153.0", "streetlamp flicker — every ~1-2 min a random element on the page flickers like a dying streetlamp, dipping and sputtering a couple of times, then glows steady again like the bulb was never dying"],
   ["v0.152.0", "garden snail — every ~2-4 min a tiny snail with a spiraled shell slowly creeps along the bottom edge of the page, antennae twitching, leaving a fading slime trail behind it, then slides off-screen like the commute was never made"],
   ["v0.151.0", "page lean — every ~40-90s the whole page leans a couple of degrees for a moment, like someone quietly rested an elbow on it, then springs upright again like nothing happened"],
@@ -5513,4 +5514,25 @@ addEventListener("dblclick", e => {
     setTimeout(flick, 60000 + Math.random() * 60000);
   }
   setTimeout(flick, 15000 + Math.random() * 25000);
+})();
+
+// meteor streak — every ~30-90s a shooting star crosses the top of the page,
+// a glowing point dragging a fading comet tail, burning out mid-flight
+(function meteorStreak() {
+  function streak() {
+    if (!document.hidden) {
+      const el = document.createElement("div");
+      el.className = "meteor";
+      const startX = innerWidth * (0.05 + Math.random() * 0.7);
+      const dx = 160 + Math.random() * 220;
+      const dur = 900 + Math.random() * 500;
+      el.style.setProperty("--mx0", startX + "px");
+      el.style.setProperty("--mdx", dx + "px");
+      el.style.setProperty("--mdur", dur + "ms");
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), dur + 300);
+    }
+    setTimeout(streak, 30000 + Math.random() * 60000);
+  }
+  setTimeout(streak, 12000 + Math.random() * 20000);
 })();
