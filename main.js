@@ -1495,6 +1495,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.98.0", "soap bubbles — every ~40-90s a bubble drifts up from the bottom of the page, wobbling on a lazy sine with an iridescent rim; click it and it pops into a tiny glyph splash, otherwise it reaches the top and dissolves like it was never blown"],
   ["v0.97.0", "dandelion drift — every ~2 min a dandelion head floats across the page on the breeze: the wind tugs loose a few seed parachutes along the way, each one spirals away on its own drift and dissolves like the wind was never there"],
   ["v0.96.0", "poezteka — every ~90s a small parade of ascii snails crosses the page one after another at their own unhurried pace, each grazing a fading rainbow slime trail behind it; every so often one stops mid-crawl to wiggle its eye-stalks at you before ambling on"],
   ["v0.95.0", "double-click firework — double-click anywhere and a firework detonates from the click point: glowing glyph sparks burst outward, arc under gravity and fade mid-air like the night sky was never lit"],
@@ -1600,7 +1601,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 29;
+const DONE_COUNT = 30;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
@@ -1668,7 +1669,7 @@ document.body.appendChild(stray);
 (function strayTick() {
   if (Math.random() < 0.0004) {
     stray.classList.add("alive");
-    const sx = Math.random() * innerWidth, sy = Math.random() * innerHeight;
+    let sx = Math.random() * innerWidth, sy = Math.random() * innerHeight;
     let ang = Math.random() * Math.PI * 2, t = 0;
     (function wander() {
       if (t++ > 300 || Math.random() < 0.006) { // ~5s of wandering
@@ -3220,4 +3221,56 @@ addEventListener("dblclick", e => {
     setTimeout(bloom, 110000 + Math.random() * 50000);
   }
   setTimeout(bloom, 30000 + Math.random() * 30000);
+})();
+
+// soap bubbles — every ~40-90s a bubble drifts up from the bottom of the page,
+// wobbling on a lazy sine with an iridescent rim; click it and it pops into a
+// tiny glyph splash, otherwise it reaches the top and dissolves like it was never blown
+(function soapBubbles() {
+  const SPLASH = "○ ° ˚ · ✧";
+  function bubble() {
+    const el = document.createElement("div");
+    el.className = "bubble";
+    const size = 22 + Math.random() * 34;
+    el.style.width = el.style.height = size.toFixed(0) + "px";
+    const x0 = 60 + Math.random() * (innerWidth - 120);
+    const speed = 24 + Math.random() * 18; // bubbles rise at their own lazy pace
+    const swayAmp = 14 + Math.random() * 16;
+    const swayFreq = 1 + Math.random() * .8;
+    const start = performance.now();
+    let dead = false;
+    el.addEventListener("click", () => {
+      if (dead) return;
+      dead = true;
+      el.remove();
+      // a glyph splash bursts out of the pop point
+      for (let i = 0; i < 6; i++) {
+        const s = document.createElement("span");
+        s.className = "bubble-pop";
+        s.textContent = SPLASH[i];
+        s.style.left = (x0 + Math.sin((performance.now() - start) / 1000 * swayFreq) * swayAmp) + "px";
+        s.style.top = (parseFloat(el.style.top) + size / 2) + "px";
+        const a = Math.random() * Math.PI * 2;
+        s.style.setProperty("--pdx", (Math.cos(a) * (30 + Math.random() * 40)).toFixed(0) + "px");
+        s.style.setProperty("--pdy", (Math.sin(a) * (30 + Math.random() * 40)).toFixed(0) + "px");
+        s.style.setProperty("--pdur", (.7 + Math.random() * .5).toFixed(2) + "s");
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 1400);
+      }
+    }, { once: false });
+    document.body.appendChild(el);
+    (function rise(now) {
+      if (dead) return;
+      const t = (now - start) / 1000;
+      const y = innerHeight + size - t * speed;
+      if (y < -size * 1.5) { dead = true; el.remove(); return; } // dissolves at the top
+      const sway = Math.sin(t * swayFreq) * swayAmp;
+      const squash = 1 + Math.sin(t * 3.1) * .06;
+      el.style.top = y + "px";
+      el.style.transform = `translate(${sway}px, 0) scale(${squash.toFixed(3)}, ${(2 - squash).toFixed(3)}) rotate(${sway * .3}deg)`;
+      requestAnimationFrame(rise);
+    })(start);
+    setTimeout(bubble, 40000 + Math.random() * 50000);
+  }
+  setTimeout(bubble, 15000 + Math.random() * 20000);
 })();
