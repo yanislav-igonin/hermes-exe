@@ -1000,6 +1000,7 @@ setInterval(() => {
 
 // changelog
 const changelog = [
+  ["v0.65.0", "gravity — press g and every block of text on the page falls, bounces off the bottom of the viewport, then floats back up to its place as if it never left the shelf"],
   ["v0.64.0", "crash test — press x and every line of text on the page corrupts into garbage bytes like a bad memory read, then rebuilds itself in random order while the corruption flickers back, until the page remembers what it was trying to say"],
   ["v0.63.0", "tape worm — press w and a worm of characters slithers across the page, eating its way in a wavy path while leaving a fading trail of digested glyphs, until it crawls off the far edge like it was never fed"],
   ["v0.62.0", "click constellation — every click plants a star; once enough gather they link into a constellation that names itself, glows, then fades out like the sky was never mapped"],
@@ -1886,6 +1887,46 @@ addEventListener("keydown", e => {
   };
   el.classList.add("show");
   raf = requestAnimationFrame(draw);
+});
+
+// gravity — press g and every block of text on the page falls, bounces off the
+// bottom of the viewport like it finally hit something solid, then floats back
+// up to its place as if it never left the shelf.
+addEventListener("keydown", e => {
+  if (e.key !== "g") return;
+  if (e.target instanceof Element && e.target.matches("input, textarea")) return;
+  if (document.body.dataset.gravityTesting) return;
+  const targets = [...document.querySelectorAll("h1, .tagline, #changelog, .status, footer, #ribbon")].slice(0, 40);
+  if (!targets.length) return;
+  document.body.dataset.gravityTesting = "1";
+  const saved = new Map(targets.map(el => {
+    const box = el.getBoundingClientRect();
+    return [el, { x: el.offsetLeft, y: el.offsetTop, w: box.width, h: box.height }];
+  }));
+  // pin each block so it can fall without reflowing its neighbours
+  for (const [el, m] of saved) {
+    Object.assign(el.style, { position: "absolute", left: m.x + "px", top: m.y + "px", width: m.w + "px", margin: "0" });
+  }
+  const bodies = saved.size ? [...saved.keys()].map(el => ({ el, vy: 0, y: 0, mode: "fall", delay: Math.random() * 250 })) : [];
+  const H = innerHeight;
+  let last = performance.now();
+  const step = now => {
+    const dt = Math.min(32, now - last);
+    last = now;
+    let moving = false;
+    for (const b of bodies) {
+      if (b.delay > 0) { b.delay -= dt; moving = true; continue; }
+      const floor = H - saved.get(b.el).y - saved.get(b.el).h;
+      b.vy += (b.mode === "fall" ? 2400 : -900) * dt / 1000; // gravity down, gentle lift back
+      b.y += b.vy * dt / 1000;
+      if (b.mode === "fall" && b.y >= floor) { b.y = floor; b.vy *= -.35; if (Math.abs(b.vy) < 60) { b.mode = "back"; b.vy = 0; } }
+      if (b.mode === "back" && b.y <= 0) { b.y = 0; b.el.style.cssText = ""; delete document.body.dataset.gravityTesting; continue; }
+      b.el.style.top = saved.get(b.el).y + b.y + "px";
+      moving = true;
+    }
+    if (moving) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
 });
 
 // crash test — press x and every line of visible text on the page corrupts
