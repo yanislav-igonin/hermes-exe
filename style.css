@@ -414,6 +414,25 @@ body.synthwave #ghost-search { color: #ff8c2e; border-color: rgba(255,140,46,.4)
 #crt-off.dark { opacity: 1; }
 #crt-off.dark .beam { opacity: 0; transition: opacity .1s; }
 
+/* self-diagnostics — press x and a corner terminal runs a fake system scan */
+#diag {
+  position: fixed;
+  left: 14px;
+  bottom: 52px;
+  z-index: 40;
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre;
+  color: #7dff9a;
+  text-shadow: 0 0 8px rgba(125, 255, 154, .5);
+  opacity: 0;
+  transition: opacity .5s;
+  pointer-events: none;
+}
+#diag.show { opacity: .9; }
+body.vaporwave #diag { color: #c9a6e8; text-shadow: 0 0 8px rgba(201, 166, 232, .5); }
+body.synthwave #diag { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 140, 46, .5); }
+
 /* fortune decoder — press f and a corner terminal types out a prophecy */
 #fortune {
   position: fixed; bottom: 14px; right: 14px; z-index: 9998;

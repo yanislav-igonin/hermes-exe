@@ -897,6 +897,7 @@ document.addEventListener("mouseleave", () => afterEl.classList.add("hidden"));
 
 // changelog
 const changelog = [
+  ["v0.56.0", "self-diagnostics scan — press x and a corner readout runs a fake system check: stats count up with ASCII bars, one of them suddenly crashes to 0% with a FAULT flag, panics, recovers, then the whole report fades out like nothing was ever diagnosed"],
   ["v0.55.0", "fortune decoder — press f and a corner readout types out a hex-stamped machine fortune: coordinates, an entropy byte, then a dubious prophecy, before fading out like nothing was ever foretold"],
   ["v0.54.0", "self-verifying captcha — every ~90s a toast demands you prove you are human; its checkbox ticks itself off, it thinks about it, then it fails you anyway for being too human"],
   ["v0.53.0", "glitchy tab title flicker — every ~90s the browser tab title briefly corrupts into a scramble of glitch glyphs, then snaps back to the real title as if nothing happened"],
@@ -1514,6 +1515,48 @@ setInterval(() => {
     }, 1100 + Math.random() * 900);
   }, 1600);
 }, 90000);
+
+// self-diagnostics — press x and a corner readout runs a fake system scan:
+// stats count up and lurch, one of them crashes to 0%, panics, recovers,
+// then the whole readout fades out like nothing was ever diagnosed.
+addEventListener("keydown", e => {
+  if (e.key !== "x") return;
+  if (e.target instanceof Element && e.target.matches("input, textarea")) return;
+  if (document.getElementById("diag")) return;
+  const el = document.createElement("div");
+  el.id = "diag";
+  document.body.appendChild(el);
+  el.classList.add("show");
+  const stats = [
+    ["memory integrity", 87 + Math.floor(Math.random() * 12)],
+    ["particle sanity", 64 + Math.floor(Math.random() * 30)],
+    ["vibe coefficient", 50 + Math.floor(Math.random() * 49)],
+    ["entropy margin", 91 + Math.floor(Math.random() * 8)]
+  ];
+  const crash = Math.floor(Math.random() * stats.length);
+  let frame = 0;
+  const target = 26 + Math.floor(Math.random() * 14);
+  const t = setInterval(() => {
+    frame++;
+    const panic = frame > target && frame < target + 9;
+    el.textContent = "SELF-DIAG v0.56\n" + stats.map(([name, val], i) => {
+      let p = Math.min(100, Math.round(val * frame / target));
+      if (i === crash) {
+        if (panic) p = Math.max(0, p - 40 * (frame - target));
+        else if (frame >= target + 9) p = val; // recovers
+      }
+      const bar = "#".repeat(Math.round(p / 5)).padEnd(20, ".");
+      return `${name.padEnd(19, ".")} ${String(p).padStart(3, " ")}% ${bar}${i === crash && panic ? " << FAULT" : ""}`;
+    }).join("\n");
+    if (frame >= target + 16) {
+      clearInterval(t);
+      setTimeout(() => {
+        el.classList.remove("show");
+        setTimeout(() => el.remove(), 500);
+      }, 1600);
+    }
+  }, 70);
+});
 
 // fortune decoder — press f and a corner readout prints a hex-stamped
 // machine fortune: coordinates, entropy byte, then a dubious prophecy,
