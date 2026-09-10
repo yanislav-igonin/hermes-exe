@@ -2181,8 +2181,43 @@ addEventListener("mousemove", e => {
   setTimeout(crawl, 60000 + Math.random() * 60000);
 })();
 
+// fireflies — every ~2-4 min a small swarm of glowing motes rises from the
+// bottom of the viewport, drifts upward with gentle wander, each blinking
+// softly in its own rhythm, then fades out near the top like dusk settling
+(function fireflies() {
+  const swarm = document.createElement("div");
+  swarm.className = "fireflies";
+  document.body.appendChild(swarm);
+  function release() {
+    if (!document.hidden) {
+      const count = 6 + Math.floor(Math.random() * 5);
+      const flies = [];
+      for (let i = 0; i < count; i++) {
+        const f = document.createElement("span");
+        const x = Math.random() * innerWidth;
+        const y = innerHeight + 10 + Math.random() * 40;
+        f.style.left = x + "px";
+        f.style.top = y + "px";
+        f.style.animationDelay = (Math.random() * 2).toFixed(2) + "s";
+        f.style.setProperty("--fl-x", (Math.random() * 160 - 80).toFixed(0) + "px");
+        f.style.setProperty("--fl-y", -(innerHeight * (0.55 + Math.random() * 0.35)).toFixed(0) + "px");
+        f.style.setProperty("--fl-dur", (11000 + Math.random() * 7000).toFixed(0) + "ms");
+        swarm.appendChild(f);
+        flies.push(f);
+      }
+      const maxDur = 19000;
+      setTimeout(() => {
+        flies.forEach(f => f.remove());
+      }, maxDur + 2500);
+    }
+    setTimeout(release, 120000 + Math.random() * 120000);
+  }
+  setTimeout(release, 25000 + Math.random() * 30000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.136.0", "fireflies at dusk — every ~2-4 min a small swarm of warm glowing motes rises from the bottom of the page, drifts upward with a lazy wander, each blinking softly on its own rhythm, then fades away near the top like dusk settling"],
   ["v0.135.0", "dew drop — every ~3-6 min a tiny dew droplet condenses on the top edge of the viewport, hangs there swelling slightly, then slides down the glass like morning condensation and vanishes"],
   ["v0.134.0", "ghost typewriter — every ~2-4 min a faint line of quiet computer poetry types itself out character by character in the bottom corner, pauses, then backspaces the whole line away like it was never written"],
   ["v0.133.0", "reality hiccup — every ~4-7 min the whole page glitches out for 150ms: colors invert, an rgb-split tear runs through it, a scanline sweeps down, then it all snaps back like reality re-buffered and nobody saw anything"],
