@@ -934,6 +934,7 @@ addEventListener("keydown", e => {
 
 // changelog
 const changelog = [
+  ["v0.60.0", "defrag ritual — press d and a corner readout runs a fake disk defragmentation: blocks scatter, shuffle, then settle into neat ordered stripes as the fragmentation counter grinds to 0%, before fading out like nothing was ever defragmented"],
   ["v0.59.0", "version séance — press v and a corner readout knocks three times, contacts a ghost of an older build, and the ghost types out one memory from its version before the link fades out like nothing was ever contacted"],
   ["v0.58.0", "ghost cursor echo — press e and a translucent ghost cursor replays your last 1.5s of mouse movement a beat behind you, then fades out like it was never there"],
   ["v0.57.0", "glitch key — press g and the whole page rgb-splits and tears for a moment while a corner readout dumps random corrupted memory fragments, then everything reassembles like nothing was ever broken"],
@@ -1002,7 +1003,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 23;
+const DONE_COUNT = 24;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
@@ -1714,4 +1715,50 @@ addEventListener("keydown", e => {
       }, 900);
     }
   }, 60);
+});
+
+// defrag ritual — press d and a corner readout runs a fake disk defrag: a grid
+// of blocks starts scattered, shuffles chaotically, then settles into neat
+// ordered stripes as the fragmentation counter grinds to 0%, before the whole
+// report fades out like nothing was ever defragmented.
+addEventListener("keydown", e => {
+  if (e.key !== "d") return;
+  if (e.target instanceof Element && e.target.matches("input, textarea")) return;
+  if (document.getElementById("defrag")) return;
+  const el = document.createElement("div");
+  el.id = "defrag";
+  document.body.appendChild(el);
+  el.classList.add("show");
+  const W = 24, H = 12;
+  let cells = Array.from({ length: W * H }, (_, i) => i % 3 === 0 ? 0 : 1); // scattered free blocks
+  let frame = 0;
+  const shuffleFrames = 16, settleFrames = 22;
+  const t = setInterval(() => {
+    frame++;
+    if (frame <= shuffleFrames) {
+      // chaotic shuffle: swap random blocks like the disk thrashing
+      for (let s = 0; s < 30; s++) {
+        const a = Math.random() * cells.length | 0, b = Math.random() * cells.length | 0;
+        [cells[a], cells[b]] = [cells[b], cells[a]];
+      }
+    } else if (frame <= shuffleFrames + settleFrames) {
+      // settle: compaction — free blocks (0) bubble to the end, one pass per frame
+      const k = Math.min(1, (frame - shuffleFrames) / settleFrames);
+      const sorted = [...cells.filter(v => v === 1), ...cells.filter(v => v === 0)];
+      cells = cells.map((v, i) => Math.random() < k * .5 + .1 ? sorted[i] : v);
+      if (frame === shuffleFrames + settleFrames) cells = sorted;
+    }
+    const frag = frame <= shuffleFrames ? Math.max(12, 87 - frame * 5)
+      : Math.max(0, Math.round(12 * (1 - (frame - shuffleFrames) / settleFrames)));
+    const grid = Array.from({ length: H }, (_, y) =>
+      cells.slice(y * W, y * W + W).map(v => v ? "█" : "·").join("")).join("\n");
+    el.textContent = `DEFRAG C:\\  pass ${frame}\n\n${grid}\n\nfragmented: ${frag}%${frag === 0 ? " — disk is whole again" : ""}`;
+    if (frame > shuffleFrames + settleFrames + 8) {
+      clearInterval(t);
+      setTimeout(() => {
+        el.classList.remove("show");
+        setTimeout(() => el.remove(), 500);
+      }, 1800);
+    }
+  }, 110);
 });

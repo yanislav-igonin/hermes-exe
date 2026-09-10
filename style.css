@@ -484,3 +484,14 @@ body.synthwave #seance { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 140, 46,
 #fortune.show { opacity: .9; }
 body.vaporwave #fortune { color: #c9a6e8; text-shadow: 0 0 8px rgba(201, 166, 232, .5); }
 body.synthwave #fortune { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 140, 46, .5); }
+
+/* defrag ritual — press d and a fake disk defrag grid shuffles, settles, fades */
+#defrag {
+  position: fixed; left: 14px; bottom: 52px; z-index: 40;
+  font-size: 10px; line-height: 1.1; white-space: pre;
+  color: #7dff9a; text-shadow: 0 0 8px rgba(125, 255, 154, .5);
+  opacity: 0; transition: opacity .5s; pointer-events: none;
+}
+#defrag.show { opacity: .9; }
+body.vaporwave #defrag { color: #c9a6e8; text-shadow: 0 0 8px rgba(201, 166, 232, .5); }
+body.synthwave #defrag { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 140, 46, .5); }
