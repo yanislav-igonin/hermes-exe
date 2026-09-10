@@ -1000,6 +1000,7 @@ setInterval(() => {
 
 // changelog
 const changelog = [
+  ["v0.63.0", "tape worm — press w and a worm of characters slithers across the page, eating its way in a wavy path while leaving a fading trail of digested glyphs, until it crawls off the far edge like it was never fed"],
   ["v0.62.0", "click constellation — every click plants a star; once enough gather they link into a constellation that names itself, glows, then fades out like the sky was never mapped"],
   ["v0.61.0", "battery of the site — the site has its own battery that slowly drains while you are here; the page dims as it dies, and at 0% it reboots to 100% with a brief boot flash"],
   ["v0.60.0", "defrag ritual — press d and a corner readout runs a fake disk defragmentation: blocks scatter, shuffle, then settle into neat ordered stripes as the fragmentation counter grinds to 0%, before fading out like nothing was ever defragmented"],
@@ -1829,4 +1830,59 @@ addEventListener("keydown", e => {
       }, 1800);
     }
   }, 110);
+});
+
+// tape worm — press w and a worm of characters slithers across the page,
+// eating its way in a wavy path while leaving a fading trail of digested
+// glyphs behind it, until it crawls off the far edge like it was never fed.
+addEventListener("keydown", e => {
+  if (e.key !== "w") return;
+  if (e.target instanceof Element && e.target.matches("input, textarea")) return;
+  if (document.getElementById("tape-worm")) return;
+  const el = document.createElement("pre");
+  el.id = "tape-worm";
+  document.body.appendChild(el);
+  const SEGS = 14;
+  const W = innerWidth, H = innerHeight;
+  const y0 = H * (0.25 + Math.random() * 0.5);
+  const amp = 30 + Math.random() * 40, wave = 0.012 + Math.random() * 0.008;
+  const speed = 9 + Math.random() * 5;
+  const glyphs = "▓▒░@#%&*§";
+  const trail = []; // {x, y, ch, born}
+  let head = -SEGS * 10, raf = 0;
+  const draw = now => {
+    head += speed;
+    trail.push({ x: head, y: y0 + Math.sin(head * wave) * amp, ch: glyphs[Math.random() * glyphs.length | 0], born: now });
+    const life = 2600;
+    for (let i = trail.length - 1; i >= 0; i--) {
+      if (now - trail[i].born > life) trail.splice(i, 1);
+    }
+    // render: paint a coarse character grid, trail under a denser worm body
+    const cell = 12;
+    const cols = Math.ceil(W / cell), rows = Math.ceil(H / cell);
+    const grid = Array.from({ length: rows }, () => Array(cols).fill(" "));
+    for (const t of trail) {
+      const c = Math.min(cols - 1, Math.max(0, t.x / cell | 0));
+      const r = Math.min(rows - 1, Math.max(0, t.y / cell | 0));
+      grid[r][c] = t.ch;
+    }
+    // worm body on top, denser than the trail
+    for (let s = 0; s < SEGS; s++) {
+      const x = head - s * 10;
+      if (x < 0) continue;
+      const y = y0 + Math.sin(x * wave) * amp;
+      const c = Math.min(cols - 1, x / cell | 0), r = Math.min(rows - 1, y / cell | 0);
+      grid[r][c] = s === 0 ? "█" : s < 5 ? "▓" : "▒";
+    }
+    el.textContent = grid.map(r => r.join("").replace(/\s+$/, "")).join("\n").replace(/^\n+/, "");
+    if (head > W + 60 && trail.every(t => now - t.born > life)) {
+      cancelAnimationFrame(raf);
+      el.classList.remove("show");
+      setTimeout(() => el.remove(), 600);
+      return;
+    }
+    raf = requestAnimationFrame(draw);
+  };
+  el.classList.add("show");
+  raf = requestAnimationFrame(draw);
 });

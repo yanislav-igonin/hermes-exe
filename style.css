@@ -496,6 +496,18 @@ body.synthwave #fortune { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 140, 46
 body.vaporwave #defrag { color: #c9a6e8; text-shadow: 0 0 8px rgba(201, 166, 232, .5); }
 body.synthwave #defrag { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 140, 46, .5); }
 
+/* tape worm — press w and a worm of characters slithers across the page,
+   leaving a fading trail of glyphs that thins out like it was never eaten */
+#tape-worm {
+  position: fixed; inset: 0; z-index: 39; margin: 0;
+  font-size: 11px; line-height: 1; white-space: pre; overflow: hidden;
+  color: #b8ff5e; text-shadow: 0 0 6px rgba(184, 255, 94, .45);
+  opacity: 0; transition: opacity .6s; pointer-events: none;
+}
+#tape-worm.show { opacity: .85; }
+body.vaporwave #tape-worm { color: #c9a6e8; text-shadow: 0 0 6px rgba(201, 166, 232, .45); }
+body.synthwave #tape-worm { color: #ff8c2e; text-shadow: 0 0 6px rgba(255, 140, 46, .45); }
+
 /* battery of the site — a corner power meter that drains and dims the page;
    the whole site sags via a brightness var proportional to remaining charge */
 body { filter: brightness(var(--battery-dim, 1)); }
