@@ -313,3 +313,13 @@ body.vaporwave #fake-404 { color: #c9a6e8; }
 body.vaporwave #fake-404 .code { text-shadow: 0 0 14px rgba(201,166,232,.5); }
 body.synthwave #fake-404 { color: #ff8c2e; }
 body.synthwave #fake-404 .code { text-shadow: 0 0 14px rgba(255,140,46,.5); }
+
+/* cursor afterimage — a phosphor ghost of the pointer, always a beat behind */
+#afterimage {
+  position: fixed; z-index: 3; width: 22px; height: 22px;
+  border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(124,252,156,.45) 0%, rgba(124,252,156,.12) 45%, transparent 70%);
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+}
+#afterimage.hidden { opacity: 0; }

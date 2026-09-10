@@ -862,8 +862,34 @@ renderCopyYear(realYear);
   }, 60000 + Math.random() * 60000);
 })();
 
+// cursor afterimage — a phosphor ghost trails the real pointer a beat behind:
+// it chases with easing, leaves a burn-in glow, and decays like a dying CRT
+// when the pointer stops (or leaves the window).
+const afterEl = document.createElement("div");
+afterEl.id = "afterimage";
+afterEl.className = "hidden";
+document.body.appendChild(afterEl);
+const afterPos = { x: innerWidth / 2, y: innerHeight / 2 };
+let afterCursorY = innerHeight / 2;
+addEventListener("mousemove", e => {
+  afterCursorY = e.clientY;
+  afterEl.classList.remove("hidden");
+}, { passive: true });
+document.addEventListener("mouseleave", () => afterEl.classList.add("hidden"));
+(function afterimageTick() {
+  // heavy spring lag: it only ever catches up if you stop moving
+  const dx = cursorX - afterPos.x, dy = afterCursorY - afterPos.y;
+  afterPos.x += dx * .055;
+  afterPos.y += dy * .055;
+  const glow = Math.min(1, Math.hypot(dx, dy) / 240); // burns brighter while moving
+  afterEl.style.opacity = afterEl.classList.contains("hidden") ? "" : (.25 + glow * .6).toFixed(2);
+  afterEl.style.transform = `translate(${afterPos.x - 11}px, ${afterPos.y - 11}px) scale(${(.7 + glow * .5).toFixed(2)})`;
+  requestAnimationFrame(afterimageTick);
+})();
+
 // changelog
 const changelog = [
+  ["v0.47.0", "cursor afterimage — a phosphor ghost of the pointer trails a beat behind your cursor, burning brighter the faster you move and decaying like a dying CRT when you stop"],
   ["v0.46.0", "fake 404 — every ~70s the page briefly claims it does not exist: a stark '404 / page not found' overlay flashes over everything, then dissolves and the site carries on as if it had never doubted itself"],
   ["v0.45.0", "vhs rewind — every ~80s the whole page hits a 'tracking error': rgb-split frames and jitter like an old tape scrambling, a '◄◄ REW' tag flashes in the corner, then the picture snaps back clean like the tape was never damaged"],
   ["v0.44.0", "copyright year poltergeist — the footer's © year occasionally flips to a wrong year from some other timeline (1970, 2077, 3000...), blinks, then heals back to the present"],
@@ -918,7 +944,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 21;
+const DONE_COUNT = 22;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
