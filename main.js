@@ -2532,6 +2532,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.159.0", "tumbleweed — every ~2-4 min a scraggly tumbleweed tumbles across the bottom of the page, bouncing off the ground and shedding tiny twig bits as it goes, then rolls off-screen like the prairie was never there"],
   ["v0.158.0", "rubber duck — every ~2-4 min a tiny yellow rubber duck paddles along the bottom of the page, bobbing gently, says a quiet \"quack.\" mid-swim, then drifts off-screen like the bug was never explained to it"],
   ["v0.157.0", "shooting star — every ~1-2.5 min a bright star streaks diagonally across the upper sky with a tapering glowing trail, burns out mid-flight and fades like the wish was never made"],
   ["v0.156.0", "firefly swarm — every ~1-2 min a handful of tiny glowing fireflies drifts across the page, blinking softly around a loose center, then scatters and fades out like the summer night was never there"],
@@ -5690,3 +5691,49 @@ addEventListener("dblclick", e => {
   setTimeout(spawn, 10000 + Math.random() * 15000);
 })();
 
+
+// tumbleweed — every ~2-4 min a scraggly tumbleweed tumbles across the bottom of
+// the page, bouncing off the ground and shedding twig bits, then rolls off-screen
+(function () {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const roll = () => {
+    const el = document.createElement("div");
+    el.className = "tumbleweed";
+    document.body.appendChild(el);
+    const r = 26;
+    let x = -r * 2, dir = 1;
+    if (Math.random() < .5) { x = innerWidth + r * 2; dir = -1; }
+    const ground = innerHeight - r - 8;
+    let y = ground, vy = 0, spin = 0, t = 0;
+    // pre-built twig blob as unicode scribble
+    el.textContent = "🝆"; // fallback glyph replaced by inline svg below
+    el.innerHTML = `<svg width="${r * 2}" height="${r * 2}" viewBox="0 0 60 60" fill="none" stroke="#7a9a5a" stroke-width="2" stroke-linecap="round"><path d="M8 38 L20 22 L34 34 L44 16 L54 30 M20 22 L28 10 M34 34 L40 44 M44 16 L38 8 M26 30 L14 30"/></svg>`;
+    const step = () => {
+      t++;
+      x += dir * (1.6 + Math.random() * .8);
+      vy += .25; y += vy;
+      if (y >= ground) { y = ground; vy = -(2.5 + Math.random() * 3.5) * (vy > .5 ? 1 : .4); if (vy > -.5) vy = 0; }
+      spin += dir * (4 + Math.abs(vy));
+      el.style.left = (x - r) + "px";
+      el.style.top = (y - r) + "px";
+      el.style.transform = `rotate(${spin}deg)`;
+      // shed a twig bit on hard bounces
+      if (vy < -1 && Math.random() < .5) {
+        const bit = document.createElement("div");
+        bit.className = "tumbleweed-bit";
+        bit.textContent = "•";
+        bit.style.left = x + "px"; bit.style.top = y + "px";
+        bit.style.setProperty("--bx", (dir * (10 + Math.random() * 30)) + "px");
+        bit.style.setProperty("--by", (-20 - Math.random() * 30) + "px");
+        document.body.appendChild(bit);
+        setTimeout(() => bit.remove(), 1200);
+      }
+      const off = dir > 0 ? x > innerWidth + r * 2 : x < -r * 2;
+      if (!off) requestAnimationFrame(step);
+      else { el.style.transition = "opacity .6s"; el.style.opacity = "0"; setTimeout(() => el.remove(), 700); }
+    };
+    requestAnimationFrame(step);
+    setTimeout(roll, 120000 + Math.random() * 120000);
+  };
+  setTimeout(roll, 20000 + Math.random() * 30000);
+})();

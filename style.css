@@ -2456,3 +2456,10 @@ body.synthwave .rubber-duck::before { filter: drop-shadow(0 0 6px rgba(255,150,6
 }
 body.vaporwave .firefly { background: rgba(236,214,255,.95); box-shadow: 0 0 8px 2px rgba(201,166,232,.55), 0 0 18px 5px rgba(201,166,232,.22); }
 body.synthwave .firefly { background: rgba(255,196,140,.95); box-shadow: 0 0 8px 2px rgba(255,140,46,.55), 0 0 18px 5px rgba(255,140,46,.22); }
+
+.tumbleweed { position: fixed; width: 52px; height: 52px; z-index: 4; pointer-events: none; will-change: transform; opacity: .85; filter: drop-shadow(0 2px 2px rgba(0,0,0,.4)); }
+.tumbleweed-bit { position: fixed; font-size: 8px; color: #7a9a5a; pointer-events: none; z-index: 4; animation: tumbleweed-bit-fly 1.2s ease-out forwards; }
+@keyframes tumbleweed-bit-fly {
+  0% { opacity: .9; transform: translate(0, 0) rotate(0deg); }
+  100% { opacity: 0; transform: translate(var(--bx), var(--by)) rotate(180deg); }
+}
