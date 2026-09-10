@@ -1647,6 +1647,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.110.0", "hot air balloon — every ~90-150s a small balloon drifts across the page, its gondola swaying gently on the breeze and bobbing on thermals, then it sails away off-screen like it was never there"],
   ["v0.109.0", "dandelion wish — every ~70-120s a dandelion head sprouts at a random spot on the page, sways gently for a few seconds, then a gust of wind scatters its floating seeds across the page; they drift with the breeze and fade away like the wish was never made"],
   ["v0.108.0", "frost bloom — every ~2-3 min a patch of crystalline frost creeps in from a random screen corner, thin ice patterns radiate and grow inward over a few seconds, then slowly melt away and the page dries like winter was never there"],
   ["v0.107.0", "firefly congregation — every ~60-100s a small swarm of fireflies gathers at a random point on the page, orbits it lazily with each one blinking on its own rhythm, then scatters into the dark like the summer night was never there"],
@@ -3687,4 +3688,37 @@ addEventListener("dblclick", e => {
     setTimeout(bloom, 70000 + Math.random() * 50000);
   }
   setTimeout(bloom, 15000 + Math.random() * 20000);
+})();
+
+// hot air balloon — every ~90-150s a small balloon drifts across the page,
+// its gondola swaying gently on the breeze, then it sails away off-screen
+(function balloonPassage() {
+  function launch() {
+    const el = document.createElement("span");
+    el.className = "balloon";
+    el.textContent = "🎈";
+    const dir = Math.random() < .5 ? 1 : -1;
+    let x = dir === 1 ? -60 : innerWidth + 60;
+    let y = Math.random() * innerHeight * .4 + innerHeight * .1;
+    const drift = 0.5 + Math.random() * 0.6;
+    const bob = 2 + Math.random() * 2;
+    let t = 0;
+    el.style.transform = dir === -1 ? "scaleX(-1)" : "";
+    el.style.left = x.toFixed(0) + "px";
+    el.style.top = y.toFixed(0) + "px";
+    document.body.appendChild(el);
+    const float = () => {
+      t += 1 / 60;
+      x += dir * drift;
+      y += Math.sin(t * 1.2) * .3;
+      el.style.left = x.toFixed(0) + "px";
+      el.style.top = y.toFixed(0) + "px";
+      el.style.rotate = (Math.sin(t * .8) * bob).toFixed(1) + "deg";
+      if (x > -80 && x < innerWidth + 80) requestAnimationFrame(float);
+      else el.remove();
+    };
+    requestAnimationFrame(float);
+    setTimeout(launch, 90000 + Math.random() * 60000);
+  }
+  setTimeout(launch, 25000 + Math.random() * 30000);
 })();

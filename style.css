@@ -942,6 +942,19 @@ body.synthwave .summit-firefly.bright { background: rgba(255,205,150,1); box-sha
 body.vaporwave .dandelion, body.vaporwave .dandelion-seed { color: rgba(235,220,255,.7); text-shadow: 0 0 6px rgba(201,166,232,.3); }
 body.synthwave .dandelion, body.synthwave .dandelion-seed { color: rgba(255,205,150,.7); text-shadow: 0 0 6px rgba(255,140,46,.3); }
 
+/* hot air balloon: a balloon drifts across the page, gondola swaying gently,
+   bobbing on the breeze, then sails away off-screen */
+.balloon {
+  position: fixed; left: 0; top: 0;
+  z-index: 9992; pointer-events: none;
+  margin: 0;
+  font-size: 22px; line-height: 1;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.25));
+  will-change: transform, left, top;
+}
+body.vaporwave .balloon { filter: drop-shadow(0 0 6px rgba(201,166,232,.4)) hue-rotate(40deg); }
+body.synthwave .balloon { filter: drop-shadow(0 0 6px rgba(255,140,46,.4)) hue-rotate(-60deg) saturate(1.3); }
+
 /* soap bubbles: bubbles rise from the bottom wobbling on a lazy sine with an
    iridescent rim; click one and it pops into a glyph splash */
 .bubble {
