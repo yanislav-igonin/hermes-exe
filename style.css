@@ -2463,3 +2463,4 @@ body.synthwave .firefly { background: rgba(255,196,140,.95); box-shadow: 0 0 8px
   0% { opacity: .9; transform: translate(0, 0) rotate(0deg); }
   100% { opacity: 0; transform: translate(var(--bx), var(--by)) rotate(180deg); }
 }
+.balloon { position: fixed; z-index: 4; pointer-events: none; will-change: transform; opacity: .9; filter: drop-shadow(0 2px 3px rgba(0,0,0,.4)); }

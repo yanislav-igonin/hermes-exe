@@ -2532,6 +2532,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.160.0", "balloon — every ~2-4 min a tiny red balloon on a string drifts up from the bottom of the page, swaying gently as it rises, then slips off the top edge like it was never let go"],
   ["v0.159.0", "tumbleweed — every ~2-4 min a scraggly tumbleweed tumbles across the bottom of the page, bouncing off the ground and shedding tiny twig bits as it goes, then rolls off-screen like the prairie was never there"],
   ["v0.158.0", "rubber duck — every ~2-4 min a tiny yellow rubber duck paddles along the bottom of the page, bobbing gently, says a quiet \"quack.\" mid-swim, then drifts off-screen like the bug was never explained to it"],
   ["v0.157.0", "shooting star — every ~1-2.5 min a bright star streaks diagonally across the upper sky with a tapering glowing trail, burns out mid-flight and fades like the wish was never made"],
@@ -5736,4 +5737,32 @@ addEventListener("dblclick", e => {
     setTimeout(roll, 120000 + Math.random() * 120000);
   };
   setTimeout(roll, 20000 + Math.random() * 30000);
+})();
+
+// balloon — every ~2-4 min a tiny red balloon on a string drifts up from the
+// bottom of the page, swaying gently as it rises, then slips off the top edge
+// like it was never let go
+(function () {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const drift = () => {
+    const el = document.createElement("div");
+    el.className = "balloon";
+    el.innerHTML = `<svg width="34" height="86" viewBox="0 0 34 86" fill="none"><path d="M17 26 C14 44 20 56 17 84" stroke="#8a6d5a" stroke-width="1.2"/><ellipse cx="17" cy="15" rx="11" ry="14" fill="#c0392b"/><ellipse cx="13" cy="9" rx="3.5" ry="5" fill="#e07a6d" opacity=".7"/><path d="M14 28 L17 32 L20 28" fill="#a93226"/></svg>`;
+    document.body.appendChild(el);
+    const x = 20 + Math.random() * (innerWidth - 60);
+    const rise = .45 + Math.random() * .35;
+    let y = innerHeight + 90, t = 0;
+    const step = () => {
+      t++;
+      y -= rise;
+      const sway = Math.sin(t * .02) * 6 + Math.sin(t * .007) * 10;
+      el.style.left = (x + sway) + "px";
+      el.style.top = y + "px";
+      if (y > -100) requestAnimationFrame(step);
+      else { el.style.transition = "opacity 1s"; el.style.opacity = "0"; setTimeout(() => el.remove(), 1100); }
+    };
+    requestAnimationFrame(step);
+    setTimeout(drift, 120000 + Math.random() * 120000);
+  };
+  setTimeout(drift, 15000 + Math.random() * 20000);
 })();
