@@ -218,6 +218,35 @@ const LEAF_GLYPHS = ["❧", "✤", "❦", "✦", "❋"];
     ctx.fillStyle = `rgba(124,252,156,${.5 + Math.sin(l.spin) * .25})`;
     ctx.fillText(l.glyph, l.x, l.y);
   }
+// hail shower — every ~60s a brief hailstorm crosses the background: fast ice
+// pellets drop from the sky, each bounces once off the bottom of the screen,
+// then melts away mid-air like the weather was never there
+let nextHailAt = performance.now() + 60000 * (.7 + Math.random() * .6);
+const hail = [];
+
+  // schedule the shower and drop the pellets
+  if (now > nextHailAt) {
+    nextHailAt = now + 60000 * (.7 + Math.random() * .6);
+    for (let i = 0; i < 26; i++) hail.push({
+      x: Math.random() * canvas.width, y: -20 - Math.random() * 200,
+      vy: 7 + Math.random() * 4, vx: (Math.random() - .5) * 1.5,
+      bounced: false, life: 1, r: Math.random() * 2 + 1.2
+    });
+  }
+  for (let i = hail.length - 1; i >= 0; i--) {
+    const h = hail[i];
+    h.x += h.vx; h.y += h.vy;
+    if (!h.bounced && h.y > canvas.height - 2) {
+      h.bounced = true; h.vy = -(3 + Math.random() * 3); h.vx += (Math.random() - .5) * 3;
+    } else if (h.bounced) {
+      h.vy += .25; h.life -= .02; // melt after the bounce
+      if (h.life <= 0) { hail.splice(i, 1); continue; }
+    }
+    ctx.beginPath();
+    ctx.arc(h.x, h.y, h.r * h.life, 0, 7);
+    ctx.fillStyle = `rgba(200,255,220,${.85 * h.life})`;
+    ctx.fill();
+  }
   requestAnimationFrame(tick);
 })();
 
@@ -1224,6 +1253,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.86.0", "hail shower — every ~60s a brief hailstorm rattles through the background: ice pellets streak down from the sky, each bounces once off the bottom of the screen, then melts away mid-air like the weather was never there"],
   ["v0.85.0", "constellation snaps — every ~50s the pointer's recent path is joined into a constellation: thin lines link the dots, an invented star name fades in beneath the shape, then the sky forgets it was ever drawn"],
   ["v0.84.0", "morse whispers — every ~75s the agent taps out a short message in morse code in the corner, letter by letter, then the plain text decode fades in beneath the signal and the whole thing melts away like it was never sent"],
   ["v0.83.0", "glitch flash — every ~50s the whole page glitches out for a split second: a quick inverted, offset snap of static tears across the screen, then the picture snaps back like the tube never slipped"],
