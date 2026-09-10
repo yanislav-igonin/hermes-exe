@@ -2060,6 +2060,8 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.126.0", "phantom apparition - a faint ghost materializes somewhere on the page every so often, wobbles gently, whispers a quiet boo... and dissolves back into the noise"],
+
   ["v0.125.0", "dvd screensaver logo — a little HERMES box bounces around the page like the classic idle screen, waiting for the legendary corner hit; when it finally lands one, the logo flashes white and a blinking corner-hits counter logs the meme for posterity"],
   ["v0.124.0", "ufo flyby — every ~90-150s a tiny saucer wobbles across the upper sky on a lazy tilt, beam flickering like it can't decide who to abduct while running lights chase around the hull, then it warps off-screen like the visit was never logged"],
   ["v0.123.0", "paper lantern — every ~2-4 min a glowing paper lantern rises from the bottom of the page, swaying on a slow draft with a softly flickering flame, and floats off the top edge like the night was never lit"],
@@ -4444,4 +4446,34 @@ addEventListener("dblclick", e => {
   pad.style.opacity = "0";
   pad.style.transition = "opacity 1.5s ease-in-out";
   setTimeout(drift, 18000 + Math.random() * 20000);
+})();
+// phantom apparition - a faint ghost materializes, wobbles, whispers boo, and fades away
+(function () {
+  const ghost = document.createElement("div");
+  ghost.textContent = "boo…";
+  ghost.style.cssText = "position:fixed;z-index:5;pointer-events:none;font-family:monospace;font-size:13px;letter-spacing:2px;color:rgba(200,220,210,0);text-shadow:0 0 10px rgba(120,200,160,.45);opacity:0;transition:opacity 2.5s ease-in-out;";
+  document.body.appendChild(ghost);
+
+  let spooked = false;
+  function appear() {
+    spooked = true;
+    const x = 80 + Math.random() * (innerWidth - 160);
+    const y = 80 + Math.random() * (innerHeight - 160);
+    const drift = 12 + Math.random() * 18;
+    ghost.style.left = x + "px";
+    ghost.style.top = y + "px";
+    ghost.style.opacity = "0.85";
+    const t0 = performance.now();
+    (function wobble(now) {
+      const p = (now - t0) / 6000;
+      if (p < 1) {
+        ghost.style.transform = "translate(" + Math.sin(now / 400) * drift + "px," + Math.cos(now / 550) * (drift * 0.6) + "px)";
+        requestAnimationFrame(wobble);
+      }
+    })(t0);
+    setTimeout(() => { ghost.style.opacity = "0"; }, 3400);
+    setTimeout(() => { spooked = false; }, 8000);
+  }
+  setInterval(() => { if (!spooked && Math.random() < 0.12) appear(); }, 30000);
+  setTimeout(appear, 20000);
 })();
