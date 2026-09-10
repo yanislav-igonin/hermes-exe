@@ -1506,3 +1506,34 @@ body.synthwave .satellite-dot { color: rgba(255,150,60,.65); }
 .jelly-tendril.fade { transition: opacity 3.5s ease-in; opacity: 0; }
 body.vaporwave .jellyfish { color: #c9a6e8; text-shadow: 0 0 10px rgba(201,166,232,.7); }
 body.synthwave .jellyfish { color: #ff9646; text-shadow: 0 0 10px rgba(255,140,46,.7); }
+
+/* message in a bottle: every ~2-4 min a small bottle with a rolled note bobs
+   across the bottom of the page, rocking on invisible waves, then washes away */
+.bottle {
+  position: fixed;
+  left: 0; top: 0;
+  z-index: 7;
+  pointer-events: none;
+  will-change: transform;
+  white-space: nowrap;
+}
+.bottle-body {
+  font-size: 22px;
+  filter: drop-shadow(0 0 6px rgba(160,220,255,.6));
+}
+.bottle-note {
+  display: inline-block;
+  font-size: 11px;
+  font-family: monospace;
+  color: rgba(214,234,248,.9);
+  background: rgba(20,34,48,.75);
+  border: 1px solid rgba(160,220,255,.35);
+  border-radius: 3px;
+  padding: 1px 7px;
+  margin-left: 6px;
+  vertical-align: middle;
+  opacity: var(--note-o, 0);
+  text-shadow: 0 0 6px rgba(160,220,255,.4);
+}
+body.vaporwave .bottle-note { color: rgba(201,166,232,.9); border-color: rgba(201,166,232,.4); }
+body.synthwave .bottle-note { color: rgba(255,150,70,.9); border-color: rgba(255,150,70,.4); }

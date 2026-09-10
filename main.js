@@ -1694,8 +1694,51 @@ addEventListener("mousemove", e => {
   setTimeout(surface, 30000 + Math.random() * 40000);
 })();
 
+// message in a bottle — every ~2-4 min a small glass bottle with a rolled note
+// bobs across the bottom of the page, rocking on invisible waves, then washes
+// away off-screen like the sea was never there
+(function bottleDrift() {
+  const NOTES = [
+    "wifi password: changeme",
+    "you are here now",
+    "the void writes back",
+    "send help (or snacks)",
+    "this page dreams of grids",
+    "lost: one easter egg"
+  ];
+  function launch() {
+    const el = document.createElement("div");
+    el.className = "bottle";
+    el.innerHTML = `<span class="bottle-body">🍾</span><span class="bottle-note">${NOTES[Math.random() * NOTES.length | 0]}</span>`;
+    document.body.appendChild(el);
+    const dir = Math.random() < .5 ? 1 : -1;
+    const y0 = innerHeight - 34 - Math.random() * 18;
+    const dur = 22000 + Math.random() * 12000;   // time to cross the page
+    const start = performance.now();
+    (function step(now) {
+      const t = (now - start) / dur;
+      if (t >= 1) {
+        el.remove();
+        setTimeout(launch, 120000 + Math.random() * 120000);
+        return;
+      }
+      const px = dir > 0 ? -40 + t * (innerWidth + 80) : innerWidth + 40 - t * (innerWidth + 80);
+      const bob = Math.sin(now * .0025) * 7;               // slow swell
+      const rock = Math.sin(now * .0018) * 11;             // rocking on waves
+      el.style.transform =
+        `translate(${px.toFixed(1)}px, ${(y0 + bob).toFixed(1)}px) rotate(${rock.toFixed(1)}deg)` +
+        (dir < 0 ? " scaleX(-1)" : "");
+      const reveal = Math.min(1, Math.max(0, (t - .35) * 6) * (1 - Math.max(0, (t - .85) * 8)));
+      el.style.setProperty("--note-o", reveal.toFixed(2));
+      requestAnimationFrame(step);
+    })(start);
+  }
+  setTimeout(launch, 25000 + Math.random() * 30000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.115.0", "message in a bottle — every ~2-4 min a small glass bottle with a rolled note inside bobs across the bottom of the page, rocking gently on invisible waves; the note briefly surfaces to be read, then the bottle washes away off-screen like the sea was never there"],
   ["v0.114.0", "bioluminescent jellyfish — every ~2-3 min a soft glowing jellyfish rises from the bottom of the page, pulsing as it climbs with a trailing fringe of glyph tendrils dissolving behind it, then fades back into the deep like the tide was never there"],
   ["v0.113.0", "satellite transit — every ~60-100s a tiny satellite glides slowly across the upper page, its nav light blinking, leaving a fading dotted trail of orbit dots that dissolve behind it like the orbit was never occupied"],
   ["v0.112.0", "meteor streak — every ~40-80s a meteor burns diagonally across the page, leaving a fading trail of glowing sparks that vanish behind it like it was never there"],
