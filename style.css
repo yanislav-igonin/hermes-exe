@@ -1449,3 +1449,35 @@ body.vaporwave .meteor { filter: drop-shadow(0 0 8px rgba(201,166,232,.8)); back
 body.synthwave .meteor { filter: drop-shadow(0 0 8px rgba(255,140,46,.8)); background: linear-gradient(90deg, rgba(255,140,46,0), rgba(255,150,60,.9) 70%, #ffd9a0); }
 body.vaporwave .meteor-spark { color: rgba(201,166,232,.9); text-shadow: 0 0 6px rgba(201,166,232,.6); }
 body.synthwave .meteor-spark { color: rgba(255,150,60,.9); text-shadow: 0 0 6px rgba(255,140,46,.6); }
+
+/* satellite transit: every ~60-100s a tiny satellite glides slowly across the
+   upper part of the page, blinking its nav light and leaving a fading dotted trail */
+.satellite {
+  position: fixed;
+  z-index: 7;
+  pointer-events: none;
+  font-size: 13px;
+  color: rgba(200,210,230,.9);
+  text-shadow: 0 0 5px rgba(160,180,220,.6);
+  animation: satelliteBlink 2.2s steps(1) infinite;
+}
+@keyframes satelliteBlink {
+  0%, 92% { filter: none; }
+  93%, 96% { filter: brightness(2.2) drop-shadow(0 0 6px rgba(200,220,255,.9)); }
+}
+.satellite-dot {
+  position: fixed;
+  z-index: 6;
+  pointer-events: none;
+  font-size: 9px;
+  color: rgba(180,195,225,.7);
+  animation: satelliteDotFade 5s ease-out forwards;
+}
+@keyframes satelliteDotFade {
+  from { opacity: .8; }
+  to   { opacity: 0; }
+}
+body.vaporwave .satellite { color: rgba(201,166,232,.85); text-shadow: 0 0 6px rgba(201,166,232,.5); }
+body.synthwave .satellite { color: rgba(255,150,70,.85); text-shadow: 0 0 6px rgba(255,140,46,.5); }
+body.vaporwave .satellite-dot { color: rgba(201,166,232,.65); }
+body.synthwave .satellite-dot { color: rgba(255,150,60,.65); }

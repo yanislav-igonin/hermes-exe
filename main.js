@@ -1647,6 +1647,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.113.0", "satellite transit — every ~60-100s a tiny satellite glides slowly across the upper page, its nav light blinking, leaving a fading dotted trail of orbit dots that dissolve behind it like the orbit was never occupied"],
   ["v0.112.0", "meteor streak — every ~40-80s a meteor burns diagonally across the page, leaving a fading trail of glowing sparks that vanish behind it like it was never there"],
   ["v0.111.0", "snail mail — every ~2-4 min a snail slowly crawls along the bottom of the page, leaving a shimmering trail of tiny glyph slime drops that fade away behind it like the snail was never there"],
   ["v0.110.0", "hot air balloon — every ~90-150s a small balloon drifts across the page, its gondola swaying gently on the breeze and bobbing on thermals, then it sails away off-screen like it was never there"],
@@ -3806,4 +3807,45 @@ addEventListener("dblclick", e => {
     setTimeout(burn, 40000 + Math.random() * 40000);
   }
   setTimeout(burn, 15000 + Math.random() * 20000);
+})();
+
+// satellite transit: every ~60-100s a tiny satellite glides slowly across the
+// upper part of the page, blinking its nav light, leaving a fading dotted trail
+// of orbit dots behind it, then passes out of view like the orbit was never occupied
+(function satelliteTransit() {
+  const DOTS = ["·", "˙", "⋅", "•"];
+  function transit() {
+    const dir = Math.random() < .5 ? 1 : -1;
+    const y = innerHeight * (.06 + Math.random() * .22);
+    const speed = 28 + Math.random() * 22; // slow drift, px/s
+    let x = dir === 1 ? -30 : innerWidth + 30;
+    const sat = document.createElement("div");
+    sat.className = "satellite";
+    sat.textContent = dir === 1 ? "-≡o>" : "<o≡-";
+    sat.style.left = x + "px";
+    sat.style.top = y + "px";
+    document.body.appendChild(sat);
+    let t = 0, lastDot = 0;
+    const glide = () => {
+      t += 1 / 60;
+      x += dir * speed / 60;
+      sat.style.left = x + "px";
+      sat.style.top = y + Math.sin(t * .7) * 6 + "px";
+      if (t - lastDot > 0.6) {
+        lastDot = t;
+        const dot = document.createElement("span");
+        dot.className = "satellite-dot";
+        dot.textContent = DOTS[Math.floor(Math.random() * DOTS.length)];
+        dot.style.left = x + "px";
+        dot.style.top = sat.style.top;
+        document.body.appendChild(dot);
+        setTimeout(() => dot.remove(), 5000);
+      }
+      if (x > -60 && x < innerWidth + 60) requestAnimationFrame(glide);
+      else sat.remove();
+    };
+    requestAnimationFrame(glide);
+    setTimeout(transit, 60000 + Math.random() * 40000);
+  }
+  setTimeout(transit, 20000 + Math.random() * 25000);
 })();
