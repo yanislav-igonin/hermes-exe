@@ -740,7 +740,36 @@ setInterval(() => {
   }, 120 + Math.random() * 160);
 }, 70000);
 
+// phantom redline — every ~45s a random word anywhere on the page briefly
+// gets struck through with a red editorial line, like a track-changes edit
+// from an invisible editor; a moment later the correction is withdrawn and
+// the word heals as if nothing happened.
+(function phantomRedline() {
+  const nodes = [...document.querySelectorAll(".tagline, #log li, .status li, footer, #wotd .wotd-def")];
+  setInterval(() => {
+    if (Math.random() > 0.042) return;
+    const node = nodes[Math.random() * nodes.length | 0];
+    if (!node || node.dataset.redlining) return;
+    const textNodes = [...node.childNodes].filter(n => n.nodeType === 3 && n.textContent.trim().length > 3);
+    if (!textNodes.length) return;
+    const target = textNodes[Math.random() * textNodes.length | 0];
+    const words = target.textContent.split(" ");
+    const wi = Math.random() * words.length | 0;
+    if (!words[wi] || words[wi].length < 4) return;
+    const word = words[wi];
+    const struck = words.map((w, i) => i === wi ? `<span class="redline">${w}</span>` : w).join(" ");
+    const backup = target.textContent;
+    target.innerHTML = struck;
+    node.dataset.redlining = "1";
+    setTimeout(() => {
+      target.textContent = backup;
+      delete node.dataset.redlining;
+    }, 1400 + Math.random() * 1800);
+  }, 1000);
+})();
+
 const changelog = [
+  ["v0.36.0", "phantom redline — every ~45s a random word on the page briefly gets struck through with a red editorial line, like a track-changes edit from an invisible editor, then the correction is quietly withdrawn"],
   ["v0.35.0", "power flicker — every ~70s the grid browns out: the page dims and stutters while a 'voltage unstable' notice blinks, then the lights snap back on"],
   ["v0.34.0", "cached typing — type anywhere and, after 8s of silence, the site ghosts your last ~40 keystrokes back in the corner, letter by letter, then quietly wipes them"],
   ["v0.33.0", "phantom progress bar — every ~40s a fake loading bar crawls in from the top edge, stalls at 99% like something went wrong, then quietly finishes and vanishes"],

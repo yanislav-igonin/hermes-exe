@@ -161,6 +161,15 @@ body.brownout #bg, body.brownout main { filter: brightness(.25) contrast(1.4); }
 body.vaporwave #power-flicker { color: #ff9ff3; text-shadow: 0 0 8px rgba(255, 159, 243, .6); }
 body.synthwave #power-flicker { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 140, 46, .6); }
 
+/* phantom redline — an invisible editor's track-changes strike-through */
+.redline {
+  text-decoration: line-through;
+  text-decoration-color: #ff5a5a;
+  text-decoration-thickness: 2px;
+  color: #ff5a5a;
+  transition: color .4s;
+}
+
 /* glitch */
 .glitch::before, .glitch::after {
   content: attr(data-text); position: absolute; inset: 0;
