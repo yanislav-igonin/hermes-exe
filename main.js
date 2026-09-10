@@ -1981,8 +1981,62 @@ addEventListener("mousemove", e => {
   setTimeout(rise, 25000 + Math.random() * 30000);
 })();
 
+// ufo flyby — every ~90-150s a tiny saucer wobbles across the upper sky with a
+// flickering beam, then warps off-screen like the visit was never logged
+(function ufoFlyby() {
+  const ufo = document.createElement("div");
+  ufo.style.cssText = "position:fixed;z-index:3;pointer-events:none;will-change:transform;opacity:0;transition:opacity 1.2s ease-in-out;";
+  ufo.innerHTML =
+    '<svg width="54" height="46" viewBox="0 0 54 46" style="display:block;filter:drop-shadow(0 0 8px rgba(140,255,190,.6))">' +
+      // flickering tractor beam (points down from hull)
+      '<polygon id="ufo-beam" points="20,24 34,24 40,46 14,46" fill="rgba(160,255,200,.18)"/>' +
+      // dome
+      '<path d="M19 20 Q 27 6 35 20 Z" fill="rgba(190,255,225,.5)" stroke="rgba(190,255,225,.7)" stroke-width="1"/>' +
+      // saucer hull
+      '<ellipse cx="27" cy="22" rx="26" ry="7" fill="rgba(150,165,175,.9)"/>' +
+      '<ellipse cx="27" cy="20.5" rx="17" ry="4.2" fill="rgba(200,215,225,.85)"/>' +
+      // running lights
+      '<circle class="ufo-light" cx="8" cy="22" r="1.6" fill="rgba(255,90,90,.9)"/>' +
+      '<circle class="ufo-light" cx="27" cy="24" r="1.6" fill="rgba(255,220,90,.9)"/>' +
+      '<circle class="ufo-light" cx="46" cy="22" r="1.6" fill="rgba(90,180,255,.9)"/>' +
+    "</svg>";
+  document.body.appendChild(ufo);
+  const beam = ufo.querySelector("#ufo-beam");
+  const lights = ufo.querySelectorAll(".ufo-light");
+
+  function flyby() {
+    const y0 = 40 + Math.random() * (innerHeight * 0.22);
+    const fromLeft = Math.random() < .5;
+    const x0 = fromLeft ? -70 : innerWidth + 70;
+    const x1 = fromLeft ? innerWidth + 70 : -70;
+    const driftY = (Math.random() - .5) * 60;
+    const wobbleAmp = 4 + Math.random() * 5;
+    const dur = 14000 + Math.random() * 8000;
+    let t0 = null;
+    ufo.style.opacity = "1";
+
+    (function frame(now) {
+      if (t0 === null) t0 = now;
+      const t = Math.min(1, (now - t0) / dur);
+      const x = x0 + (x1 - x0) * t;
+      const y = y0 + driftY * t + Math.sin(now * .006) * wobbleAmp;
+      const tilt = Math.sin(now * .006 + 1.2) * 4;
+      // beam flickers like it can't decide who to abduct
+      beam.style.opacity = (.55 + Math.sin(now * .021) * .3 + Math.sin(now * .07) * .15).toFixed(2);
+      // running lights chase around the hull
+      const phase = Math.floor(now / 320) % lights.length;
+      lights.forEach(function (l, i) { l.style.opacity = i === phase ? "1" : ".25"; });
+      ufo.style.transform = "translate(" + x + "px," + y + "px) rotate(" + tilt + "deg)";
+      if (t < 1) requestAnimationFrame(frame);
+      else { ufo.style.opacity = "0"; setTimeout(flyby, 90000 + Math.random() * 60000); }
+    })(performance.now());
+  }
+  setTimeout(flyby, 30000 + Math.random() * 40000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.124.0", "ufo flyby — every ~90-150s a tiny saucer wobbles across the upper sky on a lazy tilt, beam flickering like it can't decide who to abduct while running lights chase around the hull, then it warps off-screen like the visit was never logged"],
   ["v0.123.0", "paper lantern — every ~2-4 min a glowing paper lantern rises from the bottom of the page, swaying on a slow draft with a softly flickering flame, and floats off the top edge like the night was never lit"],
   ["v0.122.0", "stray cat — every ~2-4 min a cat silhouette slinks along the bottom of the page in a stop-and-go walk, tail swaying, occasionally pausing to look around with a glinting eye before slipping off-screen like the alley was never patrolled"],
   ["v0.121.0", "dandelion seed drift — every ~3-5 min a lone dandelion seed floats across the page on a whim of wind, swaying and slowly sinking, its tuft trembling in the draft until it drifts off-screen like the meadow was never mowed"],
