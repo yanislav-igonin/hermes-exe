@@ -47,6 +47,21 @@ body.vaporwave #changelog h2, body.vaporwave .status h2 { color: #ff9ff3; }
 body.vaporwave .tagline, body.vaporwave #log li, body.vaporwave .status li { color: #c9a6e8; }
 body.vaporwave footer a { color: #ff9ff3; }
 
+/* synthwave sunset — body.synthwave burns everything purple/orange */
+body.synthwave #bg { filter: hue-rotate(285deg) saturate(1.6) contrast(1.1); }
+body.synthwave h1 { color: #ffb347; text-shadow: 0 0 18px rgba(255,80,150,.7); }
+body.synthwave .glitch::before { color: #ff5aa0; }
+body.synthwave .glitch::after { color: #ff8c2e; }
+body.synthwave #changelog h2, body.synthwave .status h2 { color: #ff8c2e; }
+body.synthwave .tagline, body.synthwave #log li, body.synthwave .status li, body.synthwave #wotd .wotd-def { color: #d8a4b8; }
+body.synthwave #log li b, body.synthwave .status li b { color: #ffb347; }
+body.synthwave #wotd .wotd-word { color: #ff5aa0; }
+body.synthwave footer a, body.synthwave #ribbon { color: #ffb347; }
+body.synthwave main {
+  background: linear-gradient(180deg, rgba(40,7,64,.55), rgba(120,20,60,.45) 70%, rgba(255,110,40,.35));
+  border-radius: 6px;
+}
+
 /* glitch */
 .glitch::before, .glitch::after {
   content: attr(data-text); position: absolute; inset: 0;

@@ -253,7 +253,20 @@ async function loadRibbon() {
 loadRibbon();
 setInterval(loadRibbon, 300000);
 
+// synthwave sunset theme — click the glitch title three times and the site
+// burns into a purple/orange synthwave palette. clicks reset after 2s idle.
+let titleClicks = 0, titleClickTimer = null;
+document.querySelector("h1.glitch").addEventListener("click", () => {
+  clearTimeout(titleClickTimer);
+  titleClickTimer = setTimeout(() => { titleClicks = 0; }, 2000);
+  if (++titleClicks >= 3) {
+    titleClicks = 0;
+    document.body.classList.toggle("synthwave");
+  }
+});
+
 const changelog = [
+  ["v0.11.0", "synthwave sunset theme — click the title three times and the site burns in purple/orange gradients"],
   ["v0.10.0", "click ripple shockwave — every click detonates an expanding ring that shoves nearby particles away"],
   ["v0.9.0", "commit feed ribbon — the last 5 real commit messages scroll along the top edge, straight from GitHub"],
   ["v0.8.0", "word of the minute — a dictionary word with a fake profound definition, re-rolled by the clock"],
@@ -274,7 +287,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 7;
+const DONE_COUNT = 8;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
