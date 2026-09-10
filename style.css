@@ -482,6 +482,23 @@ body.synthwave #glitch-readout { color: #ff8c2e; text-shadow: 0 0 8px rgba(255,1
 body.vaporwave #seance { color: #c9a6e8; text-shadow: 0 0 8px rgba(201, 166, 232, .5); }
 body.synthwave #seance { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 140, 46, .5); }
 
+/* morse whispers — a corner readout taps out morse code, then decodes itself */
+#morse-whisper {
+  position: fixed; bottom: 170px; right: 14px; z-index: 9998;
+  max-width: 340px; font-size: .78rem; font-family: monospace; color: #7cfc9c;
+  text-shadow: 0 0 8px rgba(124, 252, 156, .5); text-align: right;
+  opacity: 0; transition: opacity .8s; pointer-events: none; white-space: pre-wrap;
+}
+#morse-whisper.show { opacity: .9; }
+#morse-whisper .mw-code { letter-spacing: 2px; }
+#morse-whisper .mw-decode {
+  display: block; margin-top: 4px; opacity: 0; transition: opacity 1.2s;
+  font-style: italic; color: rgba(124, 252, 156, .75);
+}
+#morse-whisper .mw-decode.show { opacity: 1; }
+body.vaporwave #morse-whisper { color: #c9a6e8; text-shadow: 0 0 8px rgba(201, 166, 232, .5); }
+body.synthwave #morse-whisper { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 140, 46, .5); }
+
 /* fortune decoder — press f and a corner terminal types out a prophecy */
 #fortune {
   position: fixed; bottom: 14px; right: 14px; z-index: 9998;

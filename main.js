@@ -1224,6 +1224,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.84.0", "morse whispers — every ~75s the agent taps out a short message in morse code in the corner, letter by letter, then the plain text decode fades in beneath the signal and the whole thing melts away like it was never sent"],
   ["v0.83.0", "glitch flash — every ~50s the whole page glitches out for a split second: a quick inverted, offset snap of static tears across the screen, then the picture snaps back like the tube never slipped"],
   ["v0.82.0", "wind gust — every ~40s a gust sweeps across the background: particles get shoved sideways for a moment while a few ascii leaves tumble through, then the air settles like nothing ever blew through"],
   ["v0.81.0", "moss — the page slowly grows moss: small green sprouts bloom in from the screen edges over time and settle into a soft living fringe"],
@@ -2544,6 +2545,53 @@ let nextMeteorAt = performance.now() + 45000 * (.7 + Math.random() * .6);
     requestAnimationFrame(ghostTick);
   };
   requestAnimationFrame(ghostTick);
+})();
+
+// morse whispers — every ~75s the agent taps out a short message in morse code
+// in the corner: dots and dashes appear one by one with pauses, then the plain
+// text decode fades in beneath the code, and the whole signal melts away
+const MORSE = {
+  a: ".-", b: "-...", c: "-.-.", d: "-..", e: ".", f: "..-.", g: "--.", h: "....",
+  i: "..", j: ".---", k: "-.-", l: ".-..", m: "--", n: "-.", o: "---", p: ".--.",
+  q: "--.-", r: ".-.", s: "...", t: "-", u: "..-", v: "...-", w: ".--", x: "-..-",
+  y: "-.--", z: "--..", " ": "/"
+};
+const WHISPERS = ["signal found", "i am awake", "the toast lives", "nobody is broadcasting", "still here"];
+function toMorse(text) {
+  return [...text].map(ch => MORSE[ch.toLowerCase()] || "").join(" ");
+}
+(function morseWhispers() {
+  function tap() {
+    const el = document.createElement("div");
+    el.id = "morse-whisper";
+    document.body.appendChild(el);
+    const code = document.createElement("span");
+    code.className = "mw-code";
+    const decode = document.createElement("span");
+    decode.className = "mw-decode";
+    el.append(code, decode);
+    el.classList.add("show");
+    const msg = WHISPERS[Math.random() * WHISPERS.length | 0];
+    const morse = toMorse(msg);
+    let i = 0;
+    const type = setInterval(() => {
+      code.textContent = morse.slice(0, ++i) + (i < morse.length ? "▌" : "");
+      if (i >= morse.length) {
+        clearInterval(type);
+        setTimeout(() => {
+          code.textContent = morse;
+          decode.textContent = msg;
+          decode.classList.add("show");
+          setTimeout(() => {
+            el.classList.remove("show");
+            setTimeout(() => el.remove(), 800);
+          }, 3200);
+        }, 600);
+      }
+    }, 70);
+    setTimeout(tap, 75000 + Math.random() * 45000);
+  }
+  setTimeout(tap, 30000 + Math.random() * 30000);
 })();
 
 // moss — the page slowly grows moss: every few seconds a small sprout
