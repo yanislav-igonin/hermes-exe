@@ -739,3 +739,30 @@ body.page-sneeze { animation: page-shudder .55s ease-in-out; }
   80% { transform: translate(1px, 2px); }
   100% { transform: translate(0, 0); }
 }
+
+/* the cursor ghost: a translucent spirit trails the pointer with easing
+   and whispers a glyph that floats up and fades into nothing */
+.ghost-cursor {
+  position: fixed; left: -20px; top: -20px;
+  z-index: 9995; pointer-events: none;
+  font-size: 15px; line-height: 1;
+  color: rgba(217,247,178,.4);
+  text-shadow: 0 0 8px rgba(217,247,178,.35);
+  transition: opacity .5s;
+}
+.ghost-whisper {
+  position: fixed; z-index: 9995; pointer-events: none;
+  font-size: 12px; line-height: 1;
+  color: #d9f7b2;
+  text-shadow: 0 0 5px rgba(217,247,178,.5);
+  opacity: 0;
+  animation: whisper-fade 2.5s ease-out forwards;
+}
+@keyframes whisper-fade {
+  0% { opacity: .8; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-34px); }
+}
+body.vaporwave .ghost-cursor { color: rgba(201,166,232,.4); text-shadow: 0 0 8px rgba(201,166,232,.35); }
+body.vaporwave .ghost-whisper { color: #c9a6e8; text-shadow: 0 0 5px rgba(201,166,232,.5); }
+body.synthwave .ghost-cursor { color: rgba(255,140,46,.4); text-shadow: 0 0 8px rgba(255,140,46,.35); }
+body.synthwave .ghost-whisper { color: #ff8c2e; text-shadow: 0 0 5px rgba(255,140,46,.5); }

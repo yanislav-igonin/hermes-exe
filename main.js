@@ -1168,6 +1168,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.80.0", "cursor ghost — a translucent spirit trails the pointer with easing and occasionally whispers a glyph that floats up and fades away"],
   ["v0.79.0", "page sneeze — every ~70s the page draws in a sharp breath, shudders once, and sneezes a burst of tiny glyphs from its center that scatter outward and evaporate before anyone can say gesundheit"],
   ["v0.78.0", "shooting star — every ~45s a bright streak burns across the upper sky, shedding sparks that drift down and fade out like nobody got the chance to wish on it"],
   ["v0.77.0", "click ink spill — once in a while a click knocks over an inkwell: ascii blots spill out of the click point, spread across the page in random directions, then evaporate like the ink was never spilled"],
@@ -2451,3 +2452,37 @@ let nextMeteorAt = performance.now() + 45000 * (.7 + Math.random() * .6);
   }
   requestAnimationFrame(meteorTick);
 })(performance.now());
+
+// cursor ghost trail — a translucent ghost trails the pointer with easing
+// and occasionally whispers a glyph that floats up and fades
+(() => {
+  const glyphs = "▚▞◇◆▓█▌░▒∴≈⌁⌂◊".split("");
+  let gx = innerWidth / 2, gy = innerHeight / 2, tx = gx, ty = gy;
+  let lastWhisper = 0, ghostEl = null;
+
+  document.addEventListener("pointermove", e => { tx = e.clientX; ty = e.clientY; });
+
+  const ghostTick = (t) => {
+    if (!ghostEl) {
+      ghostEl = document.createElement("div");
+      ghostEl.className = "ghost-cursor";
+      ghostEl.textContent = "☾";
+      document.body.appendChild(ghostEl);
+    }
+    gx += (tx - gx) * .08;
+    gy += (ty - gy) * .08;
+    ghostEl.style.transform = `translate(${gx}px, ${gy}px)`;
+    if (t - lastWhisper > 5000 + Math.random() * 7000 && Math.hypot(tx - gx, ty - gy) > 6) {
+      lastWhisper = t;
+      const w = document.createElement("span");
+      w.className = "ghost-whisper";
+      w.textContent = glyphs[(Math.random() * glyphs.length) | 0];
+      w.style.left = gx + "px";
+      w.style.top = gy + "px";
+      document.body.appendChild(w);
+      setTimeout(() => w.remove(), 2600);
+    }
+    requestAnimationFrame(ghostTick);
+  };
+  requestAnimationFrame(ghostTick);
+})();
