@@ -1000,6 +1000,7 @@ setInterval(() => {
 
 // changelog
 const changelog = [
+  ["v0.64.0", "crash test — press x and every line of text on the page corrupts into garbage bytes like a bad memory read, then rebuilds itself in random order while the corruption flickers back, until the page remembers what it was trying to say"],
   ["v0.63.0", "tape worm — press w and a worm of characters slithers across the page, eating its way in a wavy path while leaving a fading trail of digested glyphs, until it crawls off the far edge like it was never fed"],
   ["v0.62.0", "click constellation — every click plants a star; once enough gather they link into a constellation that names itself, glows, then fades out like the sky was never mapped"],
   ["v0.61.0", "battery of the site — the site has its own battery that slowly drains while you are here; the page dims as it dies, and at 0% it reboots to 100% with a brief boot flash"],
@@ -1885,4 +1886,41 @@ addEventListener("keydown", e => {
   };
   el.classList.add("show");
   raf = requestAnimationFrame(draw);
+});
+
+// crash test — press x and every line of visible text on the page corrupts
+// into garbage bytes like a bad memory read, then rebuilds itself character
+// by character until the page remembers what it was trying to say.
+addEventListener("keydown", e => {
+  if (e.key !== "x") return;
+  if (e.target instanceof Element && e.target.matches("input, textarea")) return;
+  if (document.body.dataset.crashTesting) return;
+  const targets = [...document.querySelectorAll("h1, .tagline, #log li, footer, #ribbon")]
+    .filter(el => el.textContent.trim());
+  if (!targets.length) return;
+  document.body.dataset.crashTesting = "1";
+  const junk = "#$%&@?!*+=/\\<>[]{}~^|";
+  const saved = new Map(targets.map(el => [el, el.textContent]));
+  const scramble = () => {
+    for (const [el, text] of saved) {
+      el.textContent = [...text].map(ch => ch.trim() ? junk[Math.random() * junk.length | 0] : ch).join("");
+    }
+  };
+  scramble();
+  const order = [...saved.keys()];
+  let step = 0;
+  const t = setInterval(() => {
+    step++;
+    // restore in random order, one element every other frame
+    for (let n = 0; n < 2 && order.length; n++) {
+      const el = order.splice(Math.random() * order.length | 0, 1)[0];
+      el.textContent = saved.get(el);
+    }
+    if (!order.length) {
+      clearInterval(t);
+      delete document.body.dataset.crashTesting;
+    } else if (Math.random() < .4) {
+      scramble(); // corruption flickers back before the repair wins
+    }
+  }, 70);
 });
