@@ -1736,6 +1736,33 @@ body.synthwave #ghost-typewriter { color: #ff8c2e; text-shadow: 0 0 8px rgba(255
   50%      { filter: brightness(1.6); }
 }
 
+/* elevator — a tiny elevator car gliding along the right edge of the viewport */
+.elevator {
+  position: fixed; right: 3px; top: 0; z-index: 9996;
+  width: 22px; height: 34px; pointer-events: none;
+  border-radius: 3px;
+  background: linear-gradient(180deg, rgba(30, 34, 40, .92), rgba(16, 18, 22, .92));
+  border: 1px solid rgba(120, 255, 170, .35);
+  box-shadow: 0 0 8px rgba(80, 220, 140, .25), inset 0 0 4px rgba(80, 220, 140, .15);
+  color: rgba(140, 255, 190, .95);
+  font-family: monospace; font-size: 10px; line-height: 32px;
+  text-align: center; text-shadow: 0 0 4px rgba(120, 255, 170, .8);
+  transform: translateY(var(--el-from, -12vh));
+  opacity: 0;
+}
+.elevator.ride {
+  opacity: 1;
+  animation: elevator-ride var(--el-dur, 11s) cubic-bezier(.45, 0, .55, 1) forwards;
+}
+@keyframes elevator-ride {
+  0% { transform: translateY(var(--el-from, -12vh)); opacity: 0; }
+  8% { opacity: 1; }
+  45% { transform: translateY(var(--el-stop, 50vh)); }
+  55% { transform: translateY(var(--el-stop, 50vh)); }
+  92% { opacity: 1; }
+  100% { transform: translateY(var(--el-to, 112vh)); opacity: 0; }
+}
+
 /* dew drop — a tiny droplet condenses on the top edge of the viewport, hangs
    there swelling, then slides down the glass like morning condensation */
 .dew-drop {

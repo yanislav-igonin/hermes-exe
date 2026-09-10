@@ -2215,8 +2215,34 @@ addEventListener("mousemove", e => {
   setTimeout(release, 25000 + Math.random() * 30000);
 })();
 
+// elevator — every ~2-4 min a tiny elevator car with a glowing floor indicator
+// glides along the right edge of the viewport, pausing at a random "floor",
+// then continues out of view like the shaft was never there
+(function elevator() {
+  const car = document.createElement("div");
+  car.className = "elevator";
+  car.textContent = String(1 + Math.floor(Math.random() * 9));
+  document.body.appendChild(car);
+  function ride() {
+    if (!document.hidden) {
+      const dir = Math.random() < 0.5 ? 1 : -1;
+      car.style.setProperty("--el-from", dir === 1 ? "-12vh" : "112vh");
+      car.style.setProperty("--el-to", dir === 1 ? "112vh" : "-12vh");
+      car.style.setProperty("--el-dur", (9000 + Math.random() * 5000).toFixed(0) + "ms");
+      car.style.setProperty("--el-stop", (20 + Math.random() * 60).toFixed(0) + "vh");
+      car.textContent = String(1 + Math.floor(Math.random() * 9));
+      car.classList.remove("ride");
+      void car.offsetWidth;
+      car.classList.add("ride");
+    }
+    setTimeout(ride, 120000 + Math.random() * 120000);
+  }
+  setTimeout(ride, 40000 + Math.random() * 40000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.137.0", "elevator — every ~2-4 min a tiny elevator car with a glowing floor indicator glides along the right edge of the viewport, pauses at a random floor mid-ride, then carries on out of sight like the shaft was never there"],
   ["v0.136.0", "fireflies at dusk — every ~2-4 min a small swarm of warm glowing motes rises from the bottom of the page, drifts upward with a lazy wander, each blinking softly on its own rhythm, then fades away near the top like dusk settling"],
   ["v0.135.0", "dew drop — every ~3-6 min a tiny dew droplet condenses on the top edge of the viewport, hangs there swelling slightly, then slides down the glass like morning condensation and vanishes"],
   ["v0.134.0", "ghost typewriter — every ~2-4 min a faint line of quiet computer poetry types itself out character by character in the bottom corner, pauses, then backspaces the whole line away like it was never written"],
@@ -2362,7 +2388,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 30;
+const DONE_COUNT = 31;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
