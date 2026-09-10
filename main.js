@@ -2060,6 +2060,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.127.0", "title glitch — every ~10-25s the tab title scrambles into glitch glyphs for a couple of seconds, then cascades back character by character like the signal just re-synced; stays quiet while the marquee owns the unfocused tab"],
   ["v0.126.0", "phantom apparition - a faint ghost materializes somewhere on the page every so often, wobbles gently, whispers a quiet boo... and dissolves back into the noise"],
 
   ["v0.125.0", "dvd screensaver logo — a little HERMES box bounces around the page like the classic idle screen, waiting for the legendary corner hit; when it finally lands one, the logo flashes white and a blinking corner-hits counter logs the meme for posterity"],
@@ -4476,4 +4477,48 @@ addEventListener("dblclick", e => {
   }
   setInterval(() => { if (!spooked && Math.random() < 0.12) appear(); }, 30000);
   setTimeout(appear, 20000);
+})();
+
+// title glitch — every ~10-25s the tab title scrambles into glitch glyphs for a
+// couple of seconds, then cascades back character by character like the signal
+// just re-synced. stays out of the marquee's way while the tab is unfocused.
+(function titleGlitch() {
+  const GLITCH_GLYPHS = "▓░▒#%@$&§¤ЖЩЪЭØΞ×+=~^";
+  let baseTitle = document.title;
+  let glitching = false;
+
+  function scramble(title) {
+    return title.split("").map(ch =>
+      ch === " " ? " " : GLITCH_GLYPHS[Math.random() * GLITCH_GLYPHS.length | 0]
+    ).join("");
+  }
+  // cascade restore: fix characters one at a time from the left
+  function restore() {
+    let fixed = 0;
+    const timer = setInterval(() => {
+      fixed++;
+      const t = baseTitle.split("");
+      for (let i = fixed; i < t.length; i++)
+        if (t[i] !== " ") t[i] = GLITCH_GLYPHS[Math.random() * GLITCH_GLYPHS.length | 0];
+      document.title = t.join("");
+      if (fixed >= baseTitle.length) { clearInterval(timer); document.title = baseTitle; }
+    }, 90);
+  }
+  function glitch() {
+    baseTitle = originalTitle; // track the real title (marquee resets it on focus)
+    if (document.hidden) { setTimeout(glitch, 10000 + Math.random() * 15000); return; }
+    glitching = true;
+    const burst = 10 + Math.random() * 8 | 0;
+    let n = 0;
+    const flicker = setInterval(() => {
+      document.title = scramble(baseTitle);
+      if (++n >= burst) {
+        clearInterval(flicker);
+        restore();
+        glitching = false;
+      }
+    }, 110);
+    setTimeout(glitch, 10000 + Math.random() * 15000);
+  }
+  setTimeout(glitch, 6000 + Math.random() * 8000);
 })();
