@@ -1000,6 +1000,7 @@ setInterval(() => {
 
 // changelog
 const changelog = [
+  ["v0.70.0", "cursor footprints — as you move the mouse the cursor leaves small paired paw prints that alternate left and right along your path and point where you are heading, each one fading out a couple of seconds later like the animal was never there"],
   ["v0.69.0", "wandering eyes — every ~45s a pair of eyes fades in at a random spot on the page and the pupils follow your cursor wherever it goes, they blink a few times, then fade out like nothing was ever watching"],
   ["v0.68.0", "chromatic aberration — press k and the lens slips: text tears into red and cyan ghosts jittering out of alignment, scanlines crawl over the page, then the channels snap back together like the tube warmed up again"],
   ["v0.67.0", "sonar ping — press m and a sonar sweep ripples out from the center of the page, pinging across the document while it counts every DOM node it echoes off of, then the readout fades like the ocean was never sounded"],
@@ -2096,3 +2097,31 @@ setTimeout(function wanderLoop() {
   spawnWanderingEyes();
   setTimeout(wanderLoop, 40000 + Math.random() * 20000);
 }, 18000);
+
+// cursor footprints — while you move the mouse the cursor leaves small paired
+// paw prints that alternate left/right along the path of travel and fade out
+// a couple of seconds later, like the animal was never there
+let lastPawX = null, lastPawY = null, pawSide = 1, lastPawT = 0;
+addEventListener("mousemove", e => {
+  const now = performance.now();
+  if (lastPawX === null) { lastPawX = e.clientX; lastPawY = e.clientY; return; }
+  const dx = e.clientX - lastPawX, dy = e.clientY - lastPawY;
+  const dist = Math.hypot(dx, dy);
+  if (dist < 46 || now - lastPawT < 90) return;
+  const ang = Math.atan2(dy, dx);
+  // offset each print sideways so paws alternate like a real gait
+  const perp = ang + Math.PI / 2;
+  const px = e.clientX + Math.cos(perp) * 7 * pawSide;
+  const py = e.clientY + Math.sin(perp) * 7 * pawSide;
+  const print = document.createElement("div");
+  print.className = "paw-print";
+  print.style.left = px - 6 + "px";
+  print.style.top = py - 7 + "px";
+  // paws point in the direction of travel
+  print.style.setProperty("--rot", (ang * 180 / Math.PI + 90) + "deg");
+  document.body.appendChild(print);
+  requestAnimationFrame(() => print.classList.add("fade"));
+  setTimeout(() => print.remove(), 2200);
+  pawSide *= -1;
+  lastPawX = e.clientX; lastPawY = e.clientY; lastPawT = now;
+});

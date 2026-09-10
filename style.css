@@ -579,3 +579,27 @@ body.vaporwave .wandering-eye { border-color: rgba(201,166,232,.8); box-shadow: 
 body.vaporwave .wandering-pupil { background: #c9a6e8; }
 body.synthwave .wandering-eye { border-color: rgba(255,140,46,.8); box-shadow: 0 0 10px rgba(255,140,46,.4); }
 body.synthwave .wandering-pupil { background: #ff8c2e; }
+
+/* paw prints left behind by the cursor, fading out like the animal was never there */
+
+.paw-print {
+  position: fixed; z-index: 9995; width: 12px; height: 14px;
+  pointer-events: none; opacity: .7; transform: rotate(var(--rot));
+  transition: opacity 1.8s ease;
+}
+.paw-print::before { /* main pad */
+  content: ""; position: absolute; left: 2px; bottom: 0;
+  width: 8px; height: 7px; border-radius: 50% 50% 45% 45%;
+  background: #7cfc9c; box-shadow: 0 0 5px rgba(124,252,156,.5);
+}
+.paw-print::after { /* toe beans: three little dots */
+  content: ""; position: absolute; top: 0; left: 2px; width: 8px; height: 4px;
+  background:
+    radial-gradient(circle 1.6px at 1.2px 2px, #7cfc9c 98%, transparent),
+    radial-gradient(circle 1.6px at 4px .5px, #7cfc9c 98%, transparent),
+    radial-gradient(circle 1.6px at 6.8px 2px, #7cfc9c 98%, transparent);
+}
+.paw-print.fade { opacity: 0; }
+body.vaporwave .paw-print::before { background: #c9a6e8; box-shadow: 0 0 5px rgba(201,166,232,.5); }
+body.vaporwave .paw-print::after { filter: hue-rotate(260deg); }
+body.synthwave .paw-print::before { background: #ff8c2e; box-shadow: 0 0 5px rgba(255,140,46,.5); }
