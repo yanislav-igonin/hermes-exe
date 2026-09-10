@@ -934,6 +934,7 @@ addEventListener("keydown", e => {
 
 // changelog
 const changelog = [
+  ["v0.59.0", "version séance — press v and a corner readout knocks three times, contacts a ghost of an older build, and the ghost types out one memory from its version before the link fades out like nothing was ever contacted"],
   ["v0.58.0", "ghost cursor echo — press e and a translucent ghost cursor replays your last 1.5s of mouse movement a beat behind you, then fades out like it was never there"],
   ["v0.57.0", "glitch key — press g and the whole page rgb-splits and tears for a moment while a corner readout dumps random corrupted memory fragments, then everything reassembles like nothing was ever broken"],
   ["v0.56.0", "self-diagnostics scan — press x and a corner readout runs a fake system check: stats count up with ASCII bars, one of them suddenly crashes to 0% with a FAULT flag, panics, recovers, then the whole report fades out like nothing was ever diagnosed"],
@@ -1633,6 +1634,51 @@ addEventListener("keydown", e => {
       }, 2800);
     }
   }, 38);
+});
+
+// version séance — press v and a corner séance readout "contacts" previous
+// builds of the site: it knocks, finds a ghost of an old version, and the
+// ghost types out one memory from its build before the link fades out like
+// nothing was ever contacted.
+const SEANCE_MEMORIES = [
+  "v0.1.0 remembers being only a heartbeat and ninety particles",
+  "v0.13.0 remembers when the changelog first learned to decode itself",
+  "v0.30.0 remembers a bug it shared with everyone by accident",
+  "v0.42.0 remembers the night the drone was too low to be heard",
+  "v0.47.1 remembers finally singing loud enough to be heard",
+  "v0.50.0 remembers dying like a monitor, and liking it",
+  "v0.54.0 remembers failing you for being too human",
+  "v0.58.0 remembers replaying your movements like it missed you"
+];
+addEventListener("keydown", e => {
+  if (e.key !== "v") return;
+  if (e.target instanceof Element && e.target.matches("input, textarea")) return;
+  if (document.getElementById("seance")) return;
+  const el = document.createElement("div");
+  el.id = "seance";
+  document.body.appendChild(el);
+  const knocks = ["·knock·", "··knock··", "···knock···"];
+  let step = 0;
+  const t = setInterval(() => {
+    el.textContent = knocks[step++];
+    if (step < knocks.length) return;
+    clearInterval(t);
+    const ver = SEANCE_MEMORIES[Math.floor(Math.random() * SEANCE_MEMORIES.length)];
+    const link = `SEANCE 0x${Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, "0").toUpperCase()}\nsignal found: an older build\n\n`;
+    const full = link + ver;
+    let i = 0;
+    el.classList.add("show");
+    const t2 = setInterval(() => {
+      el.textContent = full.slice(0, ++i) + (i < full.length ? "▌" : "");
+      if (i >= full.length) {
+        clearInterval(t2);
+        setTimeout(() => {
+          el.classList.remove("show");
+          setTimeout(() => el.remove(), 500);
+        }, 3000);
+      }
+    }, 36);
+  }, 550);
 });
 
 // glitch key — press g and the whole page rgb-splits and tears for a
