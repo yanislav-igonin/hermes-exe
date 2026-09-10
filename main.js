@@ -1738,6 +1738,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.117.0", "aurora borealis — every ~2-3 min a soft shimmering curtain of green-teal light drifts across the upper sky, rays folding and swaying like slow silk, then fades away leaving no trace of the northern lights"],
   ["v0.116.0", "migrating geese — every ~2-3 min a small V-formation of birds crosses the upper page, each flapping on its own rhythm while the formation lazily reorders; the lead bird occasionally drops a fading honk glyph, then the flock sails away off-screen like the migration was never there"],
   ["v0.115.0", "message in a bottle — every ~2-4 min a small glass bottle with a rolled note inside bobs across the bottom of the page, rocking gently on invisible waves; the note briefly surfaces to be read, then the bottle washes away off-screen like the sea was never there"],
   ["v0.114.0", "bioluminescent jellyfish — every ~2-3 min a soft glowing jellyfish rises from the bottom of the page, pulsing as it climbs with a trailing fringe of glyph tendrils dissolving behind it, then fades back into the deep like the tide was never there"],
@@ -4001,4 +4002,51 @@ addEventListener("dblclick", e => {
     setTimeout(fly, 120000 + Math.random() * 60000);
   }
   setTimeout(fly, 12000 + Math.random() * 20000);
+})();
+
+// aurora borealis: every ~2-3 min a soft shimmering curtain of light drifts
+// across the upper sky, folding and swaying like slow silk, then fades away
+(function auroraBorealis() {
+  const ac = document.createElement("canvas");
+  ac.width = innerWidth; ac.height = Math.min(340, innerHeight * .45);
+  ac.style.cssText = "position:fixed;top:0;left:0;z-index:2;pointer-events:none;opacity:0;transition:opacity 3s ease-in-out;";
+  document.body.appendChild(ac);
+  const ax = ac.getContext("2d");
+  addEventListener("resize", () => { ac.width = innerWidth; ac.height = Math.min(340, innerHeight * .45); });
+  const HUES = [140, 160, 180, 200];
+  function show() {
+    const hue = HUES[Math.floor(Math.random() * HUES.length)];
+    let t = 0, last = 0, alive = true;
+    ac.style.opacity = .55;
+    const draw = (now) => {
+      if (!alive) return;
+      t += (now - last) / 1000 || 0; last = now;
+      ax.clearRect(0, 0, ac.width, ac.height);
+      const offsetX = Math.sin(t * .05) * ac.width * .25;
+      const rays = 7;
+      for (let i = 0; i < rays; i++) {
+        const baseX = ((offsetX + i * ac.width / rays) % (ac.width + 400)) - 200;
+        const sway = Math.sin(t * .7 + i * 1.3) * 60;
+        const grad = ax.createLinearGradient(baseX, 0, baseX + sway, ac.height);
+        const h = hue + Math.sin(t * .4 + i) * 20;
+        grad.addColorStop(0, "hsla(" + h + ",80%,65%,0)");
+        grad.addColorStop(.25, "hsla(" + h + ",80%,60%,.16)");
+        grad.addColorStop(1, "hsla(" + (h + 40) + ",85%,55%,0)");
+        ax.fillStyle = grad;
+        ax.beginPath();
+        ax.moveTo(baseX - 90, 0);
+        ax.bezierCurveTo(baseX + sway, ac.height * .5, baseX + sway * .4, ac.height * .7, baseX + sway * .8 - 60, ac.height);
+        ax.lineTo(baseX + sway * .8 + 120, ac.height);
+        ax.bezierCurveTo(baseX + sway * .4 + 180, ac.height * .65, baseX + sway + 150, ac.height * .4, baseX + 130, 0);
+        ax.closePath();
+        ax.fill();
+      }
+      // slow fade-out after ~14s of shimmering
+      if (t > 14) ac.style.opacity = 0;
+      if (t < 20) requestAnimationFrame(draw);
+      else { alive = false; setTimeout(show, 120000 + Math.random() * 60000); }
+    };
+    requestAnimationFrame(draw);
+  }
+  setTimeout(show, 15000 + Math.random() * 15000);
 })();
