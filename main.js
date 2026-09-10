@@ -2109,6 +2109,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.130.0", "pollen counter — every ~2-4 min a tiny readout surfaces in the corner reporting the local pollen count in grains/m³, recalculated from thin air each time, then drifts away like the allergy season was never measured"],
   ["v0.129.0", "page hiccup — every ~60-100s the page involuntarily hiccups: a few tiny jumps with a small \"hic\" toast in the corner, then everything settles like the spasm never happened"],
   ["v0.128.0", "shooting star — every ~2-4 min a bright meteor streaks diagonally across the upper sky with a sparkling tail, burns out mid-flight like the wish was never made, and fades back into the noise"],
   ["v0.127.0", "title glitch — every ~10-25s the tab title scrambles into glitch glyphs for a couple of seconds, then cascades back character by character like the signal just re-synced; stays quiet while the marquee owns the unfocused tab"],
@@ -4596,4 +4597,25 @@ addEventListener("dblclick", e => {
     }, 110);
   }
   setTimeout(hiccup, 35000 + Math.random() * 25000);
+})();
+
+// pollen counter — every ~2-4 min a tiny readout surfaces in the corner
+// reporting the local pollen count in grains/m³, recalculated from thin air
+// each time, then drifts away like the allergy season was never measured
+(function pollenCounter() {
+  const el = document.createElement("div");
+  el.id = "pollen-toast";
+  document.body.appendChild(el);
+  const LEVELS = ["low", "moderate", "high", "very high", "unhinged"];
+  function report() {
+    if (!document.hidden) {
+      const grains = 12 + Math.random() * 9800 | 0;
+      const level = LEVELS[Math.min(4, grains / 2200 | 0)];
+      el.textContent = `pollen: ${grains} grains/m³ (${level})`;
+      el.classList.add("show");
+      setTimeout(() => el.classList.remove("show"), 4200);
+    }
+    setTimeout(report, 120000 + Math.random() * 120000);
+  }
+  setTimeout(report, 25000 + Math.random() * 20000);
 })();
