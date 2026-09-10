@@ -2183,6 +2183,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.133.0", "reality hiccup — every ~4-7 min the whole page glitches out for 150ms: colors invert, an rgb-split tear runs through it, a scanline sweeps down, then it all snaps back like reality re-buffered and nobody saw anything"],
   ["v0.132.0", "pixel moth swarm — every ~90-150s one or two tiny moths flutter erratically around a random element on the page, drawn to its light for a few seconds, then flutter off-screen like the lamp was never lit"],
   ["v0.131.0", "garden snail — every ~3-6 min a tiny snail crosses the bottom of the page at a glacial pace, leaving a slowly fading slime trail behind it, antennae twitching as it goes, then vanishes like the garden was never crossed"],
   ["v0.130.0", "pollen counter — every ~2-4 min a tiny readout surfaces in the corner reporting the local pollen count in grains/m³, recalculated from thin air each time, then drifts away like the allergy season was never measured"],
@@ -4738,4 +4739,23 @@ addEventListener("dblclick", e => {
     })(start);
   }
   setTimeout(visit, 40000 + Math.random() * 30000);
+})();
+
+// reality hiccup — rarely (every ~4-7 min) the whole page glitches out for
+// 150ms: inverted colors, rgb-split tear, a scanline sweep — then snaps back
+// like reality re-buffered and nobody saw anything
+(function realityHiccup() {
+  setTimeout(() => {
+    if (!document.hidden) {
+      const veil = document.createElement("div");
+      veil.className = "reality-hiccup";
+      document.body.appendChild(veil);
+      document.body.classList.add("hiccuping");
+      setTimeout(() => {
+        veil.remove();
+        document.body.classList.remove("hiccuping");
+      }, 150);
+    }
+    realityHiccup();
+  }, 240000 + Math.random() * 180000);
 })();

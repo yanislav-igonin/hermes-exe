@@ -1677,3 +1677,22 @@ body.synthwave .sun-shower.ss-rainbow::after {
 }
 body.vaporwave .moth { filter: drop-shadow(0 0 4px rgba(201, 166, 232, .6)); }
 body.synthwave .moth { filter: drop-shadow(0 0 4px rgba(255, 140, 46, .6)); }
+
+/* reality hiccup: rare 150ms full-page glitch — inverted colors, rgb-split
+   tear, scanline sweep — then it snaps back like nothing happened */
+.reality-hiccup {
+  position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+  mix-blend-mode: difference; background: #fff; opacity: .12;
+}
+.reality-hiccup::before {
+  content: ""; position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg,
+    transparent 0 3px, rgba(255, 60, 60, .25) 3px 4px,
+    transparent 4px 7px, rgba(60, 200, 255, .25) 7px 8px);
+  animation: hiccup-scan .15s linear;
+}
+@keyframes hiccup-scan {
+  from { transform: translateY(-40px); }
+  to { transform: translateY(40px); }
+}
+body.hiccuping { filter: invert(1) hue-rotate(90deg) saturate(2); }
