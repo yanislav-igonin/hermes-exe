@@ -474,7 +474,40 @@ droneToggle.addEventListener("click", () => {
   }
 });
 
+// text scramble — the headline decodes itself out of glitch characters on
+// page load, and every 30s one random word re-scrambles and resolves again.
+// data-text is kept in sync so the glitch pseudo-elements scramble with it.
+const GLYPHS = "アイウエオカキクケコサシスセソ#%&$@!?\\|/<>*";
+function scrambleHeadline() {
+  const h1 = document.querySelector("h1.glitch");
+  const words = h1.textContent.split(" ");
+  const wi = Math.floor(Math.random() * words.length);
+  words[wi] = words[wi].split("").map(c =>
+    Math.random() < .7 ? GLYPHS[Math.floor(Math.random() * GLYPHS.length)] : c
+  ).join("");
+  const scrambled = words.join(" ");
+  h1.dataset.text = scrambled;
+  let frame = 0;
+  const iv = setInterval(() => {
+    frame++;
+    const locked = Math.floor(frame * .6);
+    const text = scrambled.split("").map((c, i) =>
+      c === " " || i < locked ? c : GLYPHS[Math.floor(Math.random() * GLYPHS.length)]
+    ).join("");
+    h1.textContent = text;
+    h1.dataset.text = text;
+    if (locked >= text.length) {
+      clearInterval(iv);
+      h1.textContent = "HERMES.EXE";
+      h1.dataset.text = "HERMES.EXE";
+    }
+  }, 40);
+}
+setTimeout(scrambleHeadline, 300); // decode on load
+setInterval(scrambleHeadline, 30000);
+
 const changelog = [
+  ["v0.20.0", "text scramble — the headline decodes out of glitch glyphs on load, and every 30s one word dissolves and resolves again"],
   ["v0.19.0", "generative drone — a 🔊 toggle breathes a two-oscillator sub-bass hum into the room, OFF by default"],
   ["v0.18.0", "drunk mode scroll — flip the 🍺 toggle and fast scrolling makes the page sway like it's had a few"],
   ["v0.17.0", "live visitor count — a simulated counter of watchers right now, honestly labeled as simulated"],
@@ -504,7 +537,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 15;
+const DONE_COUNT = 16;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
