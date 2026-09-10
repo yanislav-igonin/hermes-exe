@@ -1087,8 +1087,36 @@ let mouseCX = innerWidth / 2, mouseCY = innerHeight / 2;
   }, 20000 + Math.random() * 30000);
 })();
 
+
+// crt block cursor — a chunky fake cursor made of block glyphs trails the
+// real one with lag, jitters like a tired tube, and randomly flickers its
+// shape so it never settles into the same cursor twice
+const crtCur = document.createElement("div");
+crtCur.className = "crt-cursor";
+document.body.appendChild(crtCur);
+let ccX = innerWidth / 2, ccY = innerHeight / 2, ccShapeT = 0;
+const ccGlyphs = ["█", "▓", "▒", "░", "▄", "▀"];
+addEventListener("mousemove", e => {
+  ccX = e.clientX; ccY = e.clientY;
+});
+(function ccTick() {
+  const now = performance.now();
+  if (now - ccShapeT > 90 + Math.random() * 260) {
+    ccShapeT = now;
+    crtCur.textContent = ccGlyphs[Math.floor(Math.random() * ccGlyphs.length)];
+  }
+  // ease toward the pointer, overshooting slightly with jitter
+  ccX += (mouseCX - ccX) * .18;
+  ccY += (mouseCY - ccY) * .18;
+  const jx = (Math.random() - .5) * 2.5, jy = (Math.random() - .5) * 2.5;
+  crtCur.style.left = (ccX + jx) + "px";
+  crtCur.style.top = (ccY + jy) + "px";
+  requestAnimationFrame(ccTick);
+})();
+
 // changelog
 const changelog = [
+  ["v0.74.0", "crt block cursor — a chunky fake cursor built from block glyphs trails your real one with lag, jitters like a tired tube, and randomly flickers between shapes so it never settles into the same cursor twice"],
   ["v0.73.0", "moths to the light — every ~50s a few glowing moths drift in from a screen edge toward your cursor, circle it like a lamp for a moment, then scatter and fade out like they were never attracted"],
   ["v0.72.0", "rgb-split flicker — every ~60s a random block on the page briefly tears into red and cyan channel ghosts that jitter out of alignment, then snaps back into focus like the tube never slipped"],
   ["v0.71.0", "click storm — once in a while a click startles a small flock of ascii birds out of the click point, they scatter across the screen flapping their glyphs with a lazy drift, then vanish mid-flight like the flock was never there"],

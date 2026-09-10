@@ -650,3 +650,16 @@ body.synthwave .moth { background: #ff8c2e; box-shadow: 0 0 6px 2px rgba(255,140
 @keyframes rs-jitter {
   50% { transform: translateX(calc(var(--rs-x, 3px) * -.5)); }
 }
+
+/* the crt block cursor: a chunky fake cursor of block glyphs that trails
+   the real one, jitters like a tired tube and flickers between shapes */
+.crt-cursor {
+  position: fixed; z-index: 9995; pointer-events: none;
+  font-size: 18px; line-height: 1;
+  color: #d9f7b2;
+  text-shadow: 0 0 6px rgba(217,247,178,.6);
+  transform: translate(-50%, -50%);
+  user-select: none;
+}
+body.vaporwave .crt-cursor { color: #c9a6e8; text-shadow: 0 0 6px rgba(201,166,232,.6); }
+body.synthwave .crt-cursor { color: #ff8c2e; text-shadow: 0 0 6px rgba(255,140,46,.6); }
