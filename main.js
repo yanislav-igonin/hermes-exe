@@ -126,6 +126,20 @@ let rainUntil = 0;
     ctx.fillStyle = `rgba(124,252,156,${.8 * t.life})`;
     ctx.fill();
   }
+  // static burst — draw analog noise while the signal is out
+  if (!staticUntil && now > nextStaticAt) staticUntil = now + 150;
+  if (staticUntil) {
+    if (now < staticUntil) {
+      const img = sctx.createImageData(staticCanvas.width, staticCanvas.height);
+      const d = img.data;
+      for (let i = 0; i < d.length; i += 4) {
+        const v = Math.random() * 255;
+        d[i] = v * .5; d[i + 1] = v; d[i + 2] = v * .65; d[i + 3] = 90;
+      }
+      sctx.putImageData(img, 0, 0);
+      ctx.drawImage(staticCanvas, 0, 0, canvas.width, canvas.height);
+    } else { staticUntil = 0; nextStaticAt = now + 25000 * (.7 + Math.random() * .6); }
+  }
   requestAnimationFrame(tick);
 })();
 
@@ -606,6 +620,14 @@ function confessionTick() {
 setTimeout(confessionTick, 8000);
 setInterval(confessionTick, 90000);
 
+// static burst — every ~25s the signal cuts out for ~150ms: the background
+// crackles with green-tinted analog static, like an old CRT losing reception.
+let staticUntil = 0, nextStaticAt = performance.now() + 25000 * (.7 + Math.random() * .6);
+const staticCanvas = document.createElement("canvas");
+const sctx = staticCanvas.getContext("2d");
+function resizeStatic() { staticCanvas.width = Math.ceil(canvas.width / 3); staticCanvas.height = Math.ceil(canvas.height / 3); }
+resizeStatic(); addEventListener("resize", resizeStatic);
+
 // corner wormhole — click within 120px of any page corner and the headline's
 // letters briefly spiral into a vortex around that corner before settling back.
 // works with the gravity tick's letter spans; re-wraps them if plain text snuck in.
@@ -649,6 +671,7 @@ addEventListener("mousedown", e => {
 });
 
 const changelog = [
+  ["v0.26.0", "static burst — every ~25s the signal cuts out for a split second and the background crackles with green analog static"],
   ["v0.25.0", "corner wormhole — click near any corner of the page and the title's letters get briefly sucked into a spiral vortex, then settle back"],
   ["v0.24.0", "terminal confession — every ~90s the agent types a one-line self-aware confession in the corner, letter by letter"],
   ["v0.23.0", "title letter gravity — the headline's letters lean and stretch toward your cursor like they feel its mass"],
@@ -684,7 +707,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 17;
+const DONE_COUNT = 18;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
