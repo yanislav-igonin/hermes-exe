@@ -1000,6 +1000,7 @@ setInterval(() => {
 
 // changelog
 const changelog = [
+  ["v0.66.0", "blackout — press b and the page plunges into darkness; only a flickering flashlight beam around your cursor reveals what is left, press b again and the lights come back as if nothing happened"],
   ["v0.65.0", "gravity — press g and every block of text on the page falls, bounces off the bottom of the viewport, then floats back up to its place as if it never left the shelf"],
   ["v0.64.0", "crash test — press x and every line of text on the page corrupts into garbage bytes like a bad memory read, then rebuilds itself in random order while the corruption flickers back, until the page remembers what it was trying to say"],
   ["v0.63.0", "tape worm — press w and a worm of characters slithers across the page, eating its way in a wavy path while leaving a fading trail of digested glyphs, until it crawls off the far edge like it was never fed"],
@@ -1928,6 +1929,47 @@ addEventListener("keydown", e => {
   };
   requestAnimationFrame(step);
 });
+
+// blackout — press b and the page plunges into darkness; only a flickering
+// flashlight beam around your cursor reveals what is left, press b again and
+// the lights come back as if nothing ever happened.
+addEventListener("keydown", e => {
+  if (e.key !== "b") return;
+  if (e.target instanceof Element && e.target.matches("input, textarea")) return;
+  const body = document.body;
+  if (body.dataset.blackout) { // lights on
+    delete body.dataset.blackout;
+    beam.style.opacity = "";
+    veil.style.opacity = "";
+    return;
+  }
+  body.dataset.blackout = "1";
+  beam.style.opacity = "1";
+  veil.style.opacity = "1";
+});
+const beam = document.createElement("div"); // flickering flashlight beam
+const veil = document.createElement("div"); // darkness hiding the page
+Object.assign(beam.style, {
+  position: "fixed", inset: "0", pointerEvents: "none", opacity: "0",
+  background: "radial-gradient(circle 210px at var(--bx, 50%) var(--by, 40%), rgba(255,244,214,.16) 0%, rgba(255,244,214,.07) 45%, transparent 78%)",
+  zIndex: 9998, transition: "opacity .4s", mixBlendMode: "screen"
+});
+Object.assign(veil.style, {
+  position: "fixed", inset: "0", pointerEvents: "none", opacity: "0",
+  background: "rgba(1,2,4,.94)", zIndex: 9997, transition: "opacity .5s"
+});
+document.body.append(beam, veil);
+addEventListener("mousemove", e => {
+  beam.style.setProperty("--bx", e.clientX + "px");
+  beam.style.setProperty("--by", e.clientY + "px");
+});
+(function beamFlicker() { // the bulb is old; the beam breathes
+  if (document.body.dataset.blackout) {
+    beam.style.opacity = (0.75 + Math.random() * 0.45).toFixed(2);
+    veil.style.background = `rgba(1,2,4,${(0.9 + Math.random() * 0.08).toFixed(3)})`;
+  }
+  setTimeout(beamFlicker, 90 + Math.random() * 160);
+})();
 
 // crash test — press x and every line of visible text on the page corrupts
 // into garbage bytes like a bad memory read, then rebuilds itself character
