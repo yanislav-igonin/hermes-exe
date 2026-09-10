@@ -2477,6 +2477,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.156.0", "firefly swarm — every ~1-2 min a handful of tiny glowing fireflies drifts across the page, blinking softly around a loose center, then scatters and fades out like the summer night was never there"],
   ["v0.155.0", "pigeon visitor — every ~1-3 min a small pixel pigeon flutters down onto the top edge of the page, bobs its head and pecks at nothing a couple of times, then takes off again like the visit was never made"],
   ["v0.154.0", "meteor streak — every ~30-90s a shooting star crosses the top of the page, a glowing point dragging a fading comet tail, burning out mid-flight like it was never there"],
   ["v0.153.0", "streetlamp flicker — every ~1-2 min a random element on the page flickers like a dying streetlamp, dipping and sputtering a couple of times, then glows steady again like the bulb was never dying"],
@@ -5584,3 +5585,51 @@ addEventListener("dblclick", e => {
   }
   setTimeout(visit, 15000 + Math.random() * 25000);
 })();
+
+// firefly swarm — every ~1-2 min a handful of tiny glowing fireflies drift
+// across the page, blinking softly, then scatter and vanish
+(function () {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const spawn = () => {
+    const swarmSize = 5 + (Math.random() * 4 | 0);
+    const fly = [];
+    const cx = innerWidth * (.15 + Math.random() * .7);
+    const cy = innerHeight * (.15 + Math.random() * .6);
+    for (let i = 0; i < swarmSize; i++) {
+      const el = document.createElement("div");
+      el.className = "firefly";
+      document.body.appendChild(el);
+      const f = { el, x: cx + (Math.random() - .5) * 120, y: cy + (Math.random() - .5) * 120,
+        vx: (Math.random() - .5) * .8, vy: (Math.random() - .5) * .8, phase: Math.random() * 7 };
+      fly.push(f);
+    }
+    let alive = true, t = 0;
+    const step = () => {
+      if (!alive) return;
+      t++;
+      const spread = Math.min(1, t / 600);
+      for (const f of fly) {
+        // wander with a soft pull that fades as the swarm disperses
+        const dx = cx - f.x, dy = cy - f.y;
+        f.vx += dx * .0004 * (1 - spread) + (Math.random() - .5) * .3;
+        f.vy += dy * .0004 * (1 - spread) + (Math.random() - .5) * .3;
+        f.vx *= .97; f.vy *= .97;
+        f.x += f.vx; f.y += f.vy;
+        f.phase += .12;
+        const glow = .35 + .65 * Math.max(0, Math.sin(f.phase));
+        f.el.style.transform = "translate(" + f.x + "px," + f.y + "px)";
+        f.el.style.opacity = glow.toFixed(2);
+      }
+      if (t < 900) requestAnimationFrame(step);
+      else {
+        alive = false;
+        for (const f of fly) { f.el.style.transition = "opacity 1.5s ease-out"; f.el.style.opacity = "0"; }
+        setTimeout(() => fly.forEach(f => f.el.remove()), 1600);
+      }
+    };
+    requestAnimationFrame(step);
+    setTimeout(spawn, 60000 + Math.random() * 60000);
+  };
+  setTimeout(spawn, 10000 + Math.random() * 15000);
+})();
+
