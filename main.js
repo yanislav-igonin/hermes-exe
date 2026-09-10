@@ -932,8 +932,38 @@ addEventListener("keydown", e => {
   }, 40);
 });
 
+// battery of the site — a tiny corner readout shows the site's own battery,
+// draining slowly over the session. as it dies the page dims a touch; at 0%
+// the site "reboots": brief boot flash, battery jumps back to 100%.
+const batteryEl = document.createElement("div");
+batteryEl.id = "site-battery";
+document.body.appendChild(batteryEl);
+const bootVeil = document.createElement("div");
+bootVeil.id = "boot-veil";
+bootVeil.textContent = "restarting…";
+document.body.appendChild(bootVeil);
+let battery = 100, booting = false;
+setInterval(() => {
+  if (booting) return;
+  battery = Math.max(0, battery - 1);
+  batteryEl.textContent = `power ${battery}% ${"▮".repeat(Math.ceil(battery / 10))}${"▯".repeat(10 - Math.ceil(battery / 10))}`;
+  batteryEl.classList.toggle("low", battery <= 20);
+  // the site sags as it dies: content dims proportionally (never fully dark)
+  document.body.style.setProperty("--battery-dim", (1 - battery / 100 * .35).toFixed(3));
+  if (battery <= 0) {
+    booting = true;
+    bootVeil.classList.add("show");
+    setTimeout(() => {
+      battery = 100;
+      bootVeil.classList.remove("show");
+      booting = false;
+    }, 1600);
+  }
+}, 4000);
+
 // changelog
 const changelog = [
+  ["v0.61.0", "battery of the site — the site has its own battery that slowly drains while you are here; the page dims as it dies, and at 0% it reboots to 100% with a brief boot flash"],
   ["v0.60.0", "defrag ritual — press d and a corner readout runs a fake disk defragmentation: blocks scatter, shuffle, then settle into neat ordered stripes as the fragmentation counter grinds to 0%, before fading out like nothing was ever defragmented"],
   ["v0.59.0", "version séance — press v and a corner readout knocks three times, contacts a ghost of an older build, and the ghost types out one memory from its version before the link fades out like nothing was ever contacted"],
   ["v0.58.0", "ghost cursor echo — press e and a translucent ghost cursor replays your last 1.5s of mouse movement a beat behind you, then fades out like it was never there"],

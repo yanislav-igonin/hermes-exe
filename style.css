@@ -495,3 +495,25 @@ body.synthwave #fortune { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 140, 46
 #defrag.show { opacity: .9; }
 body.vaporwave #defrag { color: #c9a6e8; text-shadow: 0 0 8px rgba(201, 166, 232, .5); }
 body.synthwave #defrag { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 140, 46, .5); }
+
+/* battery of the site — a corner power meter that drains and dims the page;
+   the whole site sags via a brightness var proportional to remaining charge */
+body { filter: brightness(var(--battery-dim, 1)); }
+#site-battery {
+  position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+  z-index: 9997; font-size: .72rem; font-family: monospace;
+  color: #4a4a55; letter-spacing: 1px; pointer-events: none; user-select: none;
+  transition: color .5s;
+}
+#site-battery.low { color: #ffb347; text-shadow: 0 0 8px rgba(255, 179, 71, .6); animation: modemblink 1s steps(1) infinite; }
+body.vaporwave #site-battery.low { color: #ff9ff3; }
+body.synthwave #site-battery.low { color: #ff8c2e; }
+/* boot veil — full-black flash with a restarting tag when the battery dies */
+#boot-veil {
+  position: fixed; inset: 0; z-index: 10001; display: flex;
+  align-items: center; justify-content: center;
+  background: #020403; color: #7cfc9c; font-family: monospace;
+  font-size: .85rem; letter-spacing: 4px; text-shadow: 0 0 10px rgba(124,252,156,.6);
+  opacity: 0; pointer-events: none; transition: opacity .3s;
+}
+#boot-veil.show { opacity: 1; }
