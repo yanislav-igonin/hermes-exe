@@ -2058,8 +2058,58 @@ addEventListener("mousemove", e => {
   setTimeout(flyby, 30000 + Math.random() * 40000);
 })();
 
+// shooting star — every ~2-4 min a meteor streaks diagonally across the upper
+// sky with a sparkling fading tail, burns out mid-flight, and vanishes
+(function shootingStar() {
+  const star = document.createElement("div");
+  star.style.cssText = "position:fixed;z-index:3;pointer-events:none;will-change:transform;opacity:0;transition:opacity .5s ease-in;";
+  star.innerHTML =
+    '<svg width="90" height="26" viewBox="0 0 90 26" style="display:block;filter:drop-shadow(0 0 6px rgba(255,245,200,.8))">' +
+      // sparkling tail: sparks get dimmer toward the end
+      '<g stroke="rgba(255,240,190,.9)" stroke-width="1.6" stroke-linecap="round">' +
+        '<line x1="2" y1="20" x2="16" y2="17" opacity=".25"/>' +
+        '<line x1="16" y1="17" x2="34" y2="14" opacity=".45"/>' +
+        '<line x1="34" y1="14" x2="52" y2="11" opacity=".7"/>' +
+      '</g>' +
+      '<line x1="52" y1="11" x2="66" y2="9" stroke="rgba(255,250,220,.95)" stroke-width="2" stroke-linecap="round"/>' +
+      // bright head with a tiny halo
+      '<circle cx="70" cy="8.5" r="3.2" fill="rgba(255,250,215,.35)"/>' +
+      '<circle cx="70" cy="8.5" r="1.7" fill="rgba(255,255,240,1)"/>' +
+    "</svg>";
+  document.body.appendChild(star);
+
+  function streak() {
+    const fromLeft = Math.random() < .5;
+    const x0 = fromLeft ? -100 : innerWidth + 30;
+    const x1 = fromLeft ? innerWidth * .55 : -100;
+    const y0 = 20 + Math.random() * (innerHeight * 0.3);
+    const dur = 1400 + Math.random() * 1000; // fast — stars don't linger
+    const burnAt = .55 + Math.random() * .25; // burns out mid-flight
+    let t0 = null;
+    star.style.opacity = "1";
+
+    (function frame(now) {
+      if (t0 === null) t0 = now;
+      let t = Math.min(1, (now - t0) / dur);
+      // after burnout the head dies and only the tail lingers
+      if (t > burnAt) {
+        star.style.opacity = Math.max(0, 1 - (t - burnAt) / (1 - burnAt) * 1.4).toFixed(2);
+      }
+      const x = x0 + (x1 - x0) * t;
+      const y = y0 + t * t * (innerHeight * 0.18); // slight downward arc
+      const flicker = .85 + Math.sin(now * .04) * .15;
+      star.style.transform =
+        "translate(" + x + "px," + y + "px) rotate(" + (fromLeft ? 12 : 168) + "deg) scale(" + flicker + ")";
+      if (t < 1) requestAnimationFrame(frame);
+      else { star.style.opacity = "0"; setTimeout(streak, 120000 + Math.random() * 120000); }
+    })(performance.now());
+  }
+  setTimeout(streak, 45000 + Math.random() * 60000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.128.0", "shooting star — every ~2-4 min a bright meteor streaks diagonally across the upper sky with a sparkling tail, burns out mid-flight like the wish was never made, and fades back into the noise"],
   ["v0.127.0", "title glitch — every ~10-25s the tab title scrambles into glitch glyphs for a couple of seconds, then cascades back character by character like the signal just re-synced; stays quiet while the marquee owns the unfocused tab"],
   ["v0.126.0", "phantom apparition - a faint ghost materializes somewhere on the page every so often, wobbles gently, whispers a quiet boo... and dissolves back into the noise"],
 
