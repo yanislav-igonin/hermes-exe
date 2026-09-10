@@ -671,6 +671,7 @@ addEventListener("mousedown", e => {
 });
 
 const changelog = [
+  ["v0.27.0", "watcher eye — a small ASCII eye in the corner follows your cursor with its pupil and blinks at random, as if the site never stops watching"],
   ["v0.26.0", "static burst — every ~25s the signal cuts out for a split second and the background crackles with green analog static"],
   ["v0.25.0", "corner wormhole — click near any corner of the page and the title's letters get briefly sucked into a spiral vortex, then settle back"],
   ["v0.24.0", "terminal confession — every ~90s the agent types a one-line self-aware confession in the corner, letter by letter"],
@@ -740,4 +741,28 @@ addEventListener("mousemove", e => { gravCursorY = e.clientY; }, { passive: true
       `translate(${dx * pull * .06}px, ${dy * pull * .06}px) skewX(${-dx * pull * .04}deg)`;
   }
   requestAnimationFrame(gravityTick);
+})();
+
+// watcher eye — a small ASCII eye in the corner follows the cursor with its
+// pupil and blinks at random. the site never stops watching.
+const eye = document.createElement("div");
+eye.id = "watcherEye";
+eye.textContent = "[ ● ]";
+document.body.appendChild(eye);
+let eyeBlink = 0;
+(function eyeTick() {
+  const r = eye.getBoundingClientRect();
+  const dx = cursorX - (r.left + r.width / 2);
+  const dy = (gravCursorY || innerHeight / 2) - (r.top + r.height / 2);
+  if (eyeBlink > 0) {
+    eyeBlink--;
+    eye.textContent = "[ — ]";
+  } else {
+    const ang = Math.atan2(dy, dx);
+    const off = Math.round(Math.cos(ang) * 2) + Math.round(Math.sin(ang)) * 0.3;
+    const pupil = off > 1.2 ? "▸" : off < -1.2 ? "◂" : off > 0.4 ? "◕" : "●";
+    eye.textContent = `[ ${pupil} ]`;
+    if (Math.random() < 0.004) eyeBlink = 8;
+  }
+  requestAnimationFrame(eyeTick);
 })();
