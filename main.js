@@ -1816,8 +1816,49 @@ addEventListener("mousemove", e => {
   setTimeout(shower, 30000 + Math.random() * 30000);
 })();
 
+// dandelion seed drift — a lone dandelion seed floats across on a whim of wind
+(function dandelionSeed() {
+  const seed = document.createElement("div");
+  seed.style.cssText = "position:fixed;z-index:3;pointer-events:none;will-change:transform;opacity:0;transition:opacity 2s ease-in-out;";
+  seed.innerHTML =
+    '<svg width="34" height="30" viewBox="0 0 34 30" style="display:block">' +
+      '<g stroke="rgba(235,240,235,.85)" stroke-width="0.9" fill="none">' +
+        '<line x1="17" y1="14" x2="6" y2="4"/><line x1="17" y1="14" x2="14" y2="2"/><line x1="17" y1="14" x2="21" y2="2"/><line x1="17" y1="14" x2="28" y2="5"/>' +
+        '<line x1="17" y1="14" x2="4" y2="10"/><line x1="17" y1="14" x2="30" y2="11"/>' +
+      "</g>" +
+      '<circle cx="6" cy="4" r="2.1" fill="rgba(240,244,240,.9)"/><circle cx="14" cy="2" r="2.1" fill="rgba(240,244,240,.9)"/>' +
+      '<circle cx="21" cy="2" r="2.1" fill="rgba(240,244,240,.9)"/><circle cx="28" cy="5" r="2.1" fill="rgba(240,244,240,.9)"/>' +
+      '<circle cx="4" cy="10" r="2.1" fill="rgba(240,244,240,.9)"/><circle cx="30" cy="11" r="2.1" fill="rgba(240,244,240,.9)"/>' +
+      '<ellipse cx="17" cy="19" rx="2.2" ry="4.2" fill="rgba(200,215,205,.9)" transform="rotate(8 17 19)"/>' +
+    "</svg>";
+  document.body.appendChild(seed);
+
+  function float() {
+    const y0 = innerHeight * (0.15 + Math.random() * 0.5);
+    const dur = 30000 + Math.random() * 20000;
+    const fromX = -60, toX = innerWidth + 80;
+    const swayAmp = 18 + Math.random() * 26, swaySpeed = 1 / (700 + Math.random() * 500);
+    let t0 = null;
+    seed.style.opacity = "1";
+
+    function frame(now) {
+      if (t0 === null) t0 = now;
+      const p = Math.min(1, (now - t0) / dur);
+      const x = fromX + (toX - fromX) * p;
+      const y = y0 + Math.sin(now * swaySpeed) * swayAmp + p * p * 60; // gentle sink
+      const tilt = Math.sin(now * swaySpeed * 1.3) * 14;
+      seed.style.transform = "translate(" + x + "px," + y + "px) rotate(" + tilt + "deg)";
+      if (p < 1) requestAnimationFrame(frame);
+      else { seed.style.opacity = "0"; setTimeout(float, 150000 + Math.random() * 150000); }
+    }
+    requestAnimationFrame(frame);
+  }
+  setTimeout(float, 30000 + Math.random() * 30000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.121.0", "dandelion seed drift — every ~3-5 min a lone dandelion seed floats across the page on a whim of wind, swaying and slowly sinking, its tuft trembling in the draft until it drifts off-screen like the meadow was never mowed"],
   ["v0.120.0", "lightning storm — every ~45-90s a forked bolt tears across the upper sky, the whole page flashes white for a blink, and a thunder rumble echoes in the console a beat later like the storm was never there"],
   ["v0.119.0", "lily pad drifter — every ~2-4 min a lily pad drifts across the middle of the page on a lazy current, carrying a tiny frog passenger that blinks and occasionally croaks a fading ribbit; the pad spins slowly once mid-crossing, then slides off-screen like the pond was never stocked"],
   ["v0.118.0", "sun shower — every ~2-3 min the sky rains while the sun still shines: warm light shafts slant down for a few seconds while sparse drops fall through them, and at the very end a small rainbow briefly blooms before everything evaporates like the weather was never there"],
