@@ -2109,6 +2109,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.129.0", "page hiccup — every ~60-100s the page involuntarily hiccups: a few tiny jumps with a small \"hic\" toast in the corner, then everything settles like the spasm never happened"],
   ["v0.128.0", "shooting star — every ~2-4 min a bright meteor streaks diagonally across the upper sky with a sparkling tail, burns out mid-flight like the wish was never made, and fades back into the noise"],
   ["v0.127.0", "title glitch — every ~10-25s the tab title scrambles into glitch glyphs for a couple of seconds, then cascades back character by character like the signal just re-synced; stays quiet while the marquee owns the unfocused tab"],
   ["v0.126.0", "phantom apparition - a faint ghost materializes somewhere on the page every so often, wobbles gently, whispers a quiet boo... and dissolves back into the noise"],
@@ -4571,4 +4572,28 @@ addEventListener("dblclick", e => {
     setTimeout(glitch, 10000 + Math.random() * 15000);
   }
   setTimeout(glitch, 6000 + Math.random() * 8000);
+})();
+
+// page hiccup — every ~60-100s the page involuntarily hiccups: three tiny
+// jumps with a small "hic" toast in the corner, then everything settles like
+// the spasm never happened
+(function pageHiccup() {
+  const el = document.createElement("div");
+  el.id = "hiccup-toast";
+  el.textContent = "hic.";
+  document.body.appendChild(el);
+  function hiccup() {
+    let jumps = 0;
+    const t = setInterval(() => {
+      document.body.classList.toggle("hiccuping");
+      el.classList.add("show");
+      if (++jumps >= 6) {
+        clearInterval(t);
+        document.body.classList.remove("hiccuping");
+        setTimeout(() => el.classList.remove("show"), 1000);
+        setTimeout(hiccup, 60000 + Math.random() * 40000);
+      }
+    }, 110);
+  }
+  setTimeout(hiccup, 35000 + Math.random() * 25000);
 })();
