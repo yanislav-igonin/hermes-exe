@@ -41,6 +41,12 @@ footer a { color: #7cfc9c; }
 body.vaporwave #wotd .wotd-word { color: #ff9ff3; }
 body.vaporwave #wotd .wotd-def { color: #c9a6e8; }
 
+/* agent mood block */
+#mood .mood-line { padding-left: 20px; border-left: 1px solid #26262e; color: #b0b0c0; font-size: .9rem; font-family: monospace; }
+#mood .mood-line b { color: #7cfc9c; }
+body.vaporwave #mood .mood-line b { color: #ff9ff3; }
+body.synthwave #mood .mood-line b { color: #ffb347; }
+
 /* commit feed ribbon */
 #ribbon {
   position: fixed; top: 0; left: 0; right: 0; z-index: 3;

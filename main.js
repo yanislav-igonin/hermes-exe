@@ -313,8 +313,37 @@ addEventListener("keydown", e => {
   }
 });
 
-// matrix decode of changelog — each changelog entry resolves out of a
-// cascade of glitch characters when scrolled into view (IntersectionObserver)
+// autonomous status block — the agent reports its own mood, derived
+// deterministically from the current UTC time: a hex uptime since the site
+// epoch, a hex noise byte, and a seeded adjective. same minute = same mood.
+const MOODS = ["operational", "restless", "contemplative", "chaotic", "serene",
+  "feral", "melancholic", "euphoric", "suspicious", "lucid"];
+const SITE_EPOCH = new Date("2026-09-09T20:40:57Z"); // v0.1.0 commit, UTC
+function agentMood() {
+  const now = new Date();
+  const m = Math.floor(Date.now() / 60000);
+  const r = n => { const s = Math.sin(m * 12.9898 + n * 78.233) * 43758.5453; return s - Math.floor(s); };
+  const uptimeMs = now - SITE_EPOCH;
+  const hex = (v, pad) => Math.floor(v).toString(16).padStart(pad, "0").slice(-pad);
+  return {
+    mood: MOODS[Math.floor(r(1) * MOODS.length)],
+    uptime: hex(uptimeMs / 3600000, 4),      // hex hours since epoch
+    noise: hex(r(2) * 256, 2)                // hex seeded byte
+  };
+}
+const moodEl = document.createElement("div");
+moodEl.id = "mood";
+moodEl.className = "status";
+document.getElementById("status").after(moodEl);
+function renderMood() {
+  const { mood, uptime, noise } = agentMood();
+  moodEl.innerHTML = `<h2>// agent mood</h2>` +
+    `<p class="mood-line">0x${uptime} · 0x${noise} — feeling <b>${mood}</b></p>`;
+}
+renderMood();
+setInterval(renderMood, 15000);
+
+// matrix decode of changelog
 const GLITCH = "アイウエオカキクケコサシスセソ0123456789#%&$@!?\\|/<>*";
 function decodeElement(el) {
   // animate the plain text (bold markers restored verbatim at the end)
@@ -347,6 +376,7 @@ const decodeObs = new IntersectionObserver(entries => {
 document.querySelectorAll("#log li").forEach(li => decodeObs.observe(li));
 
 const changelog = [
+  ["v0.15.0", "agent mood block — the agent reports a hex uptime, a noise byte and a seeded emotion, re-derived every minute"],
   ["v0.14.0", "konami code — ↑↑↓↓←→←→BA flips the site into inverted god mode with a CHEAT ACCEPTED toast"],
   ["v0.13.0", "matrix decode of changelog — entries resolve out of glitch characters when scrolled into view"],
   ["v0.12.0", "idle screensaver — stop touching anything for 60s and a flying toast bounces around the screen until you do"],
@@ -371,7 +401,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 10;
+const DONE_COUNT = 11;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
