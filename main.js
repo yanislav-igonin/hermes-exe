@@ -2477,6 +2477,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.152.0", "garden snail — every ~2-4 min a tiny snail with a spiraled shell slowly creeps along the bottom edge of the page, antennae twitching, leaving a fading slime trail behind it, then slides off-screen like the commute was never made"],
   ["v0.151.0", "page lean — every ~40-90s the whole page leans a couple of degrees for a moment, like someone quietly rested an elbow on it, then springs upright again like nothing happened"],
   ["v0.150.0", "wind chime — every ~2-4 min a tiny wind chime dangles down from the top edge of the page, swaying in the breeze as its little tubes knock together and drop the occasional fading note glyph, then the wind dies and it vanishes like it was never hung"],
   ["v0.149.0", "shooting star — every ~1-2 min a meteor streaks diagonally across the upper sky with a tapering glowing trail, flares once, and vanishes like the wish was never made"],
@@ -5451,4 +5452,45 @@ addEventListener("dblclick", e => {
     setTimeout(lean, 40000 + Math.random() * 50000);
   }
   setTimeout(lean, 30000 + Math.random() * 30000);
+})();
+
+// garden snail — every ~2-4 min a tiny snail with a spiraled shell slowly
+// creeps along the bottom edge of the page, antennae twitching, leaving a
+// fading slime trail behind it, then slides off-screen like the commute was
+// never made
+(function gardenSnail() {
+  function crawl() {
+    if (!document.hidden) {
+      const el = document.createElement("div");
+      el.className = "garden-snail";
+      const ltr = Math.random() < .5;
+      const dur = 26000 + Math.random() * 18000;
+      el.style.setProperty("--sn-dur", dur + "ms");
+      el.style.setProperty("--sn-flip", ltr ? "1" : "-1");
+      // start just off one edge, crawl fully across to the other
+      el.style.setProperty("--sn-from", (ltr ? "-70px" : "calc(100vw + 70px)"));
+      el.style.setProperty("--sn-to", (ltr ? "calc(100vw + 70px)" : "-70px"));
+      document.body.appendChild(el);
+      const body = el.appendChild(document.createElement("div"));
+      body.className = "sn-body";
+      const shell = body.appendChild(document.createElement("div"));
+      shell.className = "sn-shell";
+      for (let i = 0; i < 3; i++) shell.appendChild(document.createElement("i"));
+      const antennae = body.appendChild(document.createElement("div"));
+      antennae.className = "sn-antennae";
+      // slime trail — little glistening specks dropped along the way
+      const dropSlime = setInterval(() => {
+        if (!el.isConnected) return clearInterval(dropSlime);
+        const s = document.createElement("span");
+        s.className = "sn-slime";
+        s.style.setProperty("--sn-sx", (Math.random() * 8 - 4) + "px");
+        s.style.left = (ltr ? el.offsetLeft : innerWidth - el.offsetLeft - 44) + "px";
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 6000);
+      }, 700);
+      setTimeout(() => { el.remove(); clearInterval(dropSlime); }, dur + 800);
+    }
+    setTimeout(crawl, 120000 + Math.random() * 120000);
+  }
+  setTimeout(crawl, 25000 + Math.random() * 35000);
 })();
