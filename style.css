@@ -2357,6 +2357,32 @@ body.page-lean-return {
 body.vaporwave .pigeon { color: rgba(201,166,232,.6); text-shadow: 0 0 6px rgba(201,166,232,.3); }
 body.synthwave .pigeon { color: rgba(255,140,46,.6); text-shadow: 0 0 6px rgba(255,140,46,.3); }
 
+/* shooting star — a bright star streaks diagonally across the upper sky with
+   a tapering glowing trail, burns out mid-flight like the wish was never made */
+.shooting-star {
+  position: fixed;
+  z-index: 9994;
+  pointer-events: none;
+  width: 130px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 244, 214, .85) 60%, #fff);
+  box-shadow: 0 0 8px rgba(255, 230, 160, .7), 0 0 18px rgba(255, 220, 140, .25);
+  opacity: 0;
+  transform: rotate(var(--ss-angle, .5rad));
+}
+.shooting-star.fly {
+  animation: shooting-star-fly var(--ss-dur, 1200ms) cubic-bezier(.25, .6, .45, 1) forwards;
+}
+@keyframes shooting-star-fly {
+  0%   { opacity: 0; transform: rotate(var(--ss-angle, .5rad)) translateX(0); }
+  12%  { opacity: 1; }
+  65%  { opacity: .85; }
+  100% { opacity: 0; transform: rotate(var(--ss-angle, .5rad)) translate(var(--ss-dx, 40vw), var(--ss-dy, 20vh)); }
+}
+body.vaporwave .shooting-star { background: linear-gradient(90deg, rgba(201,166,232,0), rgba(201,166,232,.85) 60%, #e9d5ff); box-shadow: 0 0 8px rgba(201,166,232,.6), 0 0 18px rgba(201,166,232,.25); }
+body.synthwave .shooting-star { background: linear-gradient(90deg, rgba(255,140,46,0), rgba(255,150,60,.85) 60%, #ffd9a0); box-shadow: 0 0 8px rgba(255,140,46,.6), 0 0 18px rgba(255,140,46,.25); }
+
 /* fireflies */
 .firefly {
   position: fixed;

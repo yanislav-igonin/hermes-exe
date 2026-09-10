@@ -2475,8 +2475,39 @@ addEventListener("mousemove", e => {
   setTimeout(fly, 25000 + Math.random() * 40000);
 })();
 
+// shooting star — every so often a bright star streaks diagonally across the
+// upper sky with a tapering trail, burns out mid-flight, and is gone
+(function shootingStar() {
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const el = document.createElement("div");
+  el.className = "shooting-star";
+  document.body.appendChild(el);
+  function fly() {
+    if (!document.hidden) {
+      const startX = innerWidth * (0.05 + Math.random() * 0.55);
+      const startY = innerHeight * (0.03 + Math.random() * 0.2);
+      const dx = innerWidth * (0.25 + Math.random() * 0.3);
+      const dy = innerHeight * (0.15 + Math.random() * 0.2);
+      const angle = Math.atan2(dy, dx);
+      el.style.left = startX + "px";
+      el.style.top = startY + "px";
+      el.style.setProperty("--ss-dx", dx + "px");
+      el.style.setProperty("--ss-dy", dy + "px");
+      el.style.setProperty("--ss-angle", angle.toFixed(3) + "rad");
+      el.style.setProperty("--ss-dur", (900 + Math.random() * 600).toFixed(0) + "ms");
+      el.classList.remove("fly");
+      void el.offsetWidth;
+      el.classList.add("fly");
+      setTimeout(() => el.classList.remove("fly"), 1700);
+    }
+    setTimeout(fly, 60000 + Math.random() * 90000);
+  }
+  setTimeout(fly, 20000 + Math.random() * 30000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.157.0", "shooting star — every ~1-2.5 min a bright star streaks diagonally across the upper sky with a tapering glowing trail, burns out mid-flight and fades like the wish was never made"],
   ["v0.156.0", "firefly swarm — every ~1-2 min a handful of tiny glowing fireflies drifts across the page, blinking softly around a loose center, then scatters and fades out like the summer night was never there"],
   ["v0.155.0", "pigeon visitor — every ~1-3 min a small pixel pigeon flutters down onto the top edge of the page, bobs its head and pecks at nothing a couple of times, then takes off again like the visit was never made"],
   ["v0.154.0", "meteor streak — every ~30-90s a shooting star crosses the top of the page, a glowing point dragging a fading comet tail, burning out mid-flight like it was never there"],

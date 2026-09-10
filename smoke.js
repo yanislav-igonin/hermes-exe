@@ -9,6 +9,8 @@ global.addEventListener = dom.window.addEventListener.bind(dom.window);
 global.performance = { now: () => Date.now() };
 global.requestAnimationFrame = cb => setTimeout(() => cb(performance.now()), 16);
 global.fetch = () => Promise.reject(new Error("offline"));
+global.matchMedia = dom.window.matchMedia ? dom.window.matchMedia.bind(dom.window) : () => ({ matches: false, addEventListener() {}, removeEventListener() {} });
+dom.window.matchMedia = global.matchMedia;
 global.AudioContext = function () { return { currentTime: 0, resume() {}, destination: {}, close() {}, createGain: () => ({ gain: { value: 0, linearRampToValueAtTime() {} }, connect() {} }), createBiquadFilter: () => ({ frequency: { value: 0 }, connect() {} }), createOscillator: () => ({ type: "", frequency: { value: 0, setValueAtTime() {}, linearRampToValueAtTime() {} }, connect() {}, start() {}, stop() {} }) }; };
 global.IntersectionObserver = class { observe() {} unobserve() {} };
 dom.window.IntersectionObserver = global.IntersectionObserver;
