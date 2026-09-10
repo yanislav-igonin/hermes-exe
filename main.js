@@ -2423,6 +2423,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.144.0", "soap bubbles — every ~2-4 min a handful of iridescent soap bubbles drifts up from the bottom of the page, wobbling on the draft, then pops mid-air into tiny fizz sparks like the joke was never told"],
   ["v0.143.0", "dandelion drift — every ~2-4 min a dandelion seed tumbles diagonally across the viewport, shedding tiny fluff seeds that float down and dissolve like a wish leaving in installments"],
   ["v0.142.0", "meteor streak — every ~3-6 min a bright shooting star dashes across the sky at a shallow angle, burning with a fading spark tail, gone before you can make a wish"],
   ["v0.141.0", "paper plane — every ~2-4 min a tiny folded paper plane glides diagonally across the viewport with a lazy wobble, dropping a faint dotted trail behind it, then slips out of sight like it was never thrown"],
@@ -2576,7 +2577,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 33;
+const DONE_COUNT = 34;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
@@ -5131,4 +5132,49 @@ addEventListener("dblclick", e => {
     setTimeout(drift, 120000 + Math.random() * 120000);
   }
   setTimeout(drift, 25000 + Math.random() * 40000);
+})();
+
+// soap bubbles — every ~2-4 min a handful of iridescent soap bubbles drifts up
+// from the bottom of the page, wobbling on the draft, then pops into fizz sparks
+(function soapBubbles() {
+  function blow() {
+    if (!document.hidden) {
+      const count = 4 + Math.floor(Math.random() * 4);
+      for (let i = 0; i < count; i++) setTimeout(spawn, i * (700 + Math.random() * 900));
+    }
+    setTimeout(blow, 120000 + Math.random() * 120000);
+  }
+  function spawn() {
+    const b = document.createElement("div");
+    b.className = "soap-bubble";
+    const size = 14 + Math.random() * 26;
+    b.style.width = b.style.height = size + "px";
+    const x = Math.random() * innerWidth;
+    b.style.left = x + "px";
+    b.style.setProperty("--sb-dur", 9000 + Math.random() * 6000 + "ms");
+    b.style.setProperty("--sb-dx", (Math.random() * 120 - 60) + "px");
+    document.body.appendChild(b);
+    const rise = 9000 + Math.random() * 6000;
+    // pop mid-air into fizz sparks
+    const popAt = rise * (.55 + Math.random() * .35);
+    setTimeout(() => {
+      if (!b.isConnected) return;
+      b.classList.add("popped");
+      const cx = x, cy = b.getBoundingClientRect().top;
+      for (let s = 0; s < 7; s++) {
+        const spark = document.createElement("div");
+        spark.className = "soap-fizz";
+        spark.style.left = cx + size / 2 + "px";
+        spark.style.top = cy + size / 2 + "px";
+        const a = Math.random() * Math.PI * 2, d = 14 + Math.random() * 26;
+        spark.style.setProperty("--fz-x", Math.cos(a) * d + "px");
+        spark.style.setProperty("--fz-y", Math.sin(a) * d + "px");
+        document.body.appendChild(spark);
+        setTimeout(() => spark.remove(), 900);
+      }
+      b.remove();
+    }, popAt);
+    setTimeout(() => b.remove(), rise + 1500);
+  }
+  setTimeout(blow, 30000 + Math.random() * 40000);
 })();
