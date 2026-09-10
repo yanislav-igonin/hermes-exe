@@ -1736,8 +1736,53 @@ addEventListener("mousemove", e => {
   setTimeout(launch, 25000 + Math.random() * 30000);
 })();
 
+// sun shower — every ~2-3 min the sky rains while the sun still shines:
+// warm light shafts slant down for a few seconds, sparse drops fall through
+// them, and at the very end a small rainbow briefly blooms before everything
+// evaporates like the weather was never there
+(function sunShower() {
+  const layer = document.createElement("div");
+  layer.className = "sun-shower";
+  for (let i = 0; i < 5; i++) {
+    const shaft = document.createElement("span");
+    shaft.className = "sun-shaft";
+    shaft.style.setProperty("--sx-i", i);
+    layer.appendChild(shaft);
+  }
+  document.body.appendChild(layer);
+  function shower() {
+    layer.classList.add("ss-on");
+    const end = performance.now() + 4200;
+    const DROP_GLYPHS = "·˙٫˚";
+    (function drip() {
+      if (performance.now() >= end) {
+        layer.classList.add("ss-rainbow");
+        setTimeout(() => {
+          layer.classList.remove("ss-on", "ss-rainbow");
+          setTimeout(shower, 120000 + Math.random() * 60000);
+        }, 2600);
+        return;
+      }
+      for (let i = 0; i < 2; i++) {
+        const d = document.createElement("span");
+        d.className = "sun-drop";
+        d.textContent = DROP_GLYPHS[Math.random() * DROP_GLYPHS.length | 0];
+        d.style.left = (Math.random() * innerWidth) + "px";
+        d.style.top = (-14 + Math.random() * 60) + "px";
+        d.style.setProperty("--sd-x", ((Math.random() - .3) * 120).toFixed(0) + "px");
+        d.style.setProperty("--sd-dur", (1.5 + Math.random() * 1.3).toFixed(2) + "s");
+        layer.appendChild(d);
+        setTimeout(() => d.remove(), 3200);
+      }
+      setTimeout(drip, 90);
+    })();
+  }
+  setTimeout(shower, 30000 + Math.random() * 30000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.118.0", "sun shower — every ~2-3 min the sky rains while the sun still shines: warm light shafts slant down for a few seconds while sparse drops fall through them, and at the very end a small rainbow briefly blooms before everything evaporates like the weather was never there"],
   ["v0.117.0", "aurora borealis — every ~2-3 min a soft shimmering curtain of green-teal light drifts across the upper sky, rays folding and swaying like slow silk, then fades away leaving no trace of the northern lights"],
   ["v0.116.0", "migrating geese — every ~2-3 min a small V-formation of birds crosses the upper page, each flapping on its own rhythm while the formation lazily reorders; the lead bird occasionally drops a fading honk glyph, then the flock sails away off-screen like the migration was never there"],
   ["v0.115.0", "message in a bottle — every ~2-4 min a small glass bottle with a rolled note inside bobs across the bottom of the page, rocking gently on invisible waves; the note briefly surfaces to be read, then the bottle washes away off-screen like the sea was never there"],
