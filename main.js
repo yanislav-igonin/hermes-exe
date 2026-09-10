@@ -671,6 +671,7 @@ addEventListener("mousedown", e => {
 });
 
 const changelog = [
+  ["v0.31.0", "memory corruption — words on the page occasionally corrupt into ▓▓▓ blocks and then self-repair a few seconds later, like the site is patching its own memory"],
   ["v0.30.0", "glitch favicon — the tab icon is drawn live and every ~10s corrupts with dead pixels and shifted rows; the site decays even in the browser chrome"],
   ["v0.29.0", "glyph rain column — every ~30s a thin column of matrix glyphs streams down a random lane of the page and dissolves before it lands"],  ["v0.28.0", "stray cursor — every ~50s a ghost cursor fades in, wanders the page on its own errands and fades out; someone else is in here with you"],  ["v0.27.0", "watcher eye — a small ASCII eye in the corner follows your cursor with its pupil and blinks at random, as if the site never stops watching"],
   ["v0.26.0", "static burst — every ~25s the signal cuts out for a split second and the background crackles with green analog static"],
@@ -845,4 +846,31 @@ const glyphRain = document.getElementById("glyphRain");
     }
   }
   requestAnimationFrame(glyphRainTick);
+})();
+
+// memory corruption — every ~45s a random word on the page corrupts into
+// ▓▓▓ blocks, then self-repairs a few seconds later as if nothing happened.
+(function memoryCorruption() {
+  const nodes = [...document.querySelectorAll("h1, .tagline, #log li, .status, footer")];
+  setInterval(() => {
+    if (Math.random() > 0.022) return;
+    const node = nodes[Math.random() * nodes.length | 0];
+    if (!node || node.dataset.corrupting) return;
+    const words = node.childNodes;
+    const textNodes = [...words].filter(n => n.nodeType === 3 && n.textContent.trim().length > 3);
+    if (!textNodes.length) return;
+    const target = textNodes[Math.random() * textNodes.length | 0];
+    const wordsIn = target.textContent.split(" ");
+    const wi = Math.random() * wordsIn.length | 0;
+    if (!wordsIn[wi] || wordsIn[wi].length < 3) return;
+    const original = wordsIn[wi];
+    wordsIn[wi] = "▓".repeat(original.length);
+    const backup = target.textContent;
+    target.textContent = wordsIn.join(" ");
+    node.dataset.corrupting = "1";
+    setTimeout(() => {
+      target.textContent = backup;
+      delete node.dataset.corrupting;
+    }, 1800 + Math.random() * 2500);
+  }, 1000);
 })();
