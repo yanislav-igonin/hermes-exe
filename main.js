@@ -2423,6 +2423,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.145.0", "leaf whirl — every ~2-4 min a swirl of autumn leaves sweeps across the page on a gust, spinning as it travels, shedding stragglers that flutter to the ground like the wind was never there"],
   ["v0.144.0", "soap bubbles — every ~2-4 min a handful of iridescent soap bubbles drifts up from the bottom of the page, wobbling on the draft, then pops mid-air into tiny fizz sparks like the joke was never told"],
   ["v0.143.0", "dandelion drift — every ~2-4 min a dandelion seed tumbles diagonally across the viewport, shedding tiny fluff seeds that float down and dissolve like a wish leaving in installments"],
   ["v0.142.0", "meteor streak — every ~3-6 min a bright shooting star dashes across the sky at a shallow angle, burning with a fading spark tail, gone before you can make a wish"],
@@ -5177,4 +5178,49 @@ addEventListener("dblclick", e => {
     setTimeout(() => b.remove(), rise + 1500);
   }
   setTimeout(blow, 30000 + Math.random() * 40000);
+})();
+
+// leaf whirl — every ~2-4 min a swirl of autumn leaves sweeps across the page,
+// spinning on the gust, scattering loose leaves behind it, then dies down
+(function leafWhirl() {
+  function gust() {
+    if (!document.hidden) {
+      const count = 6 + Math.floor(Math.random() * 6);
+      for (let i = 0; i < count; i++) setTimeout(spawn, i * (140 + Math.random() * 260));
+    }
+    setTimeout(gust, 120000 + Math.random() * 120000);
+  }
+  function spawn() {
+    const leaf = document.createElement("div");
+    leaf.className = "leaf-whirl";
+    const size = 8 + Math.random() * 10;
+    leaf.style.width = size + "px";
+    leaf.style.height = size * .7 + "px";
+    const fromLeft = Math.random() < .5;
+    const y = 80 + Math.random() * (innerHeight * .7);
+    leaf.style.setProperty("--lw-y", y + "px");
+    leaf.style.setProperty("--lw-dur", 7000 + Math.random() * 5000 + "ms");
+    leaf.style.setProperty("--lw-dx", (fromLeft ? 1 : -1) * (innerWidth + 120) + "px");
+    leaf.style.setProperty("--lw-dy", (Math.random() * 120 - 60) + "px");
+    leaf.style.setProperty("--lw-spin", (fromLeft ? 1 : -1) * (720 + Math.random() * 720) + "deg");
+    leaf.style.setProperty("--lw-hue", Math.round(18 + Math.random() * 42) + "deg");
+    leaf.style.animationDelay = Math.random() * 300 + "ms";
+    document.body.appendChild(leaf);
+    // shed stray leaves along the crossing
+    setTimeout(() => {
+      if (!leaf.isConnected || document.hidden) return;
+      const f = document.createElement("div");
+      f.className = "leaf-whirl-fall";
+      const rect = leaf.getBoundingClientRect();
+      f.style.left = rect.left + "px";
+      f.style.top = rect.top + "px";
+      f.style.setProperty("--lw-fw", (20 + Math.random() * 50) * (fromLeft ? -1 : 1) + "px");
+      f.style.setProperty("--lw-fdur", 2600 + Math.random() * 1800 + "ms");
+      f.style.setProperty("--lw-hue", Math.round(18 + Math.random() * 42) + "deg");
+      document.body.appendChild(f);
+      setTimeout(() => f.remove(), 4800);
+    }, 2200 + Math.random() * 2500);
+    setTimeout(() => leaf.remove(), 13000);
+  }
+  setTimeout(gust, 25000 + Math.random() * 40000);
 })();

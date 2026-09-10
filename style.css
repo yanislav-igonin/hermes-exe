@@ -1950,3 +1950,35 @@ body.synthwave #ghost-typewriter { color: #ff8c2e; text-shadow: 0 0 8px rgba(255
   0%   { transform: translate(0, 0); opacity: .9; }
   100% { transform: translate(var(--fz-x, 10px), calc(var(--fz-y, 10px) + 14px)); opacity: 0; }
 }
+
+/* leaf whirl — a swirl of autumn leaves sweeps across the page on a gust,
+   spins while it travels, sheds stragglers that flutter to the ground */
+.leaf-whirl {
+  position: fixed; left: 0; top: var(--lw-y, 30vh); z-index: 9995;
+  pointer-events: none;
+  border-radius: 60% 40% 55% 45% / 55% 60% 40% 45%;
+  background: linear-gradient(120deg,
+    hsl(var(--lw-hue, 30deg) 70% 42%),
+    hsl(calc(var(--lw-hue, 30deg) + 18deg) 65% 30%));
+  box-shadow: 0 0 5px hsla(var(--lw-hue, 30deg), 70%, 45%, .35);
+  opacity: 0;
+  animation: leaf-gust var(--lw-dur, 9000ms) linear forwards;
+}
+@keyframes leaf-gust {
+  0%   { transform: translate(-40px, 0) rotate(0deg); opacity: 0; }
+  8%   { opacity: .85; }
+  90%  { opacity: .75; }
+  100% { transform: translate(var(--lw-dx, 110vw), var(--lw-dy, 0px)) rotate(var(--lw-spin, 900deg)); opacity: 0; }
+}
+.leaf-whirl-fall {
+  position: fixed; z-index: 9995;
+  width: 7px; height: 5px;
+  pointer-events: none;
+  border-radius: 60% 40% 55% 45% / 55% 60% 40% 45%;
+  background: hsl(var(--lw-hue, 30deg) 60% 38%);
+  animation: leaf-fall var(--lw-fdur, 3200ms) ease-in forwards;
+}
+@keyframes leaf-fall {
+  0%   { opacity: .8; transform: translate(0, 0) rotate(0deg); }
+  100% { opacity: 0; transform: translate(var(--lw-fw, -30px), 24vh) rotate(420deg); }
+}
