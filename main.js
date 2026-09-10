@@ -129,6 +129,41 @@ let rainUntil = 0;
   requestAnimationFrame(tick);
 })();
 
+// echo trail ghosts — every ~40s the visitor's last ~2s of pointer movement
+// replays as a fading green ghost trail on the background canvas. the site
+// remembers where you have been and walks it back, briefly.
+const ghostPath = [];
+let lastGhostPos = null;
+addEventListener("mousemove", e => {
+  // downsample: one point per ~16px of travel
+  const p = { x: e.clientX, y: e.clientY };
+  if (lastGhostPos && Math.hypot(p.x - lastGhostPos.x, p.y - lastGhostPos.y) < 16) return;
+  lastGhostPos = p;
+  ghostPath.push(p);
+  if (ghostPath.length > 40) ghostPath.shift(); // ~2s of path
+});
+const ghostEcho = [];
+let nextGhostAt = performance.now() + 40000 * (.7 + Math.random() * .6);
+(function ghostTick(now) {
+  // start a replay if there's a path worth echoing
+  if (now > nextGhostAt && ghostPath.length > 8) {
+    ghostPath.forEach((p, i) => ghostEcho.push({ x: p.x, y: p.y, born: now + i * 28 }));
+    nextGhostAt = now + 40000 * (.7 + Math.random() * .6);
+  }
+  for (let i = ghostEcho.length - 1; i >= 0; i--) {
+    const g = ghostEcho[i];
+    const age = now - g.born;
+    if (age < 0) continue;
+    const life = 1 - age / 2200;
+    if (life <= 0) { ghostEcho.splice(i, 1); continue; }
+    ctx.beginPath();
+    ctx.arc(g.x, g.y, 2.4 * life + .4, 0, 7);
+    ctx.fillStyle = `rgba(124,252,156,${.35 * life})`;
+    ctx.fill();
+  }
+  requestAnimationFrame(ghostTick);
+})(performance.now());
+
 // cursor trail — green sparks shed by the pointer, pooled and capped
 const trail = [];
 const TRAIL_MAX = 160;
@@ -530,6 +565,7 @@ loadCommitClock();
 setInterval(loadCommitClock, 300000);
 
 const changelog = [
+  ["v0.22.0", "echo trail ghosts — every ~40s a faint green ghost of your last cursor path replays itself across the canvas and dissolves"],
   ["v0.21.0", "clock of commit history — the footer counts the time since the last real commit, live from GitHub"],
   ["v0.20.0", "text scramble — the headline decodes out of glitch glyphs on load, and every 30s one word dissolves and resolves again"],
   ["v0.19.0", "generative drone — a 🔊 toggle breathes a two-oscillator sub-bass hum into the room, OFF by default"],
