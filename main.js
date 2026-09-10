@@ -1114,8 +1114,34 @@ addEventListener("mousemove", e => {
   requestAnimationFrame(ccTick);
 })();
 
+// waterfall glyphs — every ~50s a cascade of ascii glyphs pours out of a random
+// spot near the top of the page, streams down in overlapping columns and
+// evaporates before it can puddle, like the site briefly sprang a leak
+(function waterfallGlyphs() {
+  const WF_GLYPHS = "▁▂▃▄▅▆▇█|/\\:·§%";
+  function pour() {
+    const x = 40 + Math.random() * (innerWidth - 80);
+    const cols = 4 + (Math.random() * 4 | 0);
+    for (let i = 0; i < cols; i++) {
+      const g = document.createElement("span");
+      g.className = "waterfall-drop";
+      g.textContent = WF_GLYPHS[Math.random() * WF_GLYPHS.length | 0];
+      g.style.left = (x + (Math.random() - .5) * 46) + "px";
+      g.style.top = (10 + Math.random() * 40) + "px";
+      g.style.setProperty("--wf-fall", (innerHeight * (.55 + Math.random() * .4)).toFixed(0) + "px");
+      g.style.setProperty("--wf-dur", (1.6 + Math.random() * 1.4).toFixed(2) + "s");
+      g.style.setProperty("--wf-delay", (i * 160 + Math.random() * 120).toFixed(0) + "ms");
+      document.body.appendChild(g);
+      setTimeout(() => g.remove(), 3400 + i * 160);
+    }
+    setTimeout(pour, 45000 + Math.random() * 30000);
+  }
+  setTimeout(pour, 25000 + Math.random() * 25000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.75.0", "waterfall glyphs — every ~50s a cascade of ascii glyphs pours out of a random spot near the top of the page, streams down in overlapping columns and evaporates before it can puddle, like the site briefly sprang a leak"],
   ["v0.74.0", "crt block cursor — a chunky fake cursor built from block glyphs trails your real one with lag, jitters like a tired tube, and randomly flickers between shapes so it never settles into the same cursor twice"],
   ["v0.73.0", "moths to the light — every ~50s a few glowing moths drift in from a screen edge toward your cursor, circle it like a lamp for a moment, then scatter and fade out like they were never attracted"],
   ["v0.72.0", "rgb-split flicker — every ~60s a random block on the page briefly tears into red and cyan channel ghosts that jitter out of alignment, then snaps back into focus like the tube never slipped"],

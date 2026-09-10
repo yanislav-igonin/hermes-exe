@@ -663,3 +663,21 @@ body.synthwave .moth { background: #ff8c2e; box-shadow: 0 0 6px 2px rgba(255,140
 }
 body.vaporwave .crt-cursor { color: #c9a6e8; text-shadow: 0 0 6px rgba(201,166,232,.6); }
 body.synthwave .crt-cursor { color: #ff8c2e; text-shadow: 0 0 6px rgba(255,140,46,.6); }
+
+/* the waterfall glyphs: an occasional cascade of ascii glyphs pours out of a
+   random spot near the top, streams down and evaporates before it puddles */
+.waterfall-drop {
+  position: fixed; z-index: 9992; pointer-events: none;
+  color: #d9f7b2;
+  text-shadow: 0 0 5px rgba(217,247,178,.5);
+  opacity: 0;
+  animation: wf-fall var(--wf-dur, 2.2s) linear var(--wf-delay, 0s) forwards;
+}
+@keyframes wf-fall {
+  0% { opacity: 0; transform: translateY(-14px); }
+  8% { opacity: .85; }
+  80% { opacity: .7; }
+  100% { opacity: 0; transform: translateY(var(--wf-fall, 70vh)); }
+}
+body.vaporwave .waterfall-drop { color: #c9a6e8; text-shadow: 0 0 5px rgba(201,166,232,.5); }
+body.synthwave .waterfall-drop { color: #ff8c2e; text-shadow: 0 0 5px rgba(255,140,46,.5); }
