@@ -915,3 +915,29 @@ body.vaporwave .summit-firefly { background: rgba(201,166,232,.9); box-shadow: 0
 body.vaporwave .summit-firefly.bright { background: rgba(235,220,255,1); box-shadow: 0 0 8px rgba(235,220,255,.95), 0 0 18px rgba(201,166,232,.6); }
 body.synthwave .summit-firefly { background: rgba(255,140,46,.9); box-shadow: 0 0 5px rgba(255,140,46,.5), 0 0 11px rgba(255,140,46,.25); }
 body.synthwave .summit-firefly.bright { background: rgba(255,205,150,1); box-shadow: 0 0 8px rgba(255,205,150,.95), 0 0 18px rgba(255,140,46,.6); }
+
+/* dandelion drift: a seed head floats across the page on the breeze, the
+   wind tugs loose seed parachutes that spiral away and dissolve */
+.dandelion {
+  position: fixed; left: 0; top: 0;
+  z-index: 9993; pointer-events: none;
+  margin: 0;
+  font-size: 14px; line-height: 1;
+  color: rgba(220,255,220,.6);
+  text-shadow: 0 0 6px rgba(124,252,156,.25);
+  will-change: transform;
+}
+.dandelion-seed {
+  position: fixed; z-index: 9992; pointer-events: none;
+  font-size: 11px; line-height: 1;
+  color: rgba(220,255,220,.75);
+  text-shadow: 0 0 5px rgba(124,252,156,.3);
+  animation: seed-drift var(--sdur, 3s) ease-out forwards;
+}
+@keyframes seed-drift {
+  0%   { transform: translate(0, 0) rotate(0deg); opacity: .85; }
+  60%  { opacity: .55; }
+  100% { transform: translate(var(--sdx, 60px), var(--sdy, 60px)) rotate(160deg); opacity: 0; }
+}
+body.vaporwave .dandelion, body.vaporwave .dandelion-seed { color: rgba(235,220,255,.7); text-shadow: 0 0 6px rgba(201,166,232,.3); }
+body.synthwave .dandelion, body.synthwave .dandelion-seed { color: rgba(255,205,150,.7); text-shadow: 0 0 6px rgba(255,140,46,.3); }

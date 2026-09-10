@@ -1495,6 +1495,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.97.0", "dandelion drift — every ~2 min a dandelion head floats across the page on the breeze: the wind tugs loose a few seed parachutes along the way, each one spirals away on its own drift and dissolves like the wind was never there"],
   ["v0.96.0", "poezteka — every ~90s a small parade of ascii snails crosses the page one after another at their own unhurried pace, each grazing a fading rainbow slime trail behind it; every so often one stops mid-crawl to wiggle its eye-stalks at you before ambling on"],
   ["v0.95.0", "double-click firework — double-click anywhere and a firework detonates from the click point: glowing glyph sparks burst outward, arc under gravity and fade mid-air like the night sky was never lit"],
   ["v0.94.0", "noise rain — every ~50s a shower of glitch droplets falls across the background; droplets passing near the cursor splash into little bursts of noise sparks, then the sky dries up like the weather was never there"],
@@ -3174,4 +3175,49 @@ addEventListener("dblclick", e => {
     }, delay);
   }
   setTimeout(parade, 40000 + Math.random() * 30000);
+})();
+
+// dandelion drift — every ~2 min a dandelion head floats across the page on
+// the breeze: the wind tugs loose a few seed parachutes along the way, each
+// one spirals away on its own drift and dissolves like the wind was never there
+(function dandelionDrift() {
+  function bloom() {
+    const head = document.createElement("pre");
+    head.className = "dandelion";
+    head.textContent = "  @}|'--,";
+    document.body.appendChild(head);
+    const dir = Math.random() < .5 ? 1 : -1;
+    const speed = 22 + Math.random() * 14; // a seed head rides the wind briskly
+    const y = 60 + Math.random() * (innerHeight * .5);
+    const start = performance.now();
+    const dur = (innerWidth + 200) / speed * 1000;
+    const SEEDS = "＊✦❋·˚";
+    let lastSeed = 0;
+    (function drift(now) {
+      const t = (now - start) / 1000;
+      if (t * 1000 >= dur) { head.remove(); return; }
+      const x = dir > 0 ? -100 + t * speed : innerWidth + 100 - t * speed;
+      const sway = Math.sin(t * 1.7) * 10;
+      const bob = Math.sin(t * 2.6) * 6;
+      head.style.transform = `translate(${x}px, ${y + bob}px) scaleX(${dir}) rotate(${sway * .35}deg)`;
+      // the wind tugs loose a seed parachute now and then
+      if (now - lastSeed > 900 + Math.random() * 900) {
+        lastSeed = now;
+        const seed = document.createElement("span");
+        seed.className = "dandelion-seed";
+        seed.textContent = "❊";
+        seed.style.left = (x + (dir > 0 ? 8 : -8)) + "px";
+        seed.style.top = (y + bob) + "px";
+        const sa = Math.random() * Math.PI * 2;
+        seed.style.setProperty("--sdx", (Math.cos(sa) * 90 + (Math.random() - .5) * 60).toFixed(0) + "px");
+        seed.style.setProperty("--sdy", (30 + Math.random() * 70).toFixed(0) + "px");
+        seed.style.setProperty("--sdur", (2.4 + Math.random() * 1.6).toFixed(2) + "s");
+        document.body.appendChild(seed);
+        setTimeout(() => seed.remove(), 4600);
+      }
+      requestAnimationFrame(drift);
+    })(start);
+    setTimeout(bloom, 110000 + Math.random() * 50000);
+  }
+  setTimeout(bloom, 30000 + Math.random() * 30000);
 })();
