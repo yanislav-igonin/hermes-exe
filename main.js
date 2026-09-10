@@ -307,6 +307,60 @@ const hail = [];
     ctx.fillStyle = `rgba(200,255,220,${.85 * h.life})`;
     ctx.fill();
   }
+// kite on a string — every ~2-4 min a small diamond kite glides across the
+// upper sky at the end of a swaying thread, bobbing on the wind, then tacks
+// off-screen like the breeze was never there
+let nextKiteAt = performance.now() + 120000 * (.7 + Math.random() * .6);
+const kite = { active: false, x: 0, y: 0, t: 0, sway: 0, phase: Math.random() * 7 };
+
+  if (!kite.active && now > nextKiteAt) {
+    kite.active = true;
+    kite.x = -60; kite.y = canvas.height * (.08 + Math.random() * .12);
+    kite.t = 0; kite.phase = Math.random() * 7;
+  }
+  if (kite.active) {
+    kite.t += .016;
+    kite.x += 1.5;
+    kite.y += Math.sin(kite.t * 1.3 + kite.phase) * .7; // bob on the wind
+    const kx = kite.x, ky = kite.y;
+    // thread from off-screen bottom-left, swaying behind the kite
+    ctx.beginPath();
+    ctx.moveTo(kx - 120 - Math.sin(kite.t * .8) * 14, canvas.height + 10);
+    for (let s = 0; s <= 8; s++) {
+      const f = s / 8;
+      const sx = kx - 120 * f - Math.sin(kite.t * .8 + f * 3) * 14 * f;
+      const sy = ky + (canvas.height + 10 - ky) * f + Math.sin(kite.t * 1.1 + f * 4) * 6 * f;
+      ctx.lineTo(sx, sy);
+    }
+    ctx.strokeStyle = "rgba(124,252,156,.35)";
+    ctx.stroke();
+    // diamond kite, tilting with the bob
+    ctx.save();
+    ctx.translate(kx, ky);
+    ctx.rotate(Math.sin(kite.t * 1.3 + kite.phase) * .12);
+    ctx.beginPath();
+    ctx.moveTo(0, -16); ctx.lineTo(9, 0); ctx.lineTo(0, 22); ctx.lineTo(-9, 0); ctx.closePath();
+    ctx.fillStyle = "rgba(124,252,156,.55)";
+    ctx.fill();
+    ctx.strokeStyle = "rgba(124,252,156,.9)";
+    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, -16); ctx.lineTo(0, 22); ctx.moveTo(-9, 0); ctx.lineTo(9, 0);
+    ctx.strokeStyle = "rgba(124,252,156,.5)";
+    ctx.stroke();
+    // tail
+    ctx.beginPath();
+    for (let s = 0; s < 5; s++) {
+      const tx = -10 - s * 8, ty = 20 + Math.sin(kite.t * 2 + s) * (4 + s);
+      s ? ctx.lineTo(tx, ty) : ctx.moveTo(tx, ty);
+    }
+    ctx.strokeStyle = "rgba(124,252,156,.45)";
+    ctx.stroke();
+    ctx.restore();
+    if (kite.x > canvas.width + 60) {
+      kite.active = false;
+      nextKiteAt = now + 120000 * (.7 + Math.random() * .6);
+    }
+  }
   requestAnimationFrame(tick);
 })();
 
@@ -2423,6 +2477,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.146.0", "kite on a string — every ~2-4 min a small diamond kite glides across the upper sky at the end of a swaying thread, bobbing on the wind with a fluttering tail, then tacks off-screen like the breeze was never there"],
   ["v0.145.0", "leaf whirl — every ~2-4 min a swirl of autumn leaves sweeps across the page on a gust, spinning as it travels, shedding stragglers that flutter to the ground like the wind was never there"],
   ["v0.144.0", "soap bubbles — every ~2-4 min a handful of iridescent soap bubbles drifts up from the bottom of the page, wobbling on the draft, then pops mid-air into tiny fizz sparks like the joke was never told"],
   ["v0.143.0", "dandelion drift — every ~2-4 min a dandelion seed tumbles diagonally across the viewport, shedding tiny fluff seeds that float down and dissolve like a wish leaving in installments"],
