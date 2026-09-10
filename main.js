@@ -98,6 +98,43 @@ addEventListener("mousedown", e => {
     ctx.lineWidth = 2 * r.life;
     ctx.stroke();
   }
+// click constellation — every click plants a star; once 5+ stars have
+// gathered, they link into a constellation that names itself, glows, then fades
+const stars = [];
+let constName = null, constLife = 0;
+const STAR_NAMES = ["alpha kleshnya", "beta null", "gamma hermetis", "delta kraken", "epsilon void", "zeta memex", "eta dumbwaiter", "theta ghostlight"];
+addEventListener("mousedown", e => {
+  if (constLife > 0) return; // don't pollute an active constellation
+  stars.push({ x: e.clientX, y: e.clientY, tw: Math.random() * 6 });
+  if (stars.length >= 5 && !constName) {
+    constName = STAR_NAMES[Math.random() * STAR_NAMES.length | 0];
+    constLife = 1;
+  }
+  if (stars.length > 9) stars.shift();
+});
+
+  // click constellation: stars twinkle, then the whole figure links up, glows and dissolves
+  for (const s of stars) s.tw += .08;
+  if (constLife > 0) {
+    constLife -= .004;
+    const linked = Math.min(1, (1 - constLife) * 6);
+    for (let i = 0; i < stars.length - 1; i++) {
+      if (i / stars.length > linked) break;
+      const a = stars[i], b = stars[i + 1];
+      ctx.strokeStyle = `rgba(124,252,156,${.45 * constLife})`;
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    }
+    ctx.font = "11px monospace";
+    ctx.fillStyle = `rgba(124,252,156,${.8 * constLife})`;
+    ctx.fillText(`✦ constellation ${constName} — ${stars.length} stars mapped`, stars[0].x + 14, stars[0].y - 10);
+    if (constLife <= 0) { stars.length = 0; constName = null; }
+  }
+  for (const s of stars) {
+    const tw = .5 + Math.sin(s.tw) * .3;
+    ctx.beginPath(); ctx.arc(s.x, s.y, 1.6 + tw, 0, 7);
+    ctx.fillStyle = `rgba(124,252,156,${.7 * (constLife > 0 ? constLife : 1)})`;
+    ctx.fill();
+  }
   // dampen shockwave-imparted speed back toward the ambient drift (never kills it)
   for (const p of pts) {
     const s = Math.hypot(p.vx, p.vy);
@@ -963,6 +1000,7 @@ setInterval(() => {
 
 // changelog
 const changelog = [
+  ["v0.62.0", "click constellation — every click plants a star; once enough gather they link into a constellation that names itself, glows, then fades out like the sky was never mapped"],
   ["v0.61.0", "battery of the site — the site has its own battery that slowly drains while you are here; the page dims as it dies, and at 0% it reboots to 100% with a brief boot flash"],
   ["v0.60.0", "defrag ritual — press d and a corner readout runs a fake disk defragmentation: blocks scatter, shuffle, then settle into neat ordered stripes as the fragmentation counter grinds to 0%, before fading out like nothing was ever defragmented"],
   ["v0.59.0", "version séance — press v and a corner readout knocks three times, contacts a ghost of an older build, and the ghost types out one memory from its version before the link fades out like nothing was ever contacted"],
