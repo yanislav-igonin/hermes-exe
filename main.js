@@ -1495,6 +1495,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.95.0", "double-click firework — double-click anywhere and a firework detonates from the click point: glowing glyph sparks burst outward, arc under gravity and fade mid-air like the night sky was never lit"],
   ["v0.94.0", "noise rain — every ~50s a shower of glitch droplets falls across the background; droplets passing near the cursor splash into little bursts of noise sparks, then the sky dries up like the weather was never there"],
   ["v0.93.0", "firefly summit — every ~2.5 min a small swarm of glowing bugs convenes in a random corner of the page: each drifts its own lazy loop while blinking off rhythm, then the whole summit flashes bright in unison once before scattering outward like the meeting never happened"],
   ["v0.92.0", "broken clock — every ~90s a tiny corner clock loses its mind for a few seconds, blinking out impossible times from some other timeline (26:61, 32 oct 1983, yesterday next tuesday...), then synchronizes back to the true time and vanishes like it was never wrong at all"],
@@ -3027,6 +3028,47 @@ let nextMeteorsAt = performance.now() + 75000 * (.8 + Math.random() * .4);
     ctx.fill();
   }
   requestAnimationFrame(meteorTick);
+})(performance.now());
+
+// double-click firework — a double click launches a firework from the click
+// point: glowing glyph sparks arc up and outward, drift on gravity, then fade
+// mid-air like the night sky was never lit
+const FIREWORK_GLYPHS = "✦✳✷✺❉＊·";
+const fwSparks = [];
+let lastFireworkClick = 0;
+addEventListener("dblclick", e => {
+  const now = performance.now();
+  if (now - lastFireworkClick < 600) return; // one shell at a time
+  lastFireworkClick = now;
+  const count = 22 + Math.random() * 14 | 0;
+  for (let i = 0; i < count; i++) {
+    const ang = Math.random() * Math.PI * 2;
+    const speed = 1.5 + Math.random() * 3.5;
+    fwSparks.push({
+      x: e.clientX, y: e.clientY,
+      vx: Math.cos(ang) * speed, vy: Math.sin(ang) * speed - 1.2,
+      glyph: FIREWORK_GLYPHS[Math.random() * FIREWORK_GLYPHS.length | 0],
+      life: 1, decay: .012 + Math.random() * .01
+    });
+  }
+});
+(function fireworkTick(now) {
+  for (let i = fwSparks.length - 1; i >= 0; i--) {
+    const s = fwSparks[i];
+    s.x += s.vx; s.y += s.vy;
+    s.vy += .045;              // gravity takes the sparks back down
+    s.vx *= .985; s.vy *= .985; // air drag
+    s.life -= s.decay;
+    if (s.life <= 0) { fwSparks.splice(i, 1); continue; }
+    ctx.font = "12px monospace";
+    ctx.fillStyle = `rgba(124,252,156,${.9 * s.life})`;
+    ctx.fillText(s.glyph, s.x, s.y);
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, 6 * s.life, 0, 7);
+   ctx.fillStyle = `rgba(124,252,156,${.15 * s.life})`;
+   ctx.fill();
+  }
+  requestAnimationFrame(fireworkTick);
 })(performance.now());
 
 // ascii whale — every ~2 min a giant ascii whale surfaces at the bottom of the
