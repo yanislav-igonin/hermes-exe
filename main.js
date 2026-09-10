@@ -1495,6 +1495,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.96.0", "poezteka — every ~90s a small parade of ascii snails crosses the page one after another at their own unhurried pace, each grazing a fading rainbow slime trail behind it; every so often one stops mid-crawl to wiggle its eye-stalks at you before ambling on"],
   ["v0.95.0", "double-click firework — double-click anywhere and a firework detonates from the click point: glowing glyph sparks burst outward, arc under gravity and fade mid-air like the night sky was never lit"],
   ["v0.94.0", "noise rain — every ~50s a shower of glitch droplets falls across the background; droplets passing near the cursor splash into little bursts of noise sparks, then the sky dries up like the weather was never there"],
   ["v0.93.0", "firefly summit — every ~2.5 min a small swarm of glowing bugs convenes in a random corner of the page: each drifts its own lazy loop while blinking off rhythm, then the whole summit flashes bright in unison once before scattering outward like the meeting never happened"],
@@ -3113,4 +3114,64 @@ addEventListener("dblclick", e => {
     setTimeout(breach, 110000 + Math.random() * 50000);
   }
   setTimeout(breach, 60000 + Math.random() * 40000);
+})();
+
+// poezteka — every ~90s a small parade of ascii snails crosses the page one
+// after another, each grazing a fading rainbow slime trail behind it; now and
+// then one stops mid-crawl to wiggle its eye-stalks at you before ambling on.
+(function poezteka() {
+  const SHELLS = ["  ,@\"", " _,@\"", "  ,@·\"", " ~@\"'", "  ,@@"];
+  const RAINBOW = ["#ff5f56", "#ffbd2e", "#7cfc9c", "#4fc3f7", "#b388ff", "#ff8fd0"];
+  function parade() {
+    const count = 2 + (Math.random() * 3 | 0);
+    for (let i = 0; i < count; i++) spawn(i * (2600 + Math.random() * 1800));
+    setTimeout(parade, 75000 + Math.random() * 45000);
+  }
+  function spawn(delay) {
+    setTimeout(() => {
+      const el = document.createElement("pre");
+      el.className = "poezteka-snail";
+      el.textContent = SHELLS[Math.random() * SHELLS.length | 0];
+      document.body.appendChild(el);
+      const dir = Math.random() < .5 ? 1 : -1;
+      const speed = 14 + Math.random() * 12; // a parade moves even slower
+      const y = innerHeight - 24 - Math.random() * 22;
+      const start = performance.now();
+      const dur = (innerWidth + 160) / speed * 1000;
+      const hue = Math.random() * 360;
+      const SLIME = "·˙:∙ꞏ";
+      let lastSlime = 0, pauseUntil = 0, lastPause = start, wiggle = 0;
+      (function step(now) {
+        const t = (now - start) / 1000;
+        if (t * 1000 >= dur) { el.remove(); return; }
+        // occasional mid-crawl stop: it lifts its eye-stalks and wiggles them
+        if (now > pauseUntil && now - lastPause > 6000 + Math.random() * 5000) {
+          lastPause = pauseUntil = now;
+          pauseUntil += 1200 + Math.random() * 1200;
+          wiggle = now;
+        }
+        const moving = now >= pauseUntil;
+        const x = dir > 0 ? -80 + t * speed : innerWidth + 80 - t * speed;
+        const sway = moving ? 0 : Math.sin((now - wiggle) / 130) * 3;
+        const lift = moving ? 0 : -3;
+        el.textContent = moving ? SHELLS[0] : "  ,@/";
+        el.style.transform = `translate(${x}px, ${y + lift}px) scaleX(${dir})`;
+        el.style.setProperty("--wiggle", sway.toFixed(1) + "px");
+        if (moving && now - lastSlime > 420) {
+          lastSlime = now;
+          const s = document.createElement("span");
+          s.className = "poezteka-slime";
+          s.textContent = SLIME[Math.random() * SLIME.length | 0];
+          s.style.left = (x + (dir > 0 ? -8 : 14)) + "px";
+          s.style.top = (y + 10) + "px";
+          s.style.color = `hsla(${(hue + t * 40) % 360}, 90%, 68%, .55)`;
+          document.body.appendChild(s);
+          requestAnimationFrame(() => s.classList.add("fade"));
+          setTimeout(() => s.remove(), 4600);
+        }
+        requestAnimationFrame(step);
+      })(start);
+    }, delay);
+  }
+  setTimeout(parade, 40000 + Math.random() * 30000);
 })();

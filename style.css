@@ -873,6 +873,28 @@ body.synthwave .bad-clock { color: rgba(255,140,46,.7); text-shadow: 0 0 6px rgb
 body.vaporwave .snail { color: rgba(201,166,232,.6); text-shadow: 0 0 6px rgba(201,166,232,.3); }
 body.synthwave .snail { color: rgba(255,140,46,.6); text-shadow: 0 0 6px rgba(255,140,46,.3); }
 
+/* poezteka: a parade of snails crosses the page one after another, each
+   grazing a rainbow slime trail that dries up behind it */
+.poezteka-snail {
+  position: fixed; left: 0; top: 0;
+  z-index: 9993; pointer-events: none;
+  margin: 0;
+  font-size: 13px; line-height: 1;
+  color: rgba(124,252,156,.7);
+  text-shadow: 0 0 6px rgba(124,252,156,.35);
+  transform: translate(var(--wiggle, 0px), 0);
+  will-change: transform;
+}
+.poezteka-slime {
+  position: fixed; z-index: 9992; pointer-events: none;
+  font-size: 11px; line-height: 1;
+  opacity: .9;
+  transition: opacity 4s ease-in;
+}
+.poezteka-slime.fade { opacity: 0; }
+body.vaporwave .poezteka-snail { color: rgba(201,166,232,.65); text-shadow: 0 0 6px rgba(201,166,232,.3); }
+body.synthwave .poezteka-snail { color: rgba(255,140,46,.65); text-shadow: 0 0 6px rgba(255,140,46,.3); }
+
 /* firefly summit: a small swarm convenes in a corner, blinks its own rhythm,
    flashes once in unison, then scatters like the meeting never happened */
 .summit-firefly {
