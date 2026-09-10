@@ -1925,8 +1925,65 @@ addEventListener("mousemove", e => {
   setTimeout(patrol, 40000 + Math.random() * 40000);
 })();
 
+// paper lantern — every ~2-4 min a glowing paper lantern rises from the bottom
+// of the page, swaying on a slow draft, flickering softly, then floats off the
+// top edge like the night was never lit
+(function paperLantern() {
+  const lantern = document.createElement("div");
+  lantern.style.cssText = "position:fixed;z-index:3;pointer-events:none;will-change:transform;opacity:0;transition:opacity 2.5s ease-in-out;";
+  lantern.innerHTML =
+    '<svg width="30" height="46" viewBox="0 0 30 46" style="display:block;filter:drop-shadow(0 0 10px rgba(255,196,120,.75))">' +
+      // hanging wire
+      '<line x1="15" y1="0" x2="15" y2="7" stroke="rgba(220,210,190,.7)" stroke-width="1"/>' +
+      // paper body with warm glow gradient
+      '<defs><radialGradient id="lantern-glow" cx="50%" cy="45%" r="60%">' +
+        '<stop offset="0%" stop-color="rgba(255,224,160,.95)"/>' +
+        '<stop offset="60%" stop-color="rgba(255,178,96,.8)"/>' +
+        '<stop offset="100%" stop-color="rgba(226,120,52,.55)"/>' +
+      "</radialGradient></defs>" +
+      '<ellipse id="lantern-body" cx="15" cy="24" rx="11" ry="15" fill="url(#lantern-glow)"/>' +
+      // rib rings
+      '<g stroke="rgba(180,90,40,.45)" stroke-width="0.8" fill="none">' +
+        '<path d="M5.5 17 Q 15 21 24.5 17"/><path d="M4 24 Q 15 28 26 24"/><path d="M5.5 31 Q 15 35 24.5 31"/>' +
+      "</g>" +
+      // top + bottom caps
+      '<rect x="10" y="7" width="10" height="3" rx="1.5" fill="rgba(150,80,40,.85)"/>' +
+      '<rect x="10" y="38" width="10" height="3" rx="1.5" fill="rgba(150,80,40,.85)"/>' +
+      // little flame tassel
+      '<line x1="15" y1="41" x2="15" y2="44" stroke="rgba(255,190,110,.8)" stroke-width="1.2"/>' +
+    "</svg>";
+  document.body.appendChild(lantern);
+  const body = lantern.querySelector("#lantern-body");
+
+  function rise() {
+    const x0 = 60 + Math.random() * (innerWidth - 120);
+    const drift = (Math.random() - .5) * 140;
+    const swayAmp = 10 + Math.random() * 12;
+    const swaySpeed = 1 / (900 + Math.random() * 500);
+    const dur = 26000 + Math.random() * 16000;
+    let t0 = null;
+    lantern.style.opacity = "1";
+
+    (function frame(now) {
+      if (t0 === null) t0 = now;
+      const t = Math.min(1, (now - t0) / dur);
+      const y = innerHeight + 50 - (innerHeight + 130) * t;
+      const x = x0 + drift * t + Math.sin(now * swaySpeed) * swayAmp;
+      const tilt = Math.sin(now * swaySpeed * 1.2) * 8;
+      // soft flicker: brightness wobbles like a real flame
+      const flicker = .82 + Math.sin(now * .011) * .1 + Math.sin(now * .037) * .08;
+      body.style.opacity = flicker.toFixed(2);
+      lantern.style.transform = "translate(" + x + "px," + y + "px) rotate(" + tilt + "deg)";
+      if (t < 1) requestAnimationFrame(frame);
+      else { lantern.style.opacity = "0"; setTimeout(rise, 120000 + Math.random() * 120000); }
+    })(performance.now());
+  }
+  setTimeout(rise, 25000 + Math.random() * 30000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.123.0", "paper lantern — every ~2-4 min a glowing paper lantern rises from the bottom of the page, swaying on a slow draft with a softly flickering flame, and floats off the top edge like the night was never lit"],
   ["v0.122.0", "stray cat — every ~2-4 min a cat silhouette slinks along the bottom of the page in a stop-and-go walk, tail swaying, occasionally pausing to look around with a glinting eye before slipping off-screen like the alley was never patrolled"],
   ["v0.121.0", "dandelion seed drift — every ~3-5 min a lone dandelion seed floats across the page on a whim of wind, swaying and slowly sinking, its tuft trembling in the draft until it drifts off-screen like the meadow was never mowed"],
   ["v0.120.0", "lightning storm — every ~45-90s a forked bolt tears across the upper sky, the whole page flashes white for a blink, and a thunder rumble echoes in the console a beat later like the storm was never there"],
