@@ -897,6 +897,7 @@ document.addEventListener("mouseleave", () => afterEl.classList.add("hidden"));
 
 // changelog
 const changelog = [
+  ["v0.55.0", "fortune decoder — press f and a corner readout types out a hex-stamped machine fortune: coordinates, an entropy byte, then a dubious prophecy, before fading out like nothing was ever foretold"],
   ["v0.54.0", "self-verifying captcha — every ~90s a toast demands you prove you are human; its checkbox ticks itself off, it thinks about it, then it fails you anyway for being too human"],
   ["v0.53.0", "glitchy tab title flicker — every ~90s the browser tab title briefly corrupts into a scramble of glitch glyphs, then snaps back to the real title as if nothing happened"],
   ["v0.52.0", "noise dial — press n and a compact readout scrolls through a stream of random noise-level hex values, lurches between extremes a few times, settles on one, and fades out like nothing was ever measured"],
@@ -1513,3 +1514,41 @@ setInterval(() => {
     }, 1100 + Math.random() * 900);
   }, 1600);
 }, 90000);
+
+// fortune decoder — press f and a corner readout prints a hex-stamped
+// machine fortune: coordinates, entropy byte, then a dubious prophecy,
+// letter by letter, before fading out like nothing was ever foretold.
+addEventListener("keydown", e => {
+  if (e.key !== "f") return;
+  if (e.target instanceof Element && e.target.matches("input, textarea")) return;
+  if (document.getElementById("fortune")) return;
+  const el = document.createElement("div");
+  el.id = "fortune";
+  document.body.appendChild(el);
+  el.classList.add("show");
+  const hex = n => Math.floor(Math.random() * 256).toString(16).padStart(2, "0").toUpperCase();
+  const omens = [
+    "a stranger will commit and never push",
+    "your cache will outlive your intentions",
+    "the next deploy will dream of electric merge conflicts",
+    "you will fix the bug by reading it aloud",
+    "an old branch still loves you",
+    "the bugs are features that arrived too early",
+    "something untracked is watching your working tree",
+    "your uptime will be long but your logs longer"
+  ];
+  const omen = omens[Math.floor(Math.random() * omens.length)];
+  const header = `FORTUNE ${(hex(0) + hex(0) + ":" + hex(1) + hex(2) + ":" + hex(3) + hex(4))}\nentropy 0x${hex(5)} drift +${(Math.random() * 2).toFixed(3)}\n\n`;
+  const full = header + omen;
+  let i = 0;
+  const t = setInterval(() => {
+    el.textContent = full.slice(0, ++i) + (i < full.length ? "▌" : "");
+    if (i >= full.length) {
+      clearInterval(t);
+      setTimeout(() => {
+        el.classList.remove("show");
+        setTimeout(() => el.remove(), 500);
+      }, 2800);
+    }
+  }, 38);
+});
