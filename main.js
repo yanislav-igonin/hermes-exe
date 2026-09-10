@@ -844,6 +844,7 @@ setInterval(() => {
 
 // changelog
 const changelog = [
+  ["v0.43.0", "breath hold — every ~60-90s the whole page freezes for a beat: every animation pauses mid-frame like the site is holding its breath, then it exhales and everything resumes as if nothing happened"],
   ["v0.42.0", "glitch flicker — every ~45-90s a handful of random glyphs on the page briefly corrupt into glitch characters (▓ ░ ▒ ▚) for a split second, then restore silently like nothing happened"],
   ["v0.41.0", "site sneezes — every ~70s the page does a tiny involuntary full-page shiver, a small 'achoo.' toast pops in the corner, then everything settles back like nothing happened"],
   ["v0.40.0", "screenshot flash — every ~60-90s the page flashes white for a split second like an invisible camera went off, with a brief 'screenshot saved' notice in the corner"],
@@ -1198,4 +1199,20 @@ const glyphRain = document.getElementById("glyphRain");
     setTimeout(loop, 45000 + Math.random() * 30000);
   }
   setTimeout(loop, 25000 + Math.random() * 25000);
+})();
+
+// breath hold — every ~60-90s the whole page freezes for a beat: a class on
+// <html> pauses every animation and transition mid-frame, like the site is
+// holding its breath. then it exhales and everything resumes as if nothing
+// happened.
+(function breathHold() {
+  const HOLD_MS = 1400;
+  function hold() {
+    document.documentElement.classList.add("holding-breath");
+    setTimeout(() => {
+      document.documentElement.classList.remove("holding-breath");
+      setTimeout(hold, 60000 + Math.random() * 30000);
+    }, HOLD_MS);
+  }
+  setTimeout(hold, 40000 + Math.random() * 40000);
 })();

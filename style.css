@@ -269,3 +269,10 @@ body.synthwave #debug-leak { color: #d8a4b8; }
   pointer-events: none;
 }
 #shot-notice.show { opacity: 1; }
+
+/* breath hold — the site stops breathing for a moment */
+.holding-breath *, .holding-breath *::before, .holding-breath *::after {
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+
