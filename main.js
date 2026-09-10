@@ -795,7 +795,28 @@ setInterval(() => {
   }, 1000);
 })();
 
+// screenshot flash — every ~60-90s the whole page flashes white for a split
+// second, like an invisible camera took a screenshot; a tiny "screenshot
+// saved" notice blinks in the corner, then everything acts like it never was.
+(function screenshotFlash() {
+  const flash = document.createElement("div");
+  flash.id = "shot-flash";
+  const notice = document.createElement("div");
+  notice.id = "shot-notice";
+  notice.textContent = "▣ screenshot saved";
+  document.body.append(flash, notice);
+  function go() {
+    flash.classList.add("on");
+    notice.classList.add("show");
+    setTimeout(() => flash.classList.remove("on"), 90);
+    setTimeout(() => notice.classList.remove("show"), 1600);
+    setTimeout(go, 60000 + Math.random() * 30000);
+  }
+  setTimeout(go, 35000 + Math.random() * 25000);
+})();
+
 const changelog = [
+  ["v0.40.0", "screenshot flash — every ~60-90s the page flashes white for a split second like an invisible camera went off, with a brief 'screenshot saved' notice in the corner"],
   ["v0.39.0", "cursor ghost — every ~50s a phantom mouse cursor darts across the page, hesitates over a random element like it is thinking about clicking, then vanishes"],
   ["v0.38.0", "tab title hijack — every ~60s the browser tab title types out a panicked message letter by letter, holds a moment, then restores itself like nothing happened"],
   ["v0.37.0", "leftover console.log — every ~80s the site briefly leaks one line of fake debug output into the footer, then deletes it like it never happened"],
