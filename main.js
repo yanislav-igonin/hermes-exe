@@ -1139,8 +1139,36 @@ addEventListener("mousemove", e => {
   setTimeout(pour, 25000 + Math.random() * 25000);
 })();
 
+// page sneeze — every ~70s the page draws in a sharp breath, shakes once,
+// and sneezes a burst of tiny glyphs out of its center that scatter and
+// evaporate before anyone can say bless you
+(function pageSneeze() {
+  const SNEEZE_GLYPHS = "··˙˚*✳✻·";
+  function sneeze() {
+    document.body.classList.add("page-sneeze");
+    const cx = innerWidth / 2, cy = innerHeight / 2;
+    for (let i = 0; i < 16; i++) {
+      const g = document.createElement("span");
+      g.className = "sneeze-mote";
+      g.textContent = SNEEZE_GLYPHS[Math.random() * SNEEZE_GLYPHS.length | 0];
+      const a = Math.random() * Math.PI * 2, d = 60 + Math.random() * 180;
+      g.style.left = cx + "px";
+      g.style.top = cy + "px";
+      g.style.setProperty("--sx", (Math.cos(a) * d).toFixed(0) + "px");
+      g.style.setProperty("--sy", (Math.sin(a) * d).toFixed(0) + "px");
+      g.style.setProperty("--sdur", (.9 + Math.random() * .8).toFixed(2) + "s");
+      document.body.appendChild(g);
+      setTimeout(() => g.remove(), 2200);
+    }
+    setTimeout(() => document.body.classList.remove("page-sneeze"), 550);
+    setTimeout(sneeze, 60000 + Math.random() * 30000);
+  }
+  setTimeout(sneeze, 35000 + Math.random() * 30000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.79.0", "page sneeze — every ~70s the page draws in a sharp breath, shudders once, and sneezes a burst of tiny glyphs from its center that scatter outward and evaporate before anyone can say gesundheit"],
   ["v0.78.0", "shooting star — every ~45s a bright streak burns across the upper sky, shedding sparks that drift down and fade out like nobody got the chance to wish on it"],
   ["v0.77.0", "click ink spill — once in a while a click knocks over an inkwell: ascii blots spill out of the click point, spread across the page in random directions, then evaporate like the ink was never spilled"],
   ["v0.76.0", "static burst — every ~55s the signal briefly breaks into a frame of tv static, random monochrome pixels hissing across the screen for a split second before the picture snaps back clean like the interference was never tuned in"],
