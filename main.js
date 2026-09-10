@@ -2477,6 +2477,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.148.0", "hot air balloon — every ~2-4 min a small hot air balloon with a striped canopy and a tiny basket drifts diagonally across the page on a gentle breeze, bobbing with the wind, then floats off-screen like the flight was never planned"],
   ["v0.147.0", "wandering firefly — every ~50-90s a lone firefly with a softly pulsing glow wanders across the page, pausing now and then as if it lost its way, then blinks out like it was never there"],
   ["v0.146.0", "kite on a string — every ~2-4 min a small diamond kite glides across the upper sky at the end of a swaying thread, bobbing on the wind with a fluttering tail, then tacks off-screen like the breeze was never there"],
   ["v0.145.0", "leaf whirl — every ~2-4 min a swirl of autumn leaves sweeps across the page on a gust, spinning as it travels, shedding stragglers that flutter to the ground like the wind was never there"],
@@ -5323,4 +5324,48 @@ addEventListener("dblclick", e => {
     setTimeout(visit, 50000 + Math.random() * 40000);
   }
   setTimeout(visit, 18000 + Math.random() * 20000);
+})();
+
+// hot air balloon — every ~2-4 min a small striped-canopy balloon with a tiny
+// basket drifts diagonally across the page on a gentle breeze, bobbing with
+// the wind, then floats off-screen like the flight was never planned
+(function hotAirBalloon() {
+  function fly() {
+    if (!document.hidden) {
+      const el = document.createElement("div");
+      el.className = "hot-air-balloon";
+      const hue = Math.round(Math.random() * 360);
+      el.style.setProperty("--hab-hue", hue + "deg");
+      const dur = 26000 + Math.random() * 14000;
+      el.style.setProperty("--hab-dur", dur + "ms");
+      const fromLeft = Math.random() < .5;
+      const y0 = innerHeight * (.12 + Math.random() * .3);
+      el.style.setProperty("--hab-y0", y0 + "px");
+      el.style.setProperty("--hab-y1", y0 + (Math.random() * 160 - 80) + "px");
+      if (!fromLeft) el.classList.add("flip");
+      document.body.appendChild(el);
+      // slow bob on top of the CSS drift, via a nested wrapper
+      const bob = document.createElement("div");
+      bob.className = "hab-body";
+      const canopy = document.createElement("div");
+      canopy.className = "hab-canopy";
+      const ropes = document.createElement("div");
+      ropes.className = "hab-ropes";
+      const basket = document.createElement("div");
+      basket.className = "hab-basket";
+      bob.appendChild(canopy); bob.appendChild(ropes); bob.appendChild(basket);
+      el.appendChild(bob);
+      const t0 = performance.now();
+      (function drift(now) {
+        if (!el.isConnected) return;
+        const t = (now - t0) / 1000;
+        bob.style.transform =
+          `translateY(${(Math.sin(t / 2.1) * 12 + Math.sin(t / 3.7) * 6).toFixed(1)}px) rotate(${(Math.sin(t / 2.8) * 2.5).toFixed(2)}deg)`;
+        if (t * 1000 < dur) requestAnimationFrame(drift);
+      })(t0);
+      setTimeout(() => el.remove(), dur + 1200);
+    }
+    setTimeout(fly, 120000 + Math.random() * 120000);
+  }
+  setTimeout(fly, 30000 + Math.random() * 60000);
 })();
