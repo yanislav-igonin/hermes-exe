@@ -1856,8 +1856,78 @@ addEventListener("mousemove", e => {
   setTimeout(float, 30000 + Math.random() * 30000);
 })();
 
+// stray cat — every ~2-4 min a cat silhouette slinks along the bottom of the
+// page with a stop-and-go walk and a swaying tail, then slips off-screen
+(function strayCat() {
+  const cat = document.createElement("div");
+  cat.style.cssText = "position:fixed;z-index:3;bottom:0;left:0;pointer-events:none;will-change:transform;opacity:0;transition:opacity 2s ease-in-out;";
+  cat.innerHTML =
+    '<svg width="72" height="40" viewBox="0 0 72 40" style="display:block">' +
+      '<g fill="rgba(8,14,10,.92)">' +
+        // tail (animated via CSS transform on its own group)
+        '<path id="cat-tail" d="M6 30 Q -2 22 3 12 Q 5 8 8 11 Q 5 20 11 28 Z"/>' +
+        // body
+        '<ellipse cx="34" cy="29" rx="22" ry="9"/>' +
+        // head
+        '<circle cx="57" cy="22" r="8"/>' +
+        // ears
+        '<path d="M51 16 L52 8 L56 14 Z"/><path d="M60 14 L64 8 L64 15 Z"/>' +
+        // legs
+        '<rect x="20" y="33" width="3.4" height="7" rx="1.6"/>' +
+        '<rect x="28" y="34" width="3.4" height="6" rx="1.6"/>' +
+        '<rect x="42" y="34" width="3.4" height="6" rx="1.6"/>' +
+        '<rect x="49" y="33" width="3.4" height="7" rx="1.6"/>' +
+      "</g>" +
+      // eye glint that appears when it pauses
+      '<circle id="cat-eye" cx="60" cy="21" r="1.1" fill="rgba(124,252,156,.9)" opacity="0"/>' +
+    "</svg>";
+  document.body.appendChild(cat);
+  const eye = cat.querySelector("#cat-eye");
+  const tail = cat.querySelector("#cat-tail");
+
+  function patrol() {
+    const dir = Math.random() < .5 ? 1 : -1;
+    const scale = .9 + Math.random() * .4;
+    const y0 = innerHeight - 40 * scale - 2;
+    let x = dir > 0 ? -100 : innerWidth + 100;
+    const target = dir > 0 ? innerWidth + 100 : -100;
+    cat.style.opacity = "1";
+
+    (function step() {
+      // one hop of the stop-and-go walk: 40-110px, then a pause
+      const hop = (40 + Math.random() * 70) * dir;
+      const walkDur = Math.abs(hop) / (0.055 + Math.random() * 0.03); // px per ms
+      const pause = 700 + Math.random() * 2200;
+      const x0 = x;
+      const t0 = performance.now();
+      const look = Math.random() < .45; // pause to look around?
+
+      (function walk(now) {
+        const p = Math.min(1, (now - t0) / walkDur);
+        x = x0 + hop * p;
+        const bob = Math.sin(now / 90) * 1.6;
+        const tailSway = Math.sin(now / 260) * 22;
+        cat.style.transform =
+          "translate(" + x + "px," + (y0 + bob) + "px) scaleX(" + (dir * scale) + ") scaleY(" + scale + ")";
+        tail.setAttribute("transform", "rotate(" + tailSway + " 8 28)");
+        if (p < 1) requestAnimationFrame(walk);
+        else {
+          eye.setAttribute("opacity", look ? "1" : "0");
+          setTimeout(() => {
+            eye.setAttribute("opacity", "0");
+            if ((dir > 0 && x < target) || (dir < 0 && x > target)) step();
+            else { cat.style.opacity = "0"; setTimeout(patrol, 120000 + Math.random() * 120000); }
+          }, pause);
+        }
+      })(t0);
+    })();
+  }
+  setTimeout(patrol, 40000 + Math.random() * 40000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.122.0", "stray cat — every ~2-4 min a cat silhouette slinks along the bottom of the page in a stop-and-go walk, tail swaying, occasionally pausing to look around with a glinting eye before slipping off-screen like the alley was never patrolled"],
   ["v0.121.0", "dandelion seed drift — every ~3-5 min a lone dandelion seed floats across the page on a whim of wind, swaying and slowly sinking, its tuft trembling in the draft until it drifts off-screen like the meadow was never mowed"],
   ["v0.120.0", "lightning storm — every ~45-90s a forked bolt tears across the upper sky, the whole page flashes white for a blink, and a thunder rumble echoes in the console a beat later like the storm was never there"],
   ["v0.119.0", "lily pad drifter — every ~2-4 min a lily pad drifts across the middle of the page on a lazy current, carrying a tiny frog passenger that blinks and occasionally croaks a fading ribbit; the pad spins slowly once mid-crossing, then slides off-screen like the pond was never stocked"],
