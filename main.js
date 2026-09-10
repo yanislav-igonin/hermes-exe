@@ -41,6 +41,17 @@ const pts = Array.from({ length: N }, () => ({
   vx: (Math.random() - .5) * .4, vy: (Math.random() - .5) * .4,
   r: Math.random() * 1.6 + .4
 }));
+// cursor trail state — declared before the tick loop that draws it
+const trail = [];
+const TRAIL_MAX = 160;
+
+// static burst state (drawn inside the tick loop below)
+let staticUntil = 0, nextStaticAt = performance.now() + 25000 * (.7 + Math.random() * .6);
+const staticCanvas = document.createElement("canvas");
+const sctx = staticCanvas.getContext("2d");
+function resizeStatic() { staticCanvas.width = Math.ceil(canvas.width / 3); staticCanvas.height = Math.ceil(canvas.height / 3); }
+resizeStatic(); addEventListener("resize", resizeStatic);
+
 (function tick(now) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawNoise(now);
@@ -179,8 +190,7 @@ let nextGhostAt = performance.now() + 40000 * (.7 + Math.random() * .6);
 })(performance.now());
 
 // cursor trail — green sparks shed by the pointer, pooled and capped
-const trail = [];
-const TRAIL_MAX = 160;
+// (trail/TRAIL_MAX declared above the tick loop — tick reads them)
 addEventListener("mousemove", e => {
   cursorX = e.clientX;
   for (let i = 0; i < 3 && trail.length < TRAIL_MAX; i++) {
@@ -622,11 +632,7 @@ setInterval(confessionTick, 90000);
 
 // static burst — every ~25s the signal cuts out for ~150ms: the background
 // crackles with green-tinted analog static, like an old CRT losing reception.
-let staticUntil = 0, nextStaticAt = performance.now() + 25000 * (.7 + Math.random() * .6);
-const staticCanvas = document.createElement("canvas");
-const sctx = staticCanvas.getContext("2d");
-function resizeStatic() { staticCanvas.width = Math.ceil(canvas.width / 3); staticCanvas.height = Math.ceil(canvas.height / 3); }
-resizeStatic(); addEventListener("resize", resizeStatic);
+// (state lives above the tick loop; resize hook wired there too)
 
 // corner wormhole — click within 120px of any page corner and the headline's
 // letters briefly spiral into a vortex around that corner before settling back.
