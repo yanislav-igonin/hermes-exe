@@ -15,7 +15,7 @@ dom.window.IntersectionObserver = global.IntersectionObserver;
 dom.window.fetch = global.fetch;
 dom.window.AudioContext = global.AudioContext;
 dom.window.performance = global.performance;
-const ctxStub = { createLinearGradient: () => ({ addColorStop() {} }), createImageData: (w, h) => ({ data: new Uint8ClampedArray(w * h * 4) }), putImageData() {}, drawImage() {}, clearRect() {}, beginPath() {}, arc() {}, fill() {}, stroke() {}, moveTo() {}, lineTo() {}, closePath() {}, fillRect() {}, getImageData: () => ({ data: new Uint8ClampedArray(0) }), strokeStyle: "", fillStyle: "", lineWidth: 0 };
+const ctxStub = { createLinearGradient: () => ({ addColorStop() {} }), createImageData: (w, h) => ({ data: new Uint8ClampedArray(w * h * 4) }), putImageData() {}, drawImage() {}, clearRect() {}, beginPath() {}, arc() {}, fill() {}, stroke() {}, moveTo() {}, lineTo() {}, closePath() {}, fillRect() {}, strokeRect() {}, fillText() {}, save() {}, restore() {}, getImageData: () => ({ data: new Uint8ClampedArray(0) }), strokeStyle: "", fillStyle: "", lineWidth: 0 };
 dom.window.HTMLCanvasElement.prototype.getContext = function () { return ctxStub; };
 dom.window.HTMLCanvasElement.prototype.toDataURL = () => "data:image/png;base64,x";
 // document.createElement must return canvas objects with a working context

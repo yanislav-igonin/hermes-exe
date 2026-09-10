@@ -200,6 +200,30 @@ function makeBolt() {
     ctx.fillStyle = "rgba(230,255,240,.25)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   } else flashUntil = 0;
+// dvd screensaver logo — a little box bounces around the page like the
+// classic dvd idle screen; corner hits (the meme) get a blinking counter
+const dvd = { x: canvas.width * .3, y: canvas.height * .4, w: 74, h: 30, vx: 1.6, vy: 1.1, hits: 0, flashUntil: 0 };
+  // dvd logo: bounce off the edges, watch for the legendary corner hit
+  dvd.x += dvd.vx; dvd.y += dvd.vy;
+  const hitCorner = (dvd.x <= 0 || dvd.x + dvd.w >= canvas.width) && (dvd.y <= 0 || dvd.y + dvd.h >= canvas.height);
+  if (dvd.x <= 0) { dvd.x = 0; dvd.vx = Math.abs(dvd.vx); }
+  if (dvd.x + dvd.w >= canvas.width) { dvd.x = canvas.width - dvd.w; dvd.vx = -Math.abs(dvd.vx); }
+  if (dvd.y <= 0) { dvd.y = 0; dvd.vy = Math.abs(dvd.vy); }
+  if (dvd.y + dvd.h >= canvas.height) { dvd.y = canvas.height - dvd.h; dvd.vy = -Math.abs(dvd.vy); }
+  if (hitCorner && now > dvd.flashUntil) { dvd.hits++; dvd.flashUntil = now + 2000; console.log(`dvd logo hit the corner — you may have seen it ${dvd.hits} time${dvd.hits > 1 ? "s" : ""}`); }
+  ctx.save();
+  ctx.strokeStyle = hitCorner || now < dvd.flashUntil ? "rgba(230,255,240,.95)" : "rgba(124,252,156,.55)";
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(dvd.x, dvd.y, dvd.w, dvd.h);
+  ctx.font = "bold 13px monospace";
+  ctx.fillStyle = ctx.strokeStyle;
+  ctx.fillText("HERMES", dvd.x + 8, dvd.y + 20);
+  ctx.restore();
+  if (dvd.hits > 0) {
+    ctx.font = "10px monospace";
+    ctx.fillStyle = `rgba(124,252,156,${now < dvd.flashUntil ? .4 + Math.abs(Math.sin(now / 120)) * .6 : .3})`;
+    ctx.fillText(`corner hits: ${dvd.hits}`, canvas.width - 96, canvas.height - 12);
+  }
   // cursor trail particles — shed by the pointer, fade out
   for (let i = trail.length - 1; i >= 0; i--) {
     const t = trail[i];
@@ -2036,6 +2060,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.125.0", "dvd screensaver logo — a little HERMES box bounces around the page like the classic idle screen, waiting for the legendary corner hit; when it finally lands one, the logo flashes white and a blinking corner-hits counter logs the meme for posterity"],
   ["v0.124.0", "ufo flyby — every ~90-150s a tiny saucer wobbles across the upper sky on a lazy tilt, beam flickering like it can't decide who to abduct while running lights chase around the hull, then it warps off-screen like the visit was never logged"],
   ["v0.123.0", "paper lantern — every ~2-4 min a glowing paper lantern rises from the bottom of the page, swaying on a slow draft with a softly flickering flame, and floats off the top edge like the night was never lit"],
   ["v0.122.0", "stray cat — every ~2-4 min a cat silhouette slinks along the bottom of the page in a stop-and-go walk, tail swaying, occasionally pausing to look around with a glinting eye before slipping off-screen like the alley was never patrolled"],
