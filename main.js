@@ -1431,8 +1431,71 @@ addEventListener("mousemove", e => {
   setTimeout(convene, 60000 + Math.random() * 40000);
 })();
 
+// noise rain — every ~50s a brief shower of glitch droplets falls across the
+// background canvas; droplets near the cursor shatter into a little burst of
+// noise sparks, then the sky dries up like the weather was never there.
+(function noiseRain() {
+  const drops = [];
+  let raining = false, nextShowerAt = performance.now() + 30000;
+  const NOISE_GLYPHS = "▚▞▟▙░▒│╵╷";
+
+  function showerTick(now) {
+    // schedule showers
+    if (!raining && now > nextShowerAt) {
+      raining = true;
+      // the shower lasts 4s; spawn a droplet every few frames
+      const end = now + 4000;
+      (function fall() {
+        if (performance.now() < end) {
+          for (let i = 0; i < 2; i++) rainDrops();
+          setTimeout(fall, 60);
+        }
+      })();
+      setTimeout(() => {
+        raining = false;
+        nextShowerAt = performance.now() + 45000 * (.7 + Math.random() * .6);
+      }, 4200);
+    }
+    // drop physics: fall, splash into noise sparks near the cursor
+    for (let i = drops.length - 1; i >= 0; i--) {
+      const d = drops[i];
+      d.y += d.vy; d.x += Math.sin(now * .01 + d.seed) * .4;
+      if (d.y > canvas.height) { drops.splice(i, 1); continue; }
+      const near = Math.hypot(d.x - mouseCX, d.y - mouseCY) < 90;
+      if (near && !d.hit) {
+        d.hit = true;
+        for (let k = 0; k < 6; k++) drops.push({
+          x: d.x, y: d.y, vy: -(1 + Math.random() * 2),
+          seed: Math.random() * 10, glyph: NOISE_GLYPHS[Math.random() * NOISE_GLYPHS.length | 0],
+          life: 1, spark: true
+        });
+        drops.splice(i, 1);
+        continue;
+      }
+      if (d.spark) {
+        d.life -= .03;
+        if (d.life <= 0) { drops.splice(i, 1); continue; }
+      }
+      ctx.font = "12px monospace";
+      ctx.fillStyle = `rgba(124,252,156,${d.spark ? .8 * d.life : .7})`;
+      ctx.fillText(d.glyph, d.x, d.y);
+    }
+    requestAnimationFrame(showerTick);
+  }
+
+  function rainDrops() {
+    drops.push({
+      x: Math.random() * canvas.width, y: -10,
+      vy: 2.5 + Math.random() * 3, seed: Math.random() * 10,
+      glyph: NOISE_GLYPHS[Math.random() * NOISE_GLYPHS.length | 0], life: 1, spark: false
+    });
+  }
+  requestAnimationFrame(showerTick);
+})();
+
 // changelog
 const changelog = [
+  ["v0.94.0", "noise rain — every ~50s a shower of glitch droplets falls across the background; droplets passing near the cursor splash into little bursts of noise sparks, then the sky dries up like the weather was never there"],
   ["v0.93.0", "firefly summit — every ~2.5 min a small swarm of glowing bugs convenes in a random corner of the page: each drifts its own lazy loop while blinking off rhythm, then the whole summit flashes bright in unison once before scattering outward like the meeting never happened"],
   ["v0.92.0", "broken clock — every ~90s a tiny corner clock loses its mind for a few seconds, blinking out impossible times from some other timeline (26:61, 32 oct 1983, yesterday next tuesday...), then synchronizes back to the true time and vanishes like it was never wrong at all"],
   ["v0.91.0", "ascii snail — every ~3 min a small snail crawls along the very bottom of the page at its own lazy pace, leaving a fading slime trail of glyphs behind it, then exits the far edge like it was never in a hurry at all"],
@@ -1534,7 +1597,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 28;
+const DONE_COUNT = 29;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
