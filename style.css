@@ -133,3 +133,12 @@ body.synthwave #confession { color: #d8a4b8; }
   font: 14px monospace; color: #0f0; opacity: .7;
   text-shadow: 0 0 6px #0f0; pointer-events: none; user-select: none;
 }
+
+/* stray cursor */
+#strayCursor {
+  position: fixed; left: 0; top: 0; z-index: 5;
+  font: 16px monospace; color: #0f0; opacity: 0;
+  text-shadow: 0 0 8px #0f0; pointer-events: none; user-select: none;
+  transition: opacity .8s;
+}
+#strayCursor.alive { opacity: .55; }

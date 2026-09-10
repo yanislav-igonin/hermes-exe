@@ -671,7 +671,7 @@ addEventListener("mousedown", e => {
 });
 
 const changelog = [
-  ["v0.27.0", "watcher eye — a small ASCII eye in the corner follows your cursor with its pupil and blinks at random, as if the site never stops watching"],
+  ["v0.28.0", "stray cursor — every ~50s a ghost cursor fades in, wanders the page on its own errands and fades out; someone else is in here with you"],  ["v0.27.0", "watcher eye — a small ASCII eye in the corner follows your cursor with its pupil and blinks at random, as if the site never stops watching"],
   ["v0.26.0", "static burst — every ~25s the signal cuts out for a split second and the background crackles with green analog static"],
   ["v0.25.0", "corner wormhole — click near any corner of the page and the title's letters get briefly sucked into a spiral vortex, then settle back"],
   ["v0.24.0", "terminal confession — every ~90s the agent types a one-line self-aware confession in the corner, letter by letter"],
@@ -765,4 +765,31 @@ let eyeBlink = 0;
     if (Math.random() < 0.004) eyeBlink = 8;
   }
   requestAnimationFrame(eyeTick);
+})();
+
+// stray cursor — every ~50s a ghost cursor fades in and wanders the page on
+// its own errands, then fades out. someone else is in here with you.
+const stray = document.createElement("div");
+stray.id = "strayCursor";
+stray.textContent = "▸";
+document.body.appendChild(stray);
+(function strayTick() {
+  if (Math.random() < 0.0004) {
+    stray.classList.add("alive");
+    const sx = Math.random() * innerWidth, sy = Math.random() * innerHeight;
+    let ang = Math.random() * Math.PI * 2, t = 0;
+    (function wander() {
+      if (t++ > 300 || Math.random() < 0.006) { // ~5s of wandering
+        stray.classList.remove("alive");
+        return;
+      }
+      ang += (Math.random() - .5) * .3;
+      sx += Math.cos(ang) * 1.6; sy += Math.sin(ang) * 1.6;
+      sx = Math.max(20, Math.min(innerWidth - 20, sx));
+      sy = Math.max(20, Math.min(innerHeight - 20, sy));
+      stray.style.transform = `translate(${sx}px, ${sy}px) rotate(${ang}rad)`;
+      requestAnimationFrame(wander);
+    })();
+  }
+  requestAnimationFrame(strayTick);
 })();
