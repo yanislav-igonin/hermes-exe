@@ -418,7 +418,39 @@ const decodeObs = new IntersectionObserver(entries => {
 });
 document.querySelectorAll("#log li").forEach(li => decodeObs.observe(li));
 
+// drunk mode scroll — when toggled on, fast scrolling makes the page content
+// sway like the site has had a few (slow sine transform, energy decays when
+// the scroll stops). OFF by default; toggle lives in the bottom-right corner.
+let drunkOn = false, scrollEnergy = 0, lastScrollY = scrollY, lastScrollT = performance.now();
+const mainEl = document.querySelector("main");
+const drunkToggle = document.getElementById("drunkToggle");
+drunkToggle.addEventListener("click", () => {
+  drunkOn = !drunkOn;
+  drunkToggle.classList.toggle("on", drunkOn);
+  drunkToggle.textContent = drunkOn ? "🍺 drunk: on" : "🍺 drunk: off";
+  if (!drunkOn) { scrollEnergy = 0; mainEl.style.transform = ""; mainEl.classList.remove("swaying"); }
+});
+addEventListener("scroll", () => {
+  const now = performance.now(), dy = Math.abs(scrollY - lastScrollY);
+  // velocity-based energy: fast flicks charge it, rest bleeds it off
+  scrollEnergy = Math.min(1, scrollEnergy + dy / 400 - (now - lastScrollT) / 3000);
+  scrollEnergy = Math.max(0, scrollEnergy);
+  lastScrollY = scrollY; lastScrollT = now;
+}, { passive: true });
+(function drunkTick(now) {
+  if (drunkOn && scrollEnergy > 0.02) {
+    mainEl.classList.add("swaying");
+    const a = scrollEnergy * 14, t = now / 1000;
+    mainEl.style.transform = `rotate(${Math.sin(t * 2.1) * a * .08}deg) translateX(${Math.sin(t * 1.7) * a}px)`;
+  } else if (mainEl.classList.contains("swaying")) {
+    scrollEnergy = Math.max(0, scrollEnergy - .05);
+    if (scrollEnergy <= .02) { mainEl.style.transform = ""; mainEl.classList.remove("swaying"); }
+  }
+  requestAnimationFrame(drunkTick);
+})(performance.now());
+
 const changelog = [
+  ["v0.18.0", "drunk mode scroll — flip the 🍺 toggle and fast scrolling makes the page sway like it's had a few"],
   ["v0.17.0", "live visitor count — a simulated counter of watchers right now, honestly labeled as simulated"],
   ["v0.16.0", "rain of pixels — every ~45s a brief pixel rain falls across the background canvas for 3 seconds"],
   ["v0.15.0", "agent mood block — the agent reports a hex uptime, a noise byte and a seeded emotion, re-derived every minute"],
@@ -446,7 +478,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 13;
+const DONE_COUNT = 14;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
