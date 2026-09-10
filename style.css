@@ -2286,3 +2286,20 @@ body.page-lean-return {
   0%   { opacity: .8; }
   100% { opacity: 0; }
 }
+
+/* streetlamp flicker — a random element briefly flickers like a dying lamp */
+.lamp-flicker {
+  animation: lamp-flicker 2.4s linear both;
+}
+@keyframes lamp-flicker {
+  0%   { filter: brightness(1); }
+  10%  { filter: brightness(.3); }
+  16%  { filter: brightness(.9); }
+  24%  { filter: brightness(.15); }
+  32%  { filter: brightness(.75); }
+  36%  { filter: brightness(.12); }
+  42%  { filter: brightness(.85); }
+  48%  { filter: brightness(.35); }
+  56%  { filter: brightness(1); }
+  100% { filter: brightness(1); }
+}

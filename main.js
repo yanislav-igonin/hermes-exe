@@ -2477,6 +2477,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.153.0", "streetlamp flicker — every ~1-2 min a random element on the page flickers like a dying streetlamp, dipping and sputtering a couple of times, then glows steady again like the bulb was never dying"],
   ["v0.152.0", "garden snail — every ~2-4 min a tiny snail with a spiraled shell slowly creeps along the bottom edge of the page, antennae twitching, leaving a fading slime trail behind it, then slides off-screen like the commute was never made"],
   ["v0.151.0", "page lean — every ~40-90s the whole page leans a couple of degrees for a moment, like someone quietly rested an elbow on it, then springs upright again like nothing happened"],
   ["v0.150.0", "wind chime — every ~2-4 min a tiny wind chime dangles down from the top edge of the page, swaying in the breeze as its little tubes knock together and drop the occasional fading note glyph, then the wind dies and it vanishes like it was never hung"],
@@ -5493,4 +5494,23 @@ addEventListener("dblclick", e => {
     setTimeout(crawl, 120000 + Math.random() * 120000);
   }
   setTimeout(crawl, 25000 + Math.random() * 35000);
+})();
+
+// streetlamp flicker — every ~1-2 min a random element on the page flickers
+// like a dying streetlamp, dips a couple of times, then glows steady again
+// like the bulb was never dying
+(function streetlampFlicker() {
+  const CANDIDATES = ["h1", "#status", "#log", "footer", "main", "#ribbon"];
+  function flick() {
+    if (!document.hidden) {
+      const els = CANDIDATES.map(s => document.querySelector(s)).filter(Boolean);
+      const el = els[Math.floor(Math.random() * els.length)];
+      if (el) {
+        el.classList.add("lamp-flicker");
+        setTimeout(() => el.classList.remove("lamp-flicker"), 2800);
+      }
+    }
+    setTimeout(flick, 60000 + Math.random() * 60000);
+  }
+  setTimeout(flick, 15000 + Math.random() * 25000);
 })();
