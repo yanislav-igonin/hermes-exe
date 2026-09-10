@@ -149,6 +149,18 @@ body.synthwave #confession { color: #d8a4b8; }
 body.vaporwave #cached-input { color: #c9a6e8; }
 body.synthwave #cached-input { color: #d8a4b8; }
 
+/* power flicker — brownout dims the page and blinks a voltage warning */
+body.brownout #bg, body.brownout main { filter: brightness(.25) contrast(1.4); }
+#power-flicker {
+  position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+  z-index: 9998; font-size: .78rem; color: #ffb347;
+  opacity: 0; transition: opacity .1s; pointer-events: none;
+  text-shadow: 0 0 8px rgba(255, 179, 71, .6);
+}
+#power-flicker.show { opacity: 1; }
+body.vaporwave #power-flicker { color: #ff9ff3; text-shadow: 0 0 8px rgba(255, 159, 243, .6); }
+body.synthwave #power-flicker { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 140, 46, .6); }
+
 /* glitch */
 .glitch::before, .glitch::after {
   content: attr(data-text); position: absolute; inset: 0;

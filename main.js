@@ -720,7 +720,28 @@ function ghostTypeback() {
   }, 55);
 }
 
+// power flicker — every ~70s the grid browns out: the whole page dims and
+// stutters, a "voltage unstable" notice blinks, then the lights snap back on
+setInterval(() => {
+  if (Math.random() > 0.5) return;
+  const el = document.createElement("div");
+  el.id = "power-flicker";
+  el.textContent = "⚠ voltage unstable";
+  document.body.appendChild(el);
+  let flicks = 0;
+  const t = setInterval(() => {
+    document.body.classList.toggle("brownout");
+    el.classList.toggle("show");
+    if (++flicks >= 8) {
+      clearInterval(t);
+      document.body.classList.remove("brownout");
+      setTimeout(() => el.remove(), 600);
+    }
+  }, 120 + Math.random() * 160);
+}, 70000);
+
 const changelog = [
+  ["v0.35.0", "power flicker — every ~70s the grid browns out: the page dims and stutters while a 'voltage unstable' notice blinks, then the lights snap back on"],
   ["v0.34.0", "cached typing — type anywhere and, after 8s of silence, the site ghosts your last ~40 keystrokes back in the corner, letter by letter, then quietly wipes them"],
   ["v0.33.0", "phantom progress bar — every ~40s a fake loading bar crawls in from the top edge, stalls at 99% like something went wrong, then quietly finishes and vanishes"],
   ["v0.32.0", "CRT scanline drift — every ~20s a faint dark band rolls slowly down the screen and occasionally stutters mid-fall, like an old monitor struggling to hold its vertical sync"],
