@@ -1647,6 +1647,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.112.0", "meteor streak — every ~40-80s a meteor burns diagonally across the page, leaving a fading trail of glowing sparks that vanish behind it like it was never there"],
   ["v0.111.0", "snail mail — every ~2-4 min a snail slowly crawls along the bottom of the page, leaving a shimmering trail of tiny glyph slime drops that fade away behind it like the snail was never there"],
   ["v0.110.0", "hot air balloon — every ~90-150s a small balloon drifts across the page, its gondola swaying gently on the breeze and bobbing on thermals, then it sails away off-screen like it was never there"],
   ["v0.109.0", "dandelion wish — every ~70-120s a dandelion head sprouts at a random spot on the page, sways gently for a few seconds, then a gust of wind scatters its floating seeds across the page; they drift with the breeze and fade away like the wish was never made"],
@@ -3761,4 +3762,48 @@ addEventListener("dblclick", e => {
     setTimeout(setOut, 120000 + Math.random() * 120000);
   }
   setTimeout(setOut, 40000 + Math.random() * 50000);
+})();
+
+// meteor streak: every ~40-80s a meteor burns diagonally across the page,
+// leaving a fading glowing trail of sparks that vanish behind it
+(function meteorStreak() {
+  const SPARK_GLYPHS = ["✦", "✧", "˖", "·", "*"];
+  function burn() {
+    const fromLeft = Math.random() < .5;
+    const startX = fromLeft ? -60 : innerWidth + 60;
+    const startY = Math.random() * innerHeight * .45;
+    const angle = (12 + Math.random() * 22) * (Math.PI / 180) * (fromLeft ? 1 : -1);
+    const speed = 520 + Math.random() * 260;
+    const meteor = document.createElement("div");
+    meteor.className = "meteor";
+    meteor.style.left = startX + "px";
+    meteor.style.top = startY + "px";
+    meteor.style.transform = "rotate(" + (angle * (fromLeft ? 1 : -1) * 180 / Math.PI).toFixed(1) + "deg)" + (fromLeft ? "" : " scaleX(-1)");
+    document.body.appendChild(meteor);
+    const dx = Math.cos(angle) * (fromLeft ? 1 : -1);
+    const dy = Math.abs(Math.sin(angle));
+    let px = startX, py = startY, t = 0, lastSpark = 0;
+    const fly = () => {
+      t += 1 / 60;
+      px += dx * speed / 60;
+      py += dy * speed / 60;
+      meteor.style.left = px + "px";
+      meteor.style.top = py + "px";
+      if (t - lastSpark > 0.05) {
+        lastSpark = t;
+        const spark = document.createElement("span");
+        spark.className = "meteor-spark";
+        spark.textContent = SPARK_GLYPHS[Math.floor(Math.random() * SPARK_GLYPHS.length)];
+        spark.style.left = px + "px";
+        spark.style.top = py + "px";
+        document.body.appendChild(spark);
+        setTimeout(() => spark.remove(), 2400);
+      }
+      if (px > -140 && px < innerWidth + 140 && py < innerHeight + 40) requestAnimationFrame(fly);
+      else meteor.remove();
+    };
+    requestAnimationFrame(fly);
+    setTimeout(burn, 40000 + Math.random() * 40000);
+  }
+  setTimeout(burn, 15000 + Math.random() * 20000);
 })();

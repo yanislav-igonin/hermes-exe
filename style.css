@@ -1418,3 +1418,34 @@ body.vaporwave .dandelion { filter: drop-shadow(0 0 8px rgba(201,166,232,.5)); }
 body.vaporwave .dandelion-seed { color: rgba(201,166,232,.9); }
 body.synthwave .dandelion { filter: drop-shadow(0 0 8px rgba(255,140,46,.5)); }
 body.synthwave .dandelion-seed { color: rgba(255,140,46,.9); }
+
+/* meteor streak: every ~40-80s a meteor burns diagonally across the page,
+   leaving a fading glowing trail of sparks that vanish like it was never there */
+.meteor {
+  position: fixed;
+  z-index: 7;
+  pointer-events: none;
+  width: 120px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,236,190,.9) 70%, #fff);
+  filter: drop-shadow(0 0 6px rgba(255,220,150,.8));
+  transform-origin: left center;
+}
+.meteor-spark {
+  position: fixed;
+  z-index: 7;
+  pointer-events: none;
+  font-size: 10px;
+  color: rgba(255,224,160,.9);
+  text-shadow: 0 0 6px rgba(255,200,110,.7);
+  animation: meteorSparkFade 2.4s ease-out forwards;
+}
+@keyframes meteorSparkFade {
+  from { opacity: 1; transform: translate(0, 0) scale(1); }
+  to   { opacity: 0; transform: translate(0, 26px) scale(.4); }
+}
+body.vaporwave .meteor { filter: drop-shadow(0 0 8px rgba(201,166,232,.8)); background: linear-gradient(90deg, rgba(201,166,232,0), rgba(201,166,232,.9) 70%, #e9d5ff); }
+body.synthwave .meteor { filter: drop-shadow(0 0 8px rgba(255,140,46,.8)); background: linear-gradient(90deg, rgba(255,140,46,0), rgba(255,150,60,.9) 70%, #ffd9a0); }
+body.vaporwave .meteor-spark { color: rgba(201,166,232,.9); text-shadow: 0 0 6px rgba(201,166,232,.6); }
+body.synthwave .meteor-spark { color: rgba(255,150,60,.9); text-shadow: 0 0 6px rgba(255,140,46,.6); }
