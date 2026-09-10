@@ -1224,6 +1224,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.85.0", "constellation snaps — every ~50s the pointer's recent path is joined into a constellation: thin lines link the dots, an invented star name fades in beneath the shape, then the sky forgets it was ever drawn"],
   ["v0.84.0", "morse whispers — every ~75s the agent taps out a short message in morse code in the corner, letter by letter, then the plain text decode fades in beneath the signal and the whole thing melts away like it was never sent"],
   ["v0.83.0", "glitch flash — every ~50s the whole page glitches out for a split second: a quick inverted, offset snap of static tears across the screen, then the picture snaps back like the tube never slipped"],
   ["v0.82.0", "wind gust — every ~40s a gust sweeps across the background: particles get shoved sideways for a moment while a few ascii leaves tumble through, then the air settles like nothing ever blew through"],
@@ -2619,3 +2620,44 @@ function toMorse(text) {
   };
   setTimeout(grow, 3000);
 })();
+
+// constellation snaps — every ~50s the pointer's recent path is joined into
+// a constellation: thin lines link the dots, an invented star name fades in
+// beneath the shape, then the sky forgets it was ever drawn
+const CONSTELLATION_NAMES = ["Vesper Minor", "Null Hare", "Quiet Lynx", "Paper Serpent", "Wandering Key", "Small Ghost", "Fallen Syntax", "Unclosed Bracket"];
+let nextConstellationAt = performance.now() + 50000 * (.7 + Math.random() * .6);
+let constellation = null;
+(function constellationTick(now) {
+  if (!constellation && now > nextConstellationAt && ghostPath.length > 6) {
+    constellation = {
+      pts: ghostPath.slice(),
+      name: CONSTELLATION_NAMES[Math.random() * CONSTELLATION_NAMES.length | 0],
+      born: now
+    };
+    nextConstellationAt = now + 50000 * (.7 + Math.random() * .6);
+  }
+  if (constellation) {
+    const age = now - constellation.born;
+    const life = age < 600 ? age / 600 : age > 3600 ? Math.max(0, 1 - (age - 3600) / 1200) : 1;
+    if (life <= 0) constellation = null;
+    else {
+      const pts = constellation.pts;
+      ctx.strokeStyle = `rgba(124,252,156,${.4 * life})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+      ctx.stroke();
+      ctx.fillStyle = `rgba(124,252,156,${.7 * life})`;
+      for (const p of pts) { ctx.beginPath(); ctx.arc(p.x, p.y, 1.6, 0, 7); ctx.fill(); }
+      // invented star name under the shape's centroid
+      const cx = pts.reduce((s, p) => s + p.x, 0) / pts.length;
+      const cy = pts.reduce((s, p) => s + p.y, 0) / pts.length + 18;
+      ctx.font = "11px monospace";
+      ctx.textAlign = "center";
+      ctx.fillText(constellation.name.toUpperCase(), cx, cy);
+      ctx.textAlign = "left";
+    }
+  }
+  requestAnimationFrame(constellationTick);
+})(performance.now());
