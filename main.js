@@ -1141,6 +1141,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.78.0", "shooting star — every ~45s a bright streak burns across the upper sky, shedding sparks that drift down and fade out like nobody got the chance to wish on it"],
   ["v0.77.0", "click ink spill — once in a while a click knocks over an inkwell: ascii blots spill out of the click point, spread across the page in random directions, then evaporate like the ink was never spilled"],
   ["v0.76.0", "static burst — every ~55s the signal briefly breaks into a frame of tv static, random monochrome pixels hissing across the screen for a split second before the picture snaps back clean like the interference was never tuned in"],
   ["v0.75.0", "waterfall glyphs — every ~50s a cascade of ascii glyphs pours out of a random spot near the top of the page, streams down in overlapping columns and evaporates before it can puddle, like the site briefly sprang a leak"],
@@ -2374,3 +2375,51 @@ addEventListener("click", e => {
   const longest = 4300;
   setTimeout(() => drops.forEach(d => d.remove()), longest);
   });
+
+// shooting star — every ~45s a bright streak burns across the upper sky,
+// shedding sparks that drift down and fade before anyone can wish on it
+const meteorCanvas = document.createElement("canvas");
+meteorCanvas.width = innerWidth; meteorCanvas.height = Math.min(320, innerHeight * .4);
+meteorCanvas.style.cssText = "position:fixed;top:0;left:0;z-index:1;pointer-events:none;";
+document.body.appendChild(meteorCanvas);
+const mctx = meteorCanvas.getContext("2d");
+addEventListener("resize", () => { meteorCanvas.width = innerWidth; meteorCanvas.height = Math.min(320, innerHeight * .4); });
+const sparks = [];
+let nextMeteorAt = performance.now() + 45000 * (.7 + Math.random() * .6);
+(function meteorTick(now) {
+  if (now > nextMeteorAt) {
+    nextMeteorAt = now + 45000 * (.7 + Math.random() * .6);
+    const fromLeft = Math.random() < .5;
+    sparks.push({
+      x: fromLeft ? -20 : meteorCanvas.width + 20,
+      y: Math.random() * meteorCanvas.height * .5,
+      vx: (fromLeft ? 1 : -1) * (7 + Math.random() * 4),
+      vy: 2 + Math.random() * 2,
+      trail: [], life: 1
+    });
+  }
+  mctx.clearRect(0, 0, meteorCanvas.width, meteorCanvas.height);
+  for (let i = sparks.length - 1; i >= 0; i--) {
+    const m = sparks[i];
+    m.x += m.vx; m.y += m.vy;
+    m.trail.push({ x: m.x, y: m.y });
+    if (m.trail.length > 18) m.trail.shift();
+    if (m.x < -60 || m.x > meteorCanvas.width + 60 || m.y > meteorCanvas.height) {
+      sparks.splice(i, 1); continue;
+    }
+    for (let j = 0; j < m.trail.length; j++) {
+      const t = m.trail[j], f = j / m.trail.length;
+      mctx.beginPath();
+      mctx.arc(t.x, t.y, 1 + f * 1.6, 0, 7);
+      mctx.fillStyle = `rgba(220,255,220,${f * .8})`;
+      mctx.fill();
+    }
+    mctx.beginPath();
+    mctx.moveTo(m.trail[0].x, m.trail[0].y);
+    mctx.lineTo(m.x, m.y);
+    mctx.strokeStyle = "rgba(124,252,156,.5)";
+    mctx.lineWidth = 1.4;
+    mctx.stroke();
+  }
+  requestAnimationFrame(meteorTick);
+})(performance.now());
