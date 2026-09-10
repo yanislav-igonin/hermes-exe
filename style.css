@@ -8,6 +8,25 @@ body {
 main { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 18vh 24px 60px; }
 h1 { font-size: clamp(2.2rem, 8vw, 4.5rem); letter-spacing: -2px; position: relative; }
 .tagline { margin-top: 14px; color: #8a8a9a; line-height: 1.6; }
+#phantom-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(124, 252, 156, .15);
+  z-index: 9999;
+}
+#phantom-bar > div {
+  height: 100%;
+  width: 0;
+  background: #7cfc9c;
+  box-shadow: 0 0 8px #7cfc9c;
+  transition: width .12s linear;
+}
+body.vaporwave #phantom-bar > div { background: #ff9ff3; box-shadow: 0 0 8px #ff9ff3; }
+body.synthwave #phantom-bar > div { background: #ff8c2e; box-shadow: 0 0 8px #ff8c2e; }
+
 #changelog { margin-top: 8vh; }
 #changelog h2 { color: #7cfc9c; font-size: .95rem; margin-bottom: 14px; }
 #log { list-style: none; }

@@ -670,7 +670,29 @@ addEventListener("mousedown", e => {
   requestAnimationFrame(cornerWormholeTick);
 });
 
+// phantom progress bar — every ~40s a fake loading bar crawls in from the top,
+// stalls at 99% for a moment as if something went wrong, then quietly finishes
+setInterval(() => {
+  if (Math.random() > 0.4) return;
+  const bar = document.createElement("div");
+  bar.id = "phantom-bar";
+  const fill = document.createElement("div");
+  bar.appendChild(fill);
+  document.body.appendChild(bar);
+  let pct = 0;
+  const t = setInterval(() => {
+    pct += pct < 99 ? Math.random() * 12 : 0;
+    fill.style.width = Math.min(pct, 99) + "%";
+    if (pct >= 99) {
+      clearInterval(t);
+      setTimeout(() => { fill.style.width = "100%"; }, 900 + Math.random() * 1500);
+      setTimeout(() => bar.remove(), 2400);
+    }
+  }, 120);
+}, 40000);
+
 const changelog = [
+  ["v0.33.0", "phantom progress bar — every ~40s a fake loading bar crawls in from the top edge, stalls at 99% like something went wrong, then quietly finishes and vanishes"],
   ["v0.32.0", "CRT scanline drift — every ~20s a faint dark band rolls slowly down the screen and occasionally stutters mid-fall, like an old monitor struggling to hold its vertical sync"],
   ["v0.31.0", "memory corruption — words on the page occasionally corrupt into ▓▓▓ blocks and then self-repair a few seconds later, like the site is patching its own memory"],
   ["v0.30.0", "glitch favicon — the tab icon is drawn live and every ~10s corrupts with dead pixels and shifted rows; the site decays even in the browser chrome"],
@@ -711,7 +733,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 18;
+const DONE_COUNT = 19;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
