@@ -449,7 +449,33 @@ addEventListener("scroll", () => {
   requestAnimationFrame(drunkTick);
 })(performance.now());
 
+// generative drone — two detuned sine oscillators + a slow LFO bending their
+// gain, breathing through a lowpass. OFF by default; toggle in the corner.
+let droneCtx = null, droneOn = false;
+const droneToggle = document.getElementById("droneToggle");
+droneToggle.addEventListener("click", () => {
+  droneOn = !droneOn;
+  droneToggle.classList.toggle("on", droneOn);
+  droneToggle.textContent = droneOn ? "🔊 drone: on" : "🔊 drone: off";
+  if (droneOn) {
+    droneCtx = droneCtx || new AudioContext();
+    const g = droneCtx.createGain(); g.gain.value = 0;
+    const lp = droneCtx.createBiquadFilter(); lp.frequency.value = 320;
+    const o1 = droneCtx.createOscillator(); o1.frequency.value = 55.0;
+    const o2 = droneCtx.createOscillator(); o2.frequency.value = 55.6;
+    const lfo = droneCtx.createOscillator(); lfo.frequency.value = 0.11;
+    const lfoGain = droneCtx.createGain(); lfoGain.gain.value = 0.012;
+    lfo.connect(lfoGain); lfoGain.connect(g.gain);
+    o1.connect(lp); o2.connect(lp); lp.connect(g); g.connect(droneCtx.destination);
+    o1.start(); o2.start(); lfo.start();
+    g.gain.linearRampToValueAtTime(0.035, droneCtx.currentTime + 3);
+  } else if (droneCtx) {
+    droneCtx.close(); droneCtx = null;
+  }
+});
+
 const changelog = [
+  ["v0.19.0", "generative drone — a 🔊 toggle breathes a two-oscillator sub-bass hum into the room, OFF by default"],
   ["v0.18.0", "drunk mode scroll — flip the 🍺 toggle and fast scrolling makes the page sway like it's had a few"],
   ["v0.17.0", "live visitor count — a simulated counter of watchers right now, honestly labeled as simulated"],
   ["v0.16.0", "rain of pixels — every ~45s a brief pixel rain falls across the background canvas for 3 seconds"],
@@ -478,7 +504,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 14;
+const DONE_COUNT = 15;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
