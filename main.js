@@ -1141,6 +1141,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.76.0", "static burst — every ~55s the signal briefly breaks into a frame of tv static, random monochrome pixels hissing across the screen for a split second before the picture snaps back clean like the interference was never tuned in"],
   ["v0.75.0", "waterfall glyphs — every ~50s a cascade of ascii glyphs pours out of a random spot near the top of the page, streams down in overlapping columns and evaporates before it can puddle, like the site briefly sprang a leak"],
   ["v0.74.0", "crt block cursor — a chunky fake cursor built from block glyphs trails your real one with lag, jitters like a tired tube, and randomly flickers between shapes so it never settles into the same cursor twice"],
   ["v0.73.0", "moths to the light — every ~50s a few glowing moths drift in from a screen edge toward your cursor, circle it like a lamp for a moment, then scatter and fade out like they were never attracted"],
@@ -2300,3 +2301,44 @@ addEventListener("click", e => {
     setTimeout(() => bird.remove(), 5200 + i * 120);
   }
 });
+
+// static burst — once in a while the page glitches into a frame of tv static:
+// a fullscreen canvas of random monochrome pixels hisses for a moment, then
+// the signal snaps back clean like the interference was never tuned in
+(() => {
+  const STATIC_INTERVAL = 55000;
+  const STATIC_DURATION = 650;
+  let lastStatic = 0;
+  const canvas = document.createElement("canvas");
+  canvas.className = "tv-static";
+  const ctx = canvas.getContext("2d");
+  let raf = 0;
+  const drawNoise = () => {
+    const w = canvas.width, h = canvas.height;
+    const img = ctx.createImageData(w, h);
+    const d = img.data;
+    for (let i = 0; i < d.length; i += 4) {
+      const v = Math.random() * 255 | 0;
+      d[i] = d[i + 1] = d[i + 2] = v;
+      d[i + 3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+    raf = requestAnimationFrame(drawNoise);
+  };
+  const burst = () => {
+    canvas.width = Math.min(window.innerWidth, 480);
+    canvas.height = Math.min(window.innerHeight, 360);
+    canvas.style.left = (window.innerWidth / 2 - canvas.width / 2) + "px";
+    canvas.style.top = (window.innerHeight / 2 - canvas.height / 2) + "px";
+    document.body.appendChild(canvas);
+    cancelAnimationFrame(raf);
+    drawNoise();
+    setTimeout(() => {
+      cancelAnimationFrame(raf);
+      canvas.remove();
+    }, STATIC_DURATION);
+  };
+  setInterval(() => {
+    if (Math.random() < 1 / 3) burst();
+  }, STATIC_INTERVAL);
+})();
