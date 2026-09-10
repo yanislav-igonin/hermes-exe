@@ -1024,8 +1024,72 @@ setInterval(() => {
   setTimeout(flick, 25000 + Math.random() * 30000);
 })();
 
+// moths to the light — every ~50s a few glowing moths drift in from a screen
+// edge toward the cursor, circle it like a lamp for a moment, then scatter
+// and fade out like they were never attracted
+let mothT = 0;
+addEventListener("mousemove", e => {
+  mouseCX = e.clientX; mouseCY = e.clientY;
+});
+let mouseCX = innerWidth / 2, mouseCY = innerHeight / 2;
+(function mothTimer() {
+  setTimeout(() => {
+    if (mothT === 0 || performance.now() - mothT > 40000) {
+      mothT = performance.now();
+      const edge = Math.floor(Math.random() * 4);
+      for (let i = 0; i < 4 + Math.floor(Math.random() * 3); i++) {
+        const moth = document.createElement("div");
+        moth.className = "moth";
+        const t = Math.random();
+        let x, y;
+        if (edge === 0) { x = t * innerWidth; y = -10; }
+        else if (edge === 1) { x = innerWidth + 10; y = t * innerHeight; }
+        else if (edge === 2) { x = t * innerWidth; y = innerHeight + 10; }
+        else { x = -10; y = t * innerHeight; }
+        moth.style.left = x + "px";
+        moth.style.top = y + "px";
+        moth.style.animationDelay = (i * 180) + "ms";
+        document.body.appendChild(moth);
+        // flap toward the cursor, circle it, then scatter and die
+        const start = performance.now() + i * 180;
+        const ox = x, oy = y, seed = Math.random() * Math.PI * 2;
+        (function flap() {
+          const age = performance.now() - start;
+          if (age < 0) { requestAnimationFrame(flap); return; }
+          const life = 4200;
+          if (age > life) { moth.remove(); return; }
+          const k = age / life;
+          // approach then orbit then scatter
+          const wob = Math.sin(age * .02 + seed) * 12;
+          let px, py;
+          if (k < .55) {
+            const a = k / .55;
+            px = ox + (mouseCX - ox) * a + wob * (1 - a);
+            py = oy + (mouseCY - oy) * a + wob * (1 - a);
+          } else if (k < .8) {
+            const ang = seed + (k - .55) * 14;
+            px = mouseCX + Math.cos(ang) * 34 + wob * .4;
+            py = mouseCY + Math.sin(ang) * 34 + wob * .4;
+          } else {
+            const s = (k - .8) / .2;
+            const ang = seed + 14 * .25;
+            px = mouseCX + Math.cos(ang) * 34 * (1 + s * 3) + wob * (1 + s * 2);
+            py = mouseCY + Math.sin(ang) * 34 * (1 + s * 3) + wob * (1 + s * 2);
+          }
+          moth.style.left = px + "px";
+          moth.style.top = py + "px";
+          moth.style.opacity = String(.85 * (k < .9 ? 1 : 1 - (k - .9) * 10));
+          requestAnimationFrame(flap);
+        })();
+      }
+    }
+    mothTimer();
+  }, 20000 + Math.random() * 30000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.73.0", "moths to the light — every ~50s a few glowing moths drift in from a screen edge toward your cursor, circle it like a lamp for a moment, then scatter and fade out like they were never attracted"],
   ["v0.72.0", "rgb-split flicker — every ~60s a random block on the page briefly tears into red and cyan channel ghosts that jitter out of alignment, then snaps back into focus like the tube never slipped"],
   ["v0.71.0", "click storm — once in a while a click startles a small flock of ascii birds out of the click point, they scatter across the screen flapping their glyphs with a lazy drift, then vanish mid-flight like the flock was never there"],
   ["v0.70.0", "cursor footprints — as you move the mouse the cursor leaves small paired paw prints that alternate left and right along your path and point where you are heading, each one fading out a couple of seconds later like the animal was never there"],

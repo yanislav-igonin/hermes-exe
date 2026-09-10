@@ -626,6 +626,19 @@ body.synthwave .paw-print::before { background: #ff8c2e; box-shadow: 0 0 5px rgb
 body.vaporwave .bird { color: #c9a6e8; text-shadow: 0 0 5px rgba(201,166,232,.5); }
 body.synthwave .bird { color: #ff8c2e; text-shadow: 0 0 5px rgba(255,140,46,.5); }
 
+/* the moths: little glowing specks that fly to the cursor like it is a lamp,
+   circle it, scatter and fade out */
+.moth {
+  position: fixed; z-index: 9993; pointer-events: none;
+  width: 4px; height: 4px; border-radius: 50%;
+  background: #d9f7b2;
+  box-shadow: 0 0 6px 2px rgba(217,247,178,.55);
+  opacity: .85;
+  transition: opacity .3s;
+}
+body.vaporwave .moth { background: #c9a6e8; box-shadow: 0 0 6px 2px rgba(201,166,232,.55); }
+body.synthwave .moth { background: #ff8c2e; box-shadow: 0 0 6px 2px rgba(255,140,46,.55); }
+
 /* the rgb-split flicker: a random block tears into red/cyan ghosts that
    jitter apart on the --rs-x variable, then snap back into focus */
 .rgb-split {
