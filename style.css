@@ -143,6 +143,15 @@ body.synthwave #confession { color: #d8a4b8; }
 }
 #strayCursor.alive { opacity: .55; }
 
+/* CRT scanline drift */
+#scanDrift {
+  position: fixed; left: 0; right: 0; height: 90px;
+  background: linear-gradient(to bottom, transparent, rgba(0,0,0,.28) 45%, rgba(0,0,0,.34) 55%, transparent);
+  z-index: 4; pointer-events: none; opacity: 0;
+  mix-blend-mode: multiply;
+}
+#scanDrift.alive { opacity: 1; }
+
 /* glyph rain column */
 #glyphRain { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
 #glyphRain span {
