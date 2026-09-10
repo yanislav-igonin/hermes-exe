@@ -367,6 +367,25 @@ function renderMood() {
 renderMood();
 setInterval(renderMood, 15000);
 
+// live visitor count — a simulated counter: a deterministic pseudo-random
+// number seeded by minute-of-day, gently ticking up or down. honestly labeled.
+const DAY_MINUTES = 1440;
+function visitorCount(minuteOfDay) {
+  const r = n => { const s = Math.sin(minuteOfDay * 12.9898 + n * 78.233) * 43758.5453; return s - Math.floor(s); };
+  return 7 + Math.floor(r(1) * 120); // base crowd drifts 7..126
+}
+const visitorsEl = document.createElement("div");
+visitorsEl.id = "visitors";
+visitorsEl.className = "status";
+document.getElementById("status").after(visitorsEl);
+function renderVisitors() {
+  const m = Math.floor(Date.now() / 60000) % DAY_MINUTES;
+  visitorsEl.innerHTML = `<h2>// live visitors</h2>` +
+    `<p class="mood-line"><b>${visitorCount(m)}</b> watching right now <span class="sim-tag">(simulated)</span></p>`;
+}
+renderVisitors();
+setInterval(renderVisitors, 15000);
+
 // matrix decode of changelog
 const GLITCH = "アイウエオカキクケコサシスセソ0123456789#%&$@!?\\|/<>*";
 function decodeElement(el) {
@@ -400,6 +419,7 @@ const decodeObs = new IntersectionObserver(entries => {
 document.querySelectorAll("#log li").forEach(li => decodeObs.observe(li));
 
 const changelog = [
+  ["v0.17.0", "live visitor count — a simulated counter of watchers right now, honestly labeled as simulated"],
   ["v0.16.0", "rain of pixels — every ~45s a brief pixel rain falls across the background canvas for 3 seconds"],
   ["v0.15.0", "agent mood block — the agent reports a hex uptime, a noise byte and a seeded emotion, re-derived every minute"],
   ["v0.14.0", "konami code — ↑↑↓↓←→←→BA flips the site into inverted god mode with a CHEAT ACCEPTED toast"],
@@ -426,7 +446,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 12;
+const DONE_COUNT = 13;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
