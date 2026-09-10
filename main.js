@@ -1493,8 +1493,47 @@ addEventListener("mousemove", e => {
   requestAnimationFrame(showerTick);
 })();
 
+// sigil snowfall — every ~45-90s a chaotic gust shakes loose a flurry of tiny
+// sigils that falls diagonally across the page, melting on impact with the bottom edge
+(function sigilSnowfall() {
+  const SIGILS = ["ᚠ", "ᚱ", "ᚹ", "ᚾ", "ᛉ", "ᛟ", "✶", "⟁", "☾", "✧"];
+  function gust() {
+    const n = 10 + Math.floor(Math.random() * 12);
+    for (let i = 0; i < n; i++) {
+      const flake = document.createElement("span");
+      flake.className = "sigil-flake";
+      flake.textContent = SIGILS[Math.floor(Math.random() * SIGILS.length)];
+      const x = Math.random() * innerWidth;
+      const y = -20 - Math.random() * 200;
+      const drift = 60 + Math.random() * 140;
+      const fall = 4500 + Math.random() * 3500;
+      const sway = 10 + Math.random() * 14;
+      const freq = .5 + Math.random() * .8;
+      const start = performance.now() + Math.random() * 900;
+      document.body.appendChild(flake);
+      (function fallTick(now) {
+        const t = (now - start) / fall;
+        if (t < 0) { requestAnimationFrame(fallTick); return; }
+        if (t >= 1) {
+          // melt at the bottom edge
+          flake.classList.add("sigil-melt");
+          setTimeout(() => flake.remove(), 700);
+          return;
+        }
+        const px = x + drift * t + Math.sin(t * freq * Math.PI * 2) * sway;
+        const py = y + (innerHeight + 40 - y) * t;
+        flake.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px)`;
+        requestAnimationFrame(fallTick);
+      })(performance.now());
+    }
+    setTimeout(gust, 45000 + Math.random() * 45000);
+  }
+  setTimeout(gust, 12000 + Math.random() * 20000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.104.0", "sigil snowfall — every ~45-90s a brief chaotic gust shakes loose a flurry of tiny hermes sigils that falls diagonally across the page, melting on impact with the bottom edge like they were never typed"],
   ["v0.103.0", "ghost cursor wanderer — every ~30-60s a tiny ghost cursor drifts along a lazy random bezier path across the page, trailing faint pixel sparks, then dissolves like nobody was ever moving it"],
   ["v0.102.0", "glitch koi — every ~80-130s a koi crosses the pond at the bottom of the page on a lazy sine, trailing fading ripple glyphs; once per crossing it flickers into a corrupted rgb-split glitch shape for a beat, then swims on like the pond was never stocked"],
   ["v0.101.0", "pixel ghost — every ~60-90s a little pixel ghost rises from near the bottom of the page, floats up with a lazy sway, says a brief \"boo!\" somewhere mid-drift, then fades out like it never had anyone to haunt"],

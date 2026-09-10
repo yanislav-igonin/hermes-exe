@@ -1126,3 +1126,30 @@ body.vaporwave .koi-ripple, body.synthwave .koi-ripple { color: rgba(255, 205, 1
 body.vaporwave .ghost-cursor { text-shadow: 0 0 8px rgba(201, 166, 232, .6); }
 body.synthwave .ghost-cursor { text-shadow: 0 0 8px rgba(255, 140, 46, .6); }
 body.vaporwave .ghost-cursor-spark, body.synthwave .ghost-cursor-spark { color: rgba(255, 205, 170, .5); }
+
+
+/* sigil snowfall */
+.sigil-flake {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 9994;
+  pointer-events: none;
+  font-size: 11px;
+  line-height: 1;
+  color: rgba(190, 175, 255, .6);
+  text-shadow: 0 0 6px rgba(180, 160, 255, .45);
+  will-change: transform;
+  animation: sigil-flicker 1.1s steps(2) infinite;
+}
+.sigil-flake.sigil-melt {
+  animation: sigil-melt .7s ease-out forwards;
+}
+@keyframes sigil-flicker {
+  50% { opacity: .45; }
+}
+@keyframes sigil-melt {
+  to { opacity: 0; transform: scale(.4) translateY(6px); filter: blur(2px); }
+}
+body.vaporwave .sigil-flake { color: rgba(201, 166, 232, .65); text-shadow: 0 0 6px rgba(201, 166, 232, .5); }
+body.synthwave .sigil-flake { color: rgba(255, 205, 150, .65); text-shadow: 0 0 6px rgba(255, 140, 46, .5); }
