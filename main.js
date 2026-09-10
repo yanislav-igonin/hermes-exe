@@ -1000,6 +1000,7 @@ setInterval(() => {
 
 // changelog
 const changelog = [
+  ["v0.71.0", "click storm — once in a while a click startles a small flock of ascii birds out of the click point, they scatter across the screen flapping their glyphs with a lazy drift, then vanish mid-flight like the flock was never there"],
   ["v0.70.0", "cursor footprints — as you move the mouse the cursor leaves small paired paw prints that alternate left and right along your path and point where you are heading, each one fading out a couple of seconds later like the animal was never there"],
   ["v0.69.0", "wandering eyes — every ~45s a pair of eyes fades in at a random spot on the page and the pupils follow your cursor wherever it goes, they blink a few times, then fade out like nothing was ever watching"],
   ["v0.68.0", "chromatic aberration — press k and the lens slips: text tears into red and cyan ghosts jittering out of alignment, scanlines crawl over the page, then the channels snap back together like the tube warmed up again"],
@@ -2124,4 +2125,33 @@ addEventListener("mousemove", e => {
   setTimeout(() => print.remove(), 2200);
   pawSide *= -1;
   lastPawX = e.clientX; lastPawY = e.clientY; lastPawT = now;
+});
+
+// click storm — once in a while a click startles a small flock of ascii birds
+// out of the click point; they scatter across the screen with a lazy drift,
+// flapping their glyphs, then vanish mid-flight like the flock was never there
+let flockT = 0;
+addEventListener("click", e => {
+  const now = performance.now();
+  if (now - flockT < 6000 || Math.random() > 1 / 12) return;
+  flockT = now;
+  const baseAng = Math.random() * Math.PI * 2;
+  const count = 5 + Math.floor(Math.random() * 4);
+  for (let i = 0; i < count; i++) {
+    const bird = document.createElement("div");
+    bird.className = "bird";
+    bird.textContent = ["v", "^", "<", ">", "'"][i % 5];
+    // spread the flock out behind the start point so it reads as a group
+    const back = baseAng + Math.PI;
+    const lag = Math.random() * 60 + i * 14;
+    const x = e.clientX + Math.cos(back) * lag + (Math.random() - .5) * 30;
+    const y = e.clientY + Math.sin(back) * lag + (Math.random() - .5) * 30;
+    bird.style.left = x + "px";
+    bird.style.top = y + "px";
+    bird.style.setProperty("--dx", (Math.cos(baseAng + (Math.random() - .5) * .5) * (window.innerWidth + 120)).toFixed(0) + "px");
+    bird.style.setProperty("--dy", (Math.sin(baseAng + (Math.random() - .5) * .5) * (window.innerHeight + 120)).toFixed(0) + "px");
+    bird.style.animationDelay = (i * 120) + "ms";
+    document.body.appendChild(bird);
+    setTimeout(() => bird.remove(), 5200 + i * 120);
+  }
 });

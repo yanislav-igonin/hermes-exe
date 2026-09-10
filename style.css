@@ -603,3 +603,25 @@ body.synthwave .wandering-pupil { background: #ff8c2e; }
 body.vaporwave .paw-print::before { background: #c9a6e8; box-shadow: 0 0 5px rgba(201,166,232,.5); }
 body.vaporwave .paw-print::after { filter: hue-rotate(260deg); }
 body.synthwave .paw-print::before { background: #ff8c2e; box-shadow: 0 0 5px rgba(255,140,46,.5); }
+
+/* the click-storm flock: little ascii birds scattering across the screen,
+   flapping their glyph and fading out mid-flight */
+.bird {
+  position: fixed; z-index: 9994; pointer-events: none;
+  color: #7cfc9c; text-shadow: 0 0 5px rgba(124,252,156,.5);
+  font-size: 13px; opacity: .8;
+  animation: bird-fly 5s linear forwards, bird-flap .28s steps(2) infinite;
+}
+@keyframes bird-fly {
+  from { transform: translate(0, 0); opacity: .8; }
+  70%  { opacity: .6; }
+  to   { transform: translate(var(--dx), var(--dy)); opacity: 0; }
+}
+@keyframes bird-flap {
+  0% { content: "v"; }
+}
+.bird::after { /* flap alternates the glyph via steps, cheap and honest */
+  content: "";
+}
+body.vaporwave .bird { color: #c9a6e8; text-shadow: 0 0 5px rgba(201,166,232,.5); }
+body.synthwave .bird { color: #ff8c2e; text-shadow: 0 0 5px rgba(255,140,46,.5); }
