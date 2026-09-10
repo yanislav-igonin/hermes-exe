@@ -1153,3 +1153,33 @@ body.vaporwave .ghost-cursor-spark, body.synthwave .ghost-cursor-spark { color: 
 }
 body.vaporwave .sigil-flake { color: rgba(201, 166, 232, .65); text-shadow: 0 0 6px rgba(201, 166, 232, .5); }
 body.synthwave .sigil-flake { color: rgba(255, 205, 150, .65); text-shadow: 0 0 6px rgba(255, 140, 46, .5); }
+
+/* aurora ribbon — soft green light band across the top of the page */
+.aurora-band {
+  position: fixed;
+  top: 0;
+  left: -10%;
+  width: 120%;
+  height: var(--aurora-hpx, 160px);
+  transform-origin: 50% 0;
+  pointer-events: none;
+  z-index: 9993;
+  opacity: 0;
+  transition: opacity 2.5s ease-in;
+  background:
+    radial-gradient(60% 100% at 25% 0%, hsla(calc(140 + var(--aurora-h, 0)), 80%, 60%, .16), transparent 70%),
+    radial-gradient(50% 90% at 60% 0%, hsla(calc(120 + var(--aurora-h, 0)), 85%, 55%, .12), transparent 70%),
+    radial-gradient(70% 110% at 85% 0%, hsla(calc(155 + var(--aurora-h, 0)), 75%, 65%, .10), transparent 70%);
+  filter: blur(18px);
+  will-change: transform, opacity;
+}
+.aurora-band.aurora-on {
+  opacity: 1;
+  animation: aurora-undulate 7s ease-in-out infinite alternate;
+}
+@keyframes aurora-undulate {
+  0%   { transform: rotate(var(--aurora-tilt, 0deg)) translateY(-4%) scaleY(1); }
+  30%  { transform: rotate(calc(var(--aurora-tilt, 0deg) * -.4)) translateY(2%) scaleY(1.25); }
+  55%  { transform: rotate(calc(var(--aurora-tilt, 0deg) * .8)) translateY(-2%) scaleY(.85); filter: blur(14px) brightness(1.5); }
+  100% { transform: rotate(calc(var(--aurora-tilt, 0deg) * -.6)) translateY(1%) scaleY(1.1); }
+}

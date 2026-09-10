@@ -1531,8 +1531,30 @@ addEventListener("mousemove", e => {
   setTimeout(gust, 12000 + Math.random() * 20000);
 })();
 
+// aurora ribbon — every ~40-80s a soft green aurora band unfurls across the top,
+// undulating on layered sine waves, occasionally flaring, then dissolving
+(function auroraRibbon() {
+  const band = document.createElement("div");
+  band.className = "aurora-band";
+  document.body.appendChild(band);
+  function show() {
+    const dur = 9000 + Math.random() * 4000;
+    const tilt = (Math.random() - .5) * 8;         // slow drift angle, degrees
+    const hueShift = (Math.random() - .5) * 20;    // subtle green variance
+    const height = 120 + Math.random() * 100;
+    band.style.setProperty("--aurora-h", hueShift.toFixed(1));
+    band.style.setProperty("--aurora-tilt", tilt.toFixed(2) + "deg");
+    band.style.setProperty("--aurora-hpx", height.toFixed(0) + "px");
+    band.classList.add("aurora-on");
+    setTimeout(() => band.classList.remove("aurora-on"), dur);
+    setTimeout(show, 40000 + Math.random() * 40000);
+  }
+  setTimeout(show, 15000 + Math.random() * 25000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.105.0", "aurora ribbon — every ~40-80s a soft green band of light unfurls across the top of the page, undulating on layered sine waves and occasionally flaring brighter, then dissolving back into the dark like the sky was never lit"],
   ["v0.104.0", "sigil snowfall — every ~45-90s a brief chaotic gust shakes loose a flurry of tiny hermes sigils that falls diagonally across the page, melting on impact with the bottom edge like they were never typed"],
   ["v0.103.0", "ghost cursor wanderer — every ~30-60s a tiny ghost cursor drifts along a lazy random bezier path across the page, trailing faint pixel sparks, then dissolves like nobody was ever moving it"],
   ["v0.102.0", "glitch koi — every ~80-130s a koi crosses the pond at the bottom of the page on a lazy sine, trailing fading ripple glyphs; once per crossing it flickers into a corrupted rgb-split glitch shape for a beat, then swims on like the pond was never stocked"],
