@@ -164,6 +164,42 @@ let rainUntil = 0;
     ctx.fillStyle = "rgba(124,252,156,.85)";
     ctx.fillRect(p.x, p.y, p.r, p.r);
   }
+// lightning storm — every ~45-90s a forked bolt tears across the upper sky:
+// the page flashes white for a blink, the bolt frays apart, and a thunder
+// rumble echoes in the console a beat later like the storm was never there
+let bolt = null, boltLife = 0, flashUntil = 0,
+    nextBoltAt = performance.now() + 45000 * (.7 + Math.random() * .6);
+function makeBolt() {
+  const segs = [];
+  let x = Math.random() * canvas.width * .8 + canvas.width * .1, y = -10;
+  while (y < canvas.height * .55) {
+    const nx = x + (Math.random() - .5) * 90, ny = y + 18 + Math.random() * 26;
+    segs.push([x, y, nx, ny]);
+    if (Math.random() < .3) segs.push([nx, ny, nx + (Math.random() - .5) * 120, ny + 30 + Math.random() * 40]); // fork
+    x = nx; y = ny;
+  }
+  return segs;
+}
+  // lightning: spawn a bolt, flash the sky, let it fray away
+  if (!bolt && now > nextBoltAt) {
+    bolt = makeBolt(); boltLife = 1; flashUntil = now + 120;
+    setTimeout(() => console.log("thunder rumbles somewhere behind the horizon"), 900 + Math.random() * 1500);
+  }
+  if (bolt) {
+    boltLife -= .05;
+    if (boltLife <= 0) { bolt = null; nextBoltAt = now + 45000 * (.7 + Math.random() * .6); }
+    else {
+      ctx.lineWidth = 2.4;
+      for (const [x1, y1, x2, y2] of bolt) {
+        ctx.strokeStyle = `rgba(220,255,235,${.9 * boltLife})`;
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      }
+    }
+  }
+  if (flashUntil && now < flashUntil) {
+    ctx.fillStyle = "rgba(230,255,240,.25)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  } else flashUntil = 0;
   // cursor trail particles — shed by the pointer, fade out
   for (let i = trail.length - 1; i >= 0; i--) {
     const t = trail[i];
@@ -1782,6 +1818,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.120.0", "lightning storm — every ~45-90s a forked bolt tears across the upper sky, the whole page flashes white for a blink, and a thunder rumble echoes in the console a beat later like the storm was never there"],
   ["v0.119.0", "lily pad drifter — every ~2-4 min a lily pad drifts across the middle of the page on a lazy current, carrying a tiny frog passenger that blinks and occasionally croaks a fading ribbit; the pad spins slowly once mid-crossing, then slides off-screen like the pond was never stocked"],
   ["v0.118.0", "sun shower — every ~2-3 min the sky rains while the sun still shines: warm light shafts slant down for a few seconds while sparse drops fall through them, and at the very end a small rainbow briefly blooms before everything evaporates like the weather was never there"],
   ["v0.117.0", "aurora borealis — every ~2-3 min a soft shimmering curtain of green-teal light drifts across the upper sky, rays folding and swaying like slow silk, then fades away leaving no trace of the northern lights"],
