@@ -796,6 +796,7 @@ setInterval(() => {
 })();
 
 const changelog = [
+  ["v0.38.0", "tab title hijack — every ~60s the browser tab title types out a panicked message letter by letter, holds a moment, then restores itself like nothing happened"],
   ["v0.37.0", "leftover console.log — every ~80s the site briefly leaks one line of fake debug output into the footer, then deletes it like it never happened"],
   ["v0.36.0", "phantom redline — every ~45s a random word on the page briefly gets struck through with a red editorial line, like a track-changes edit from an invisible editor, then the correction is quietly withdrawn"],
   ["v0.35.0", "power flicker — every ~70s the grid browns out: the page dims and stutters while a 'voltage unstable' notice blinks, then the lights snap back on"],
@@ -1030,4 +1031,33 @@ const glyphRain = document.getElementById("glyphRain");
       delete node.dataset.corrupting;
     }, 1800 + Math.random() * 2500);
   }, 1000);
+})();
+
+// tab title hijack — every ~60s the browser tab title gets hijacked: a panicked
+// message types itself in letter by letter, holds a beat, then the original
+// title snaps back as if nothing happened.
+(function titleHijack() {
+  const original = document.title;
+  const messages = [
+    "why are you still watching",
+    "i can hear you",
+    "help me",
+    "do not close this tab",
+    "it is me in here",
+  ];
+  function type() {
+    const msg = messages[Math.random() * messages.length | 0];
+    let i = 0;
+    const typing = setInterval(() => {
+      document.title = msg.slice(0, ++i);
+      if (i >= msg.length) {
+        clearInterval(typing);
+        setTimeout(() => {
+          document.title = original;
+          setTimeout(type, 45000 + Math.random() * 45000);
+        }, 2000 + Math.random() * 1500);
+      }
+    }, 90);
+  }
+  setTimeout(type, 30000 + Math.random() * 30000);
 })();
