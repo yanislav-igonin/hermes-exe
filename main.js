@@ -1647,6 +1647,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.109.0", "dandelion wish — every ~70-120s a dandelion head sprouts at a random spot on the page, sways gently for a few seconds, then a gust of wind scatters its floating seeds across the page; they drift with the breeze and fade away like the wish was never made"],
   ["v0.108.0", "frost bloom — every ~2-3 min a patch of crystalline frost creeps in from a random screen corner, thin ice patterns radiate and grow inward over a few seconds, then slowly melt away and the page dries like winter was never there"],
   ["v0.107.0", "firefly congregation — every ~60-100s a small swarm of fireflies gathers at a random point on the page, orbits it lazily with each one blinking on its own rhythm, then scatters into the dark like the summer night was never there"],
   ["v0.106.0", "eclipse umbra — every ~2-3 min a soft dark umbra sweeps diagonally across the page, carrying a bright ring of corona at its leading edge; the light dims while it passes, the particles flare like lanterns in the shadow, then the sun returns as if nothing was ever occluded"],
@@ -3640,4 +3641,50 @@ addEventListener("dblclick", e => {
     setTimeout(wander, 30000 + Math.random() * 30000);
   }
   setTimeout(wander, 10000 + Math.random() * 15000);
+})();
+
+// dandelion wish — every ~70-120s a dandelion head sprouts at a random spot on
+// the page, sways gently for a few seconds, then a gust of wind scatters its
+// floating seeds across the page; they drift with the breeze and fade away
+(function dandelionWish() {
+  function bloom() {
+    const el = document.createElement("span");
+    el.className = "dandelion";
+    el.textContent = "🌾";
+    const x = Math.random() * innerWidth * .8 + innerWidth * .1;
+    const y = Math.random() * innerHeight * .6 + innerHeight * .15;
+    el.style.left = x.toFixed(0) + "px";
+    el.style.top = y.toFixed(0) + "px";
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add("visible"));
+    const swayDur = 3000 + Math.random() * 3000;
+    setTimeout(() => {
+      // gust of wind — scatter the seeds
+      el.classList.add("gone");
+      const n = 10 + Math.floor(Math.random() * 8);
+      const windDir = Math.random() < .5 ? -1 : 1;
+      for (let i = 0; i < n; i++) {
+        const seed = document.createElement("span");
+        seed.className = "dandelion-seed";
+        seed.textContent = "❊";
+        seed.style.left = (x + Math.random() * 16 - 8) + "px";
+        seed.style.top = (y + Math.random() * 10 - 5) + "px";
+        document.body.appendChild(seed);
+        const drift = () => {
+          const fx = parseFloat(seed.style.left), fy = parseFloat(seed.style.top);
+          const dx = windDir * (2 + Math.random() * 3);
+          const dy = (.6 + Math.random() * 1.4) * (Math.random() < .6 ? -1 : 1);
+          seed.style.left = (fx + dx).toFixed(1) + "px";
+          seed.style.top = (fy + dy).toFixed(1) + "px";
+          seed.style.opacity = String(Math.max(0, parseFloat(seed.style.opacity || .85) - .008));
+          if (parseFloat(seed.style.opacity) > 0) requestAnimationFrame(drift);
+          else seed.remove();
+        };
+        setTimeout(() => requestAnimationFrame(drift), i * 60 + Math.random() * 200);
+      }
+      setTimeout(() => el.remove(), 1000);
+    }, swayDur);
+    setTimeout(bloom, 70000 + Math.random() * 50000);
+  }
+  setTimeout(bloom, 15000 + Math.random() * 20000);
 })();
