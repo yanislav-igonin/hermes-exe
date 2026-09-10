@@ -2240,8 +2240,35 @@ addEventListener("mousemove", e => {
   setTimeout(ride, 40000 + Math.random() * 40000);
 })();
 
+// shooting star — every ~2-4 min a brief meteor streaks diagonally across
+// the viewport: a thin bright line with a fading trail, then it burns out
+(function shootingStar() {
+  const star = document.createElement("div");
+  star.className = "meteor";
+  document.body.appendChild(star);
+  function fly() {
+    if (!document.hidden) {
+      const fromX = -10 + Math.random() * 40;
+      const fromY = Math.random() * 30;
+      const ang = 20 + Math.random() * 35;
+      star.style.setProperty("--mt-from-x", fromX + "vw");
+      star.style.setProperty("--mt-from-y", fromY + "vh");
+      star.style.setProperty("--mt-dx", (60 + Math.random() * 40) + "vw");
+      star.style.setProperty("--mt-dy", (25 + Math.random() * 30) + "vh");
+      star.style.setProperty("--mt-dur", (900 + Math.random() * 700).toFixed(0) + "ms");
+      star.style.setProperty("--mt-angle", ang + "deg");
+      star.classList.remove("fly");
+      void star.offsetWidth;
+      star.classList.add("fly");
+    }
+    setTimeout(fly, 120000 + Math.random() * 120000);
+  }
+  setTimeout(fly, 30000 + Math.random() * 30000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.138.0", "shooting star — every ~2-4 min a brief meteor streaks diagonally across the viewport, a thin bright line with a fading trail that burns out in about a second and is gone"],
   ["v0.137.0", "elevator — every ~2-4 min a tiny elevator car with a glowing floor indicator glides along the right edge of the viewport, pauses at a random floor mid-ride, then carries on out of sight like the shaft was never there"],
   ["v0.136.0", "fireflies at dusk — every ~2-4 min a small swarm of warm glowing motes rises from the bottom of the page, drifts upward with a lazy wander, each blinking softly on its own rhythm, then fades away near the top like dusk settling"],
   ["v0.135.0", "dew drop — every ~3-6 min a tiny dew droplet condenses on the top edge of the viewport, hangs there swelling slightly, then slides down the glass like morning condensation and vanishes"],

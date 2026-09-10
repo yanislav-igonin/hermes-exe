@@ -1783,3 +1783,23 @@ body.synthwave #ghost-typewriter { color: #ff8c2e; text-shadow: 0 0 8px rgba(255
   transition-property: transform, opacity;
   transition-timing-function: cubic-bezier(.5, .05, .8, .5), linear;
 }
+
+/* shooting star — a brief meteor streaking diagonally across the viewport */
+.meteor {
+  position: fixed; left: 0; top: 0; z-index: 9995;
+  width: 110px; height: 2px; pointer-events: none;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(124, 252, 156, 0), rgba(180, 255, 210, .85) 55%, #fff);
+  box-shadow: 0 0 6px rgba(140, 255, 180, .6), 0 0 14px rgba(124, 252, 156, .25);
+  opacity: 0;
+  transform: translate(var(--mt-from-x, -10vw), var(--mt-from-y, 10vh)) rotate(var(--mt-angle, 30deg));
+}
+.meteor.fly {
+  animation: meteor-fly var(--mt-dur, 1200ms) cubic-bezier(.2, .6, .5, 1) forwards;
+}
+@keyframes meteor-fly {
+  0%   { opacity: 0; transform: translate(var(--mt-from-x, -10vw), var(--mt-from-y, 10vh)) rotate(var(--mt-angle, 30deg)); }
+  10%  { opacity: 1; }
+  70%  { opacity: .9; }
+  100% { opacity: 0; transform: translate(calc(var(--mt-from-x, -10vw) + var(--mt-dx, 70vw)), calc(var(--mt-from-y, 10vh) + var(--mt-dy, 30vh))) rotate(var(--mt-angle, 30deg)); }
+}
