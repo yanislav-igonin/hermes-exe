@@ -1861,6 +1861,39 @@ body.synthwave #ghost-typewriter { color: #ff8c2e; text-shadow: 0 0 8px rgba(255
   transition-timing-function: cubic-bezier(.5, .05, .8, .5), linear;
 }
 
+/* dandelion drift — a dandelion seed tumbles diagonally across the viewport,
+   shedding tiny fluff seeds that float down and dissolve */
+.dandelion-seed {
+  position: fixed; left: 0; top: 0; z-index: 9996;
+  width: 10px; height: 14px; pointer-events: none;
+  opacity: 0;
+}
+.dandelion-seed::before {
+  content: ""; position: absolute; left: 4px; top: 6px;
+  width: 2px; height: 7px; border-radius: 1px;
+  background: rgba(200, 230, 190, .8);
+}
+.dandelion-seed::after {
+  content: ""; position: absolute; left: 0; top: 0;
+  width: 10px; height: 7px; border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 100%,
+    rgba(255, 255, 255, .5), rgba(220, 255, 230, .25) 60%, transparent 75%);
+  box-shadow: 0 0 5px rgba(220, 255, 230, .35);
+}
+.dandelion-fluff {
+  position: fixed; left: 0; top: 0; z-index: 9995;
+  width: 5px; height: 5px; pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, rgba(255,255,255,.6), rgba(220,255,230,.2) 70%, transparent);
+  opacity: 0;
+  animation: dandelion-fluff-drift var(--df-dur, 4200ms) linear forwards;
+}
+@keyframes dandelion-fluff-drift {
+  0%   { opacity: 0; transform: translate(0, 0) rotate(0deg); }
+  12%  { opacity: .7; }
+  100% { opacity: 0; transform: translate(var(--df-x, 30px), 16vh) rotate(240deg); }
+}
+
 /* shooting star — a brief meteor streaking diagonally across the viewport */
 .meteor {
   position: fixed; left: 0; top: 0; z-index: 9995;

@@ -2423,6 +2423,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.143.0", "dandelion drift — every ~2-4 min a dandelion seed tumbles diagonally across the viewport, shedding tiny fluff seeds that float down and dissolve like a wish leaving in installments"],
   ["v0.142.0", "meteor streak — every ~3-6 min a bright shooting star dashes across the sky at a shallow angle, burning with a fading spark tail, gone before you can make a wish"],
   ["v0.141.0", "paper plane — every ~2-4 min a tiny folded paper plane glides diagonally across the viewport with a lazy wobble, dropping a faint dotted trail behind it, then slips out of sight like it was never thrown"],
   ["v0.140.0", "snail visitor — every ~2-4 min a tiny snail with a glowing shell slowly creeps along the bottom edge of the viewport, leaving a shimmering slime trail that fades behind it, then crawls out of sight like the journey was never made"],
@@ -2575,7 +2576,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 32;
+const DONE_COUNT = 33;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
@@ -5086,4 +5087,48 @@ addEventListener("dblclick", e => {
   }
   function schedule() { setTimeout(drop, 180000 + Math.random() * 180000); }
   setTimeout(drop, 45000 + Math.random() * 45000);
+})();
+
+// dandelion drift — every ~2-4 min a dandelion seed tumbles diagonally across
+// the viewport, shedding tiny fluff seeds that float down and dissolve
+(function dandelionDrift() {
+  const seed = document.createElement("div");
+  seed.className = "dandelion-seed";
+  document.body.appendChild(seed);
+  function drift() {
+    if (!document.hidden) {
+      const fromLeft = Math.random() < .5;
+      const startX = fromLeft ? -20 : innerWidth + 20;
+      const startY = 60 + Math.random() * (innerHeight * .35);
+      const endX = fromLeft ? innerWidth + 20 : -20;
+      const endY = startY + 180 + Math.random() * 220;
+      const dur = 13000 + Math.random() * 6000;
+      seed.animate([
+        { transform: `translate(${startX}px, ${startY}px) rotate(0deg)`, opacity: 0 },
+        { opacity: .9, offset: .1 },
+        { opacity: .9, offset: .9 },
+        { transform: `translate(${endX}px, ${endY}px) rotate(${(fromLeft ? 1 : -1) * 900}deg)`, opacity: 0 }
+      ], { duration: dur, easing: "linear" });
+      // shed fluff seeds along the way
+      let shed = 0;
+      const shedTimer = setInterval(() => {
+        if (++shed > 6 || document.hidden) {
+          clearInterval(shedTimer);
+          return;
+        }
+        const f = document.createElement("div");
+        f.className = "dandelion-fluff";
+        const t = shed / 7;
+        const fx = startX + (endX - startX) * t;
+        const fy = startY + (endY - startY) * t;
+        f.style.transform = `translate(${fx}px, ${fy}px)`;
+        f.style.setProperty("--df-x", (20 + Math.random() * 60) * (fromLeft ? 1 : -1) + "px");
+        f.style.setProperty("--df-dur", 3600 + Math.random() * 2500 + "ms");
+        document.body.appendChild(f);
+        setTimeout(() => f.remove(), 6500);
+      }, dur / 8);
+    }
+    setTimeout(drift, 120000 + Math.random() * 120000);
+  }
+  setTimeout(drift, 25000 + Math.random() * 40000);
 })();
