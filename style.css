@@ -76,6 +76,18 @@ body.synthwave main {
   border-radius: 6px;
 }
 
+/* konami god mode — body.godmode inverts the palette */
+body.godmode { filter: invert(1) hue-rotate(180deg); background: #050507; }
+body.godmode #godtoast.show { opacity: 1; transform: translate(-50%, 0); }
+#godtoast {
+  position: fixed; bottom: 14vh; left: 50%; z-index: 99;
+  transform: translate(-50%, 20px);
+  padding: 10px 22px; border: 1px solid #7cfc9c; color: #7cfc9c;
+  background: rgba(5, 5, 7, .9); font-size: .95rem; letter-spacing: 3px;
+  opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none;
+}
+body.vaporwave #godtoast, body.synthwave #godtoast { border-color: #ff9ff3; color: #ff9ff3; }
+
 /* glitch */
 .glitch::before, .glitch::after {
   content: attr(data-text); position: absolute; inset: 0;

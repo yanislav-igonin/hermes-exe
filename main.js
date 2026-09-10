@@ -291,6 +291,28 @@ function saverTick() {
 }
 saverTick();
 
+// konami code easter egg — ↑↑↓↓←→←→BA flips the site into god mode
+// (inverted palette) with a toast. keyed sequence resets on wrong input.
+const KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
+let konamiIdx = 0;
+const godToast = document.createElement("div");
+godToast.id = "godtoast";
+godToast.textContent = "CHEAT ACCEPTED";
+document.body.appendChild(godToast);
+addEventListener("keydown", e => {
+  const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+  if (key === KONAMI[konamiIdx]) {
+    if (++konamiIdx === KONAMI.length) {
+      konamiIdx = 0;
+      document.body.classList.toggle("godmode");
+      godToast.classList.add("show");
+      setTimeout(() => godToast.classList.remove("show"), 2200);
+    }
+  } else {
+    konamiIdx = key === KONAMI[0] ? 1 : 0;
+  }
+});
+
 // matrix decode of changelog — each changelog entry resolves out of a
 // cascade of glitch characters when scrolled into view (IntersectionObserver)
 const GLITCH = "アイウエオカキクケコサシスセソ0123456789#%&$@!?\\|/<>*";
@@ -325,6 +347,7 @@ const decodeObs = new IntersectionObserver(entries => {
 document.querySelectorAll("#log li").forEach(li => decodeObs.observe(li));
 
 const changelog = [
+  ["v0.14.0", "konami code — ↑↑↓↓←→←→BA flips the site into inverted god mode with a CHEAT ACCEPTED toast"],
   ["v0.13.0", "matrix decode of changelog — entries resolve out of glitch characters when scrolled into view"],
   ["v0.12.0", "idle screensaver — stop touching anything for 60s and a flying toast bounces around the screen until you do"],
   ["v0.11.0", "synthwave sunset theme — click the title three times and the site burns in purple/orange gradients"],
@@ -348,7 +371,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 9;
+const DONE_COUNT = 10;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
