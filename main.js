@@ -2477,6 +2477,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.151.0", "page lean — every ~40-90s the whole page leans a couple of degrees for a moment, like someone quietly rested an elbow on it, then springs upright again like nothing happened"],
   ["v0.150.0", "wind chime — every ~2-4 min a tiny wind chime dangles down from the top edge of the page, swaying in the breeze as its little tubes knock together and drop the occasional fading note glyph, then the wind dies and it vanishes like it was never hung"],
   ["v0.149.0", "shooting star — every ~1-2 min a meteor streaks diagonally across the upper sky with a tapering glowing trail, flares once, and vanishes like the wish was never made"],
   ["v0.148.0", "hot air balloon — every ~2-4 min a small hot air balloon with a striped canopy and a tiny basket drifts diagonally across the page on a gentle breeze, bobbing with the wind, then floats off-screen like the flight was never planned"],
@@ -5430,4 +5431,24 @@ addEventListener("dblclick", e => {
     setTimeout(chime, 120000 + Math.random() * 120000);
   }
   setTimeout(chime, 20000 + Math.random() * 30000);
+})();
+
+// page lean — every ~40-90s the whole page leans a couple of degrees for a
+// moment, like someone quietly rested an elbow on it, then springs upright
+// again like nothing happened
+(function pageLean() {
+  function lean() {
+    if (!document.hidden) {
+      const tilt = (Math.random() < .5 ? -1 : 1) * (1.2 + Math.random() * 1.3);
+      document.body.style.transform = `rotate(${tilt}deg)`;
+      document.body.classList.add("page-lean");
+      setTimeout(() => {
+        document.body.classList.add("page-lean-return");
+        document.body.style.transform = "";
+        setTimeout(() => document.body.classList.remove("page-lean", "page-lean-return"), 1600);
+      }, 2500 + Math.random() * 2500);
+    }
+    setTimeout(lean, 40000 + Math.random() * 50000);
+  }
+  setTimeout(lean, 30000 + Math.random() * 30000);
 })();

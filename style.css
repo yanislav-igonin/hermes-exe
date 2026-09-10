@@ -2175,3 +2175,12 @@ body.synthwave #ghost-typewriter { color: #ff8c2e; text-shadow: 0 0 8px rgba(255
   88%      { transform: rotate(0deg); opacity: 1; }
   100%     { transform: rotate(0deg); opacity: 0; }
 }
+
+/* page lean — the whole page tips slightly, then springs back upright */
+body {
+  transform-origin: 50% 120%;
+  transition: transform 1.4s cubic-bezier(.34, 1.56, .64, 1);
+}
+body.page-lean-return {
+  transition: transform 1.6s cubic-bezier(.34, 1.8, .64, 1);
+}
