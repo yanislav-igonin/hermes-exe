@@ -897,6 +897,7 @@ document.addEventListener("mouseleave", () => afterEl.classList.add("hidden"));
 
 // changelog
 const changelog = [
+  ["v0.50.0", "CRT power-off — every ~90s the whole page dies like an old monitor: everything collapses into a bright horizontal beam, blinks out, then powers back on"],
   ["v0.49.0", "ghost search — press / and a fake 'search this page' overlay appears: it types out its own existential query, counts up results before landing on '0 results — the page contains nothing', then dissolves like it never existed"],
   ["v0.48.0", "dial-up handshake flashback — every ~2-3 min the site briefly remembers the sound of a 56k modem: a short burst of scrambled screech (if audio is unlocked) and a 'CONNECT 56000' tag, then it hangs up like nothing happened"],
   ["v0.47.1", "drone audibility fix — the drone was a 55Hz sub that laptop speakers literally cannot play; now it sings one octave up with real volume"],
@@ -1355,6 +1356,26 @@ const glyphRain = document.getElementById("glyphRain");
     function loop() { screech(); setTimeout(loop, 120000 + Math.random() * 90000); }
     setTimeout(loop, 60000 + Math.random() * 60000);
     })();
+
+// CRT power-off — every ~90s the whole page dies like an old monitor: content
+// collapses to a bright horizontal line, blinks out, then powers back on.
+(function crtPowerOff() {
+  const veil = document.createElement("div");
+  veil.id = "crt-off";
+  veil.innerHTML = '<div class="beam"></div>';
+  document.body.appendChild(veil);
+  function loop() {
+    veil.classList.add("dying");            // squash vertically to the beam
+    setTimeout(() => {
+      veil.classList.add("dark");           // beam blinks out
+      setTimeout(() => {
+        veil.classList.remove("dying", "dark");
+        setTimeout(loop, 80000 + Math.random() * 40000);
+      }, 180 + Math.random() * 220);
+    }, 260);
+  }
+  setTimeout(loop, 30000 + Math.random() * 30000);
+})();
 
 // ghost search — pressing / summons a fake "search this page" overlay: a
 // blinking query line types out its own existential query, a results counter

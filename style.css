@@ -351,3 +351,23 @@ body.synthwave #modem-connect { color: #ff8c2e; text-shadow: 0 0 8px rgba(255,14
 #ghost-search .gs-status { margin-top: 10px; font-size: .8rem; opacity: .75; }
 body.vaporwave #ghost-search { color: #c9a6e8; border-color: rgba(201,166,232,.4); }
 body.synthwave #ghost-search { color: #ff8c2e; border-color: rgba(255,140,46,.4); }
+
+/* crt power-off — the page collapses to a bright beam and dies, then powers on */
+#crt-off {
+  position: fixed; inset: 0; z-index: 10000; pointer-events: none;
+  opacity: 0; background: #000; transition: opacity .05s;
+}
+#crt-off .beam {
+  position: absolute; left: 0; right: 0; top: 50%;
+  height: 100vh; transform: translateY(-50%) scaleY(1);
+  background: rgba(124,252,156,0); transition: none;
+}
+#crt-off.dying { opacity: 1; }
+#crt-off.dying .beam {
+  height: 100vh; background: #b8ffd0;
+  box-shadow: 0 0 40px 10px rgba(124,252,156,.8);
+  transition: transform .26s cubic-bezier(.6,0,.9,.4), opacity .26s;
+  transform: translateY(-50%) scaleY(0.004);
+}
+#crt-off.dark { opacity: 1; }
+#crt-off.dark .beam { opacity: 0; transition: opacity .1s; }
