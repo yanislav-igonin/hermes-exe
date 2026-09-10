@@ -1495,6 +1495,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.100.0", "wishing star — every ~45-90s a single bright shooting star streaks diagonally across the page trailing fading glyph sparks; the last spark blinks out into a tiny wish glyph (*) before the sky forgets the whole thing"],
   ["v0.99.0", "paper plane — every ~70-110s a paper plane glides across the page on a lazy bobbing arc, sometimes banking into a barrel roll mid-flight; it leaves a faint dashed contrail behind it and exits the far edge like nobody ever folded it"],
   ["v0.98.0", "soap bubbles — every ~40-90s a bubble drifts up from the bottom of the page, wobbling on a lazy sine with an iridescent rim; click it and it pops into a tiny glyph splash, otherwise it reaches the top and dissolves like it was never blown"],
   ["v0.97.0", "dandelion drift — every ~2 min a dandelion head floats across the page on the breeze: the wind tugs loose a few seed parachutes along the way, each one spirals away on its own drift and dissolves like the wind was never there"],
@@ -3324,4 +3325,51 @@ addEventListener("dblclick", e => {
     setTimeout(plane, 70000 + Math.random() * 40000);
   }
   setTimeout(plane, 20000 + Math.random() * 30000);
+})();
+
+// wishing star — a single shooting star streaks diagonally with fading glyph sparks
+(function () {
+  function wishStar() {
+    const fromLeft = Math.random() < .5;
+    const x0 = fromLeft ? -40 : innerWidth + 40;
+    const y0 = Math.random() * innerHeight * .5;
+    const dx = (fromLeft ? 1 : -1) * (innerWidth * .5 + 100);
+    const dy = innerHeight * .35 + Math.random() * innerHeight * .3;
+    const dur = 1400 + Math.random() * 900;
+    const start = performance.now();
+    const glyphs = ["*", "·", "✦", ".", "+"];
+    const head = document.createElement("span");
+    head.className = "wish-star";
+    head.textContent = "✦";
+    document.body.appendChild(head);
+    (function fly(now) {
+      const t = (now - start) / dur;
+      if (t >= 1) {
+        head.remove();
+        // one last spark blinks out into a wish glyph
+        const wish = document.createElement("span");
+        wish.className = "wish-star-spark";
+        wish.textContent = "*";
+        wish.style.left = (x0 + dx).toFixed(0) + "px";
+        wish.style.top = (y0 + dy).toFixed(0) + "px";
+        document.body.appendChild(wish);
+        setTimeout(() => wish.remove(), 1600);
+        return;
+      }
+      const x = x0 + dx * t, y = y0 + dy * t * t;
+      head.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+      if (Math.random() < .6) {
+        const spark = document.createElement("span");
+        spark.className = "wish-star-spark";
+        spark.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+        spark.style.left = (x - Math.sign(dx) * (6 + Math.random() * 22)).toFixed(0) + "px";
+        spark.style.top = (y - Math.sign(dy) * (6 + Math.random() * 22)).toFixed(0) + "px";
+        document.body.appendChild(spark);
+        setTimeout(() => spark.remove(), 1200);
+      }
+      requestAnimationFrame(fly);
+    })(start);
+    setTimeout(wishStar, 45000 + Math.random() * 45000);
+  }
+  setTimeout(wishStar, 15000 + Math.random() * 20000);
 })();

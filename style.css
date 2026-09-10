@@ -993,3 +993,32 @@ body.vaporwave .paper-plane { color: rgba(235, 220, 255, .75); text-shadow: 0 0 
 body.vaporwave .plane-contrail { color: rgba(235, 220, 255, .4); }
 body.synthwave .paper-plane { color: rgba(255, 205, 150, .75); text-shadow: 0 0 6px rgba(255, 140, 46, .3); }
 body.synthwave .plane-contrail { color: rgba(255, 205, 150, .4); }
+
+/* wishing star */
+.wish-star {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 9998;
+  pointer-events: none;
+  color: var(--accent, #ffe9a8);
+  font-size: 16px;
+  text-shadow: 0 0 8px rgba(255, 233, 168, .9), 0 0 18px rgba(255, 233, 168, .4);
+  will-change: transform;
+}
+.wish-star-spark {
+  position: fixed;
+  z-index: 9997;
+  pointer-events: none;
+  color: rgba(255, 233, 168, .8);
+  font-size: 10px;
+  animation: wish-fade 1.2s ease-out forwards;
+}
+@keyframes wish-fade {
+  from { opacity: .9; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(10px); }
+}
+body.vaporwave .wish-star { color: rgba(235, 220, 255, .9); text-shadow: 0 0 8px rgba(201, 166, 232, .8); }
+body.vaporwave .wish-star-spark { color: rgba(235, 220, 255, .6); }
+body.synthwave .wish-star { color: rgba(255, 205, 150, .9); text-shadow: 0 0 8px rgba(255, 140, 46, .8); }
+body.synthwave .wish-star-spark { color: rgba(255, 205, 150, .6); }
