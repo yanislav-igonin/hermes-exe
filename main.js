@@ -188,6 +188,36 @@ let rainUntil = 0;
       ctx.drawImage(staticCanvas, 0, 0, canvas.width, canvas.height);
     } else { staticUntil = 0; nextStaticAt = now + 25000 * (.7 + Math.random() * .6); }
   }
+// wind gust — every ~40s a gust sweeps across the background: particles get
+// shoved sideways for a moment while a few ascii leaves tumble through,
+// then the air settles like nothing ever blew through
+let gustPower = 0, nextGustAt = performance.now() + 40000 * (.7 + Math.random() * .6);
+const leaves = [];
+const LEAF_GLYPHS = ["❧", "✤", "❦", "✦", "❋"];
+
+  // schedule and run the gust
+  if (!gustPower && now > nextGustAt) {
+    gustPower = 1;
+    nextGustAt = now + 40000 * (.7 + Math.random() * .6);
+    for (let i = 0; i < 7; i++) leaves.push({
+      x: -20, y: Math.random() * canvas.height,
+      vy: (Math.random() - .3) * 1.4, spin: Math.random() * Math.PI * 2,
+      glyph: LEAF_GLYPHS[Math.random() * LEAF_GLYPHS.length | 0]
+    });
+  }
+  if (gustPower > 0) {
+    gustPower -= .012; // gust dies down over ~1.5s
+    if (gustPower <= 0) gustPower = 0;
+    for (const p of pts) { p.vx += gustPower * 1.4; } // shove particles sideways
+  }
+  ctx.font = "13px monospace";
+  for (let i = leaves.length - 1; i >= 0; i--) {
+    const l = leaves[i];
+    l.x += 3 + gustPower * 4; l.y += l.vy + Math.sin(l.spin += .08) * .8;
+    if (l.x > canvas.width + 20) { leaves.splice(i, 1); continue; }
+    ctx.fillStyle = `rgba(124,252,156,${.5 + Math.sin(l.spin) * .25})`;
+    ctx.fillText(l.glyph, l.x, l.y);
+  }
   requestAnimationFrame(tick);
 })();
 
@@ -1168,6 +1198,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.82.0", "wind gust — every ~40s a gust sweeps across the background: particles get shoved sideways for a moment while a few ascii leaves tumble through, then the air settles like nothing ever blew through"],
   ["v0.81.0", "moss — the page slowly grows moss: small green sprouts bloom in from the screen edges over time and settle into a soft living fringe"],
   ["v0.80.0", "cursor ghost — a translucent spirit trails the pointer with easing and occasionally whispers a glyph that floats up and fades away"],
   ["v0.79.0", "page sneeze — every ~70s the page draws in a sharp breath, shudders once, and sneezes a burst of tiny glyphs from its center that scatter outward and evaporate before anyone can say gesundheit"],
