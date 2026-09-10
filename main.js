@@ -1647,6 +1647,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.111.0", "snail mail — every ~2-4 min a snail slowly crawls along the bottom of the page, leaving a shimmering trail of tiny glyph slime drops that fade away behind it like the snail was never there"],
   ["v0.110.0", "hot air balloon — every ~90-150s a small balloon drifts across the page, its gondola swaying gently on the breeze and bobbing on thermals, then it sails away off-screen like it was never there"],
   ["v0.109.0", "dandelion wish — every ~70-120s a dandelion head sprouts at a random spot on the page, sways gently for a few seconds, then a gust of wind scatters its floating seeds across the page; they drift with the breeze and fade away like the wish was never made"],
   ["v0.108.0", "frost bloom — every ~2-3 min a patch of crystalline frost creeps in from a random screen corner, thin ice patterns radiate and grow inward over a few seconds, then slowly melt away and the page dries like winter was never there"],
@@ -3721,4 +3722,43 @@ addEventListener("dblclick", e => {
     setTimeout(launch, 90000 + Math.random() * 60000);
   }
   setTimeout(launch, 25000 + Math.random() * 30000);
+})();
+
+// snail mail: every ~2-4 min a snail slowly crawls along the bottom of the
+// page, leaving a shimmering glyph slime trail that fades behind it
+(function snailMail() {
+  const GLYPHS = ["·", "˖", "˙", "ᐧ", "⋅", "*"];
+  function setOut() {
+    const el = document.createElement("span");
+    el.className = "snail";
+    el.textContent = "🐌";
+    const dir = Math.random() < .5 ? 1 : -1;
+    let x = dir === 1 ? -30 : innerWidth + 30;
+    const speed = 0.35 + Math.random() * 0.3;
+    let t = 0, lastDrop = 0;
+    el.style.transform = dir === -1 ? "scaleX(-1)" : "";
+    el.style.left = x.toFixed(0) + "px";
+    document.body.appendChild(el);
+    const crawl = () => {
+      t += 1 / 60;
+      x += dir * speed;
+      el.style.left = x.toFixed(0) + "px";
+      el.style.bottom = (6 + Math.abs(Math.sin(t * 1.5)) * 3).toFixed(1) + "px";
+      if (t - lastDrop > 0.45) {
+        lastDrop = t;
+        const drop = document.createElement("span");
+        drop.className = "snail-trail";
+        drop.textContent = GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+        drop.style.left = x.toFixed(0) + "px";
+        drop.style.bottom = (6 + Math.abs(Math.sin(t * 1.5)) * 3).toFixed(1) + "px";
+        document.body.appendChild(drop);
+        setTimeout(() => drop.remove(), 6200);
+      }
+      if (x > -40 && x < innerWidth + 40) requestAnimationFrame(crawl);
+      else el.remove();
+    };
+    requestAnimationFrame(crawl);
+    setTimeout(setOut, 120000 + Math.random() * 120000);
+  }
+  setTimeout(setOut, 40000 + Math.random() * 50000);
 })();

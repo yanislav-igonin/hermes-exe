@@ -955,6 +955,33 @@ body.synthwave .dandelion, body.synthwave .dandelion-seed { color: rgba(255,205,
 body.vaporwave .balloon { filter: drop-shadow(0 0 6px rgba(201,166,232,.4)) hue-rotate(40deg); }
 body.synthwave .balloon { filter: drop-shadow(0 0 6px rgba(255,140,46,.4)) hue-rotate(-60deg) saturate(1.3); }
 
+/* snail mail: a snail slowly crawls across the bottom edge leaving a
+   shimmering glyph slime trail that fades behind it */
+.snail {
+  position: fixed; left: 0; bottom: 6px;
+  z-index: 9992; pointer-events: none;
+  margin: 0;
+  font-size: 18px; line-height: 1;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.25));
+  will-change: transform, left;
+}
+.snail-trail {
+  position: fixed; z-index: 9991; pointer-events: none;
+  margin: 0;
+  font-size: 10px; line-height: 1;
+  color: rgba(160, 220, 255, .55);
+  text-shadow: 0 0 4px rgba(120, 200, 255, .5);
+  animation: snailTrailFade 6s ease-in forwards;
+  will-change: opacity, transform;
+}
+@keyframes snailTrailFade {
+  0% { opacity: 1; }
+  70% { opacity: .5; }
+  100% { opacity: 0; }
+}
+body.vaporwave .snail-trail { color: rgba(201,166,232,.6); text-shadow: 0 0 4px rgba(201,166,232,.5); }
+body.synthwave .snail-trail { color: rgba(255,140,46,.6); text-shadow: 0 0 4px rgba(255,140,46,.5); }
+
 /* soap bubbles: bubbles rise from the bottom wobbling on a lazy sine with an
    iridescent rim; click one and it pops into a glyph splash */
 .bubble {
