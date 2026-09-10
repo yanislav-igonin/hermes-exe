@@ -1285,6 +1285,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.90.0", "ascii whale — every ~2 min a giant ascii whale surfaces at the bottom of the page, glides across it bobbing on a lazy sine while exhaling a glyph spray, then dives out of view like it was never there"],
   ["v0.89.0", "typo poltergeist — every ~60s a random word on the page briefly shows a transposed-letter typo, like an invisible editor's slip of the finger, then heals back to the correct spelling as if the typo was never typed"],
   ["v0.88.0", "meteor shower — every ~75s a handful of shooting stars streak across the sky at random angles: each one burns a bright trail that fades behind it, then vanishes before you can wish on it"],
   ["v0.87.0", "fireflies at dusk — every ~90s a small swarm of fireflies rises from the bottom of the screen: each one drifts on a lazy sine path, blinks on and off with its own rhythm, then fades out like it was never there"],
@@ -1382,7 +1383,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 26;
+const DONE_COUNT = 27;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
@@ -2813,3 +2814,47 @@ let nextMeteorsAt = performance.now() + 75000 * (.8 + Math.random() * .4);
   }
   requestAnimationFrame(meteorTick);
 })(performance.now());
+
+// ascii whale — every ~2 min a giant ascii whale surfaces at the bottom of the
+// page, glides across it bobbing on a lazy sine, exhales a glyph spray on its
+// way, then dives out of view like it was never there.
+(function whaleSighting() {
+  const WHALE = [
+    "        __     ",
+    "      <(o )____ ",
+    "       ( ._>--^ ",
+    "        `-------'"
+  ];
+  function breach() {
+    const el = document.createElement("pre");
+    el.className = "whale";
+    el.textContent = WHALE.join("\n");
+    document.body.appendChild(el);
+    const dir = Math.random() < .5 ? 1 : -1;
+    const dur = 16000 + Math.random() * 6000;
+    const y = innerHeight - 150 - Math.random() * 40;
+    const start = performance.now();
+    let lastSpout = 0;
+    (function swim(now) {
+      const t = (now - start) / dur; // 0..1 across the page
+      if (t >= 1) { el.remove(); return; }
+      const x = dir > 0 ? -140 + t * (innerWidth + 280) : innerWidth + 140 - t * (innerWidth + 280);
+      const bob = Math.sin(t * Math.PI * 3) * 14;
+      el.style.transform = `translate(${x}px, ${y + bob}px) scaleX(${dir})`;
+      // occasional glyph spout from the blowhole
+      if (now - lastSpout > 2200) {
+        lastSpout = now;
+        const s = document.createElement("span");
+        s.className = "whale-spout";
+        s.textContent = "·˚˚˙*";
+        s.style.left = (x + (dir > 0 ? 60 : 10)) + "px";
+        s.style.top = (y + bob - 10) + "px";
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 2600);
+      }
+      requestAnimationFrame(swim);
+    })(start);
+    setTimeout(breach, 110000 + Math.random() * 50000);
+  }
+  setTimeout(breach, 60000 + Math.random() * 40000);
+})();

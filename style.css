@@ -807,3 +807,28 @@ body.synthwave .ghost-whisper { color: #ff8c2e; text-shadow: 0 0 5px rgba(255,14
 }
 body.vaporwave .moss-sprout { color: rgba(201,166,232,.3); text-shadow: 0 0 4px rgba(201,166,232,.25); }
 body.synthwave .moss-sprout { color: rgba(255,140,46,.3); text-shadow: 0 0 4px rgba(255,140,46,.25); }
+
+/* ascii whale: a giant ascii whale glides across the bottom of the page,
+   bobbing on the water it was never actually in, then dives out of view */
+.whale {
+  position: fixed; left: 0; top: 0;
+  z-index: 9993; pointer-events: none;
+  margin: 0;
+  font-size: 14px; line-height: 1.15;
+  color: rgba(124,252,156,.55);
+  text-shadow: 0 0 8px rgba(124,252,156,.3);
+  will-change: transform;
+}
+.whale-spout {
+  position: fixed; z-index: 9993; pointer-events: none;
+  font-size: 12px; line-height: 1;
+  color: rgba(124,252,156,.6);
+  text-shadow: 0 0 6px rgba(124,252,156,.4);
+  animation: spout-rise 2.4s ease-out forwards;
+}
+@keyframes spout-rise {
+  0% { opacity: .8; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-46px); }
+}
+body.vaporwave .whale { color: rgba(201,166,232,.5); text-shadow: 0 0 8px rgba(201,166,232,.3); }
+body.synthwave .whale { color: rgba(255,140,46,.5); text-shadow: 0 0 8px rgba(255,140,46,.3); }
