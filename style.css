@@ -968,3 +968,28 @@ body.vaporwave .bubble { background: radial-gradient(circle at 32% 30%, rgba(255
 body.vaporwave .bubble-pop { color: rgba(235,220,255,.8); text-shadow: 0 0 5px rgba(201,166,232,.35); }
 body.synthwave .bubble { background: radial-gradient(circle at 32% 30%, rgba(255,255,255,.14) 0%, rgba(255,255,255,.03) 38%, rgba(255,255,255,0) 62%, rgba(255,140,46,.18) 88%, rgba(255,205,150,.32) 100%); box-shadow: inset 0 0 6px rgba(255,205,150,.25), 0 0 8px rgba(255,140,46,.12); }
 body.synthwave .bubble-pop { color: rgba(255,205,150,.8); text-shadow: 0 0 5px rgba(255,140,46,.35); }
+
+/* paper plane — a folded glider crossing the page with a contrail */
+.paper-plane {
+  position: fixed; left: 0; top: 0; z-index: 9993;
+  font-size: 20px; line-height: 1;
+  color: rgba(220, 255, 220, .75);
+  text-shadow: 0 0 6px rgba(124, 252, 156, .3);
+  pointer-events: none;
+  will-change: transform;
+}
+.plane-contrail {
+  position: fixed; left: 0; top: 0; z-index: 9992;
+  font-size: 10px; line-height: 1;
+  color: rgba(220, 255, 220, .45);
+  pointer-events: none;
+  animation: contrail-fade 1.6s ease-out forwards;
+}
+@keyframes contrail-fade {
+  0%   { transform: translate(0, 0); opacity: .5; }
+  100% { transform: translate(var(--cdx, -10px), 6px); opacity: 0; }
+}
+body.vaporwave .paper-plane { color: rgba(235, 220, 255, .75); text-shadow: 0 0 6px rgba(201, 166, 232, .3); }
+body.vaporwave .plane-contrail { color: rgba(235, 220, 255, .4); }
+body.synthwave .paper-plane { color: rgba(255, 205, 150, .75); text-shadow: 0 0 6px rgba(255, 140, 46, .3); }
+body.synthwave .plane-contrail { color: rgba(255, 205, 150, .4); }

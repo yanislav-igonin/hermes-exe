@@ -1495,6 +1495,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.99.0", "paper plane — every ~70-110s a paper plane glides across the page on a lazy bobbing arc, sometimes banking into a barrel roll mid-flight; it leaves a faint dashed contrail behind it and exits the far edge like nobody ever folded it"],
   ["v0.98.0", "soap bubbles — every ~40-90s a bubble drifts up from the bottom of the page, wobbling on a lazy sine with an iridescent rim; click it and it pops into a tiny glyph splash, otherwise it reaches the top and dissolves like it was never blown"],
   ["v0.97.0", "dandelion drift — every ~2 min a dandelion head floats across the page on the breeze: the wind tugs loose a few seed parachutes along the way, each one spirals away on its own drift and dissolves like the wind was never there"],
   ["v0.96.0", "poezteka — every ~90s a small parade of ascii snails crosses the page one after another at their own unhurried pace, each grazing a fading rainbow slime trail behind it; every so often one stops mid-crawl to wiggle its eye-stalks at you before ambling on"],
@@ -3273,4 +3274,54 @@ addEventListener("dblclick", e => {
     setTimeout(bubble, 40000 + Math.random() * 50000);
   }
   setTimeout(bubble, 15000 + Math.random() * 20000);
+})();
+
+// paper plane — every ~70-110s a paper plane glides across the page on a lazy
+// bobbing arc, sometimes banking into a small loop; it leaves a faint dashed
+// contrail behind it and exits the far edge like nobody ever folded it
+(function paperPlane() {
+  function plane() {
+    const el = document.createElement("div");
+    el.className = "paper-plane";
+    el.textContent = "✈";
+    const dir = Math.random() < .5 ? 1 : -1;
+    const y0 = 60 + Math.random() * (innerHeight * .45);
+    const speed = 90 + Math.random() * 50; // px/s across the page
+    const bobAmp = 18 + Math.random() * 22;
+    const bobFreq = .8 + Math.random() * .6;
+    const doLoop = Math.random() < .35;
+    const start = performance.now();
+    const totalMs = (innerWidth + 120) / speed * 1000;
+    document.body.appendChild(el);
+    (function fly(now) {
+      const t = (now - start) / 1000;
+      const prog = (now - start) / totalMs;
+      if (prog >= 1) { el.remove(); return; }
+      let x, y, rot;
+      if (dir === 1) x = -60 + prog * (innerWidth + 120);
+      else x = innerWidth + 60 - prog * (innerWidth + 120);
+      y = y0 + Math.sin(t * bobFreq * Math.PI * 2) * bobAmp;
+      rot = dir * (Math.cos(t * bobFreq * Math.PI * 2) * bobAmp * .8);
+      if (doLoop) {
+        // one lazy barrel roll over the middle of the flight
+        const loopT = Math.min(Math.max((prog - .4) / .18, 0), 1);
+        rot += dir * loopT * 360;
+      }
+      el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${rot.toFixed(1)}deg) scaleX(${dir})`;
+      // a dashed contrail particle fades behind it
+      if (Math.random() < .5) {
+        const dash = document.createElement("span");
+        dash.className = "plane-contrail";
+        dash.textContent = Math.random() < .5 ? "-" : "·";
+        dash.style.left = x.toFixed(0) + "px";
+        dash.style.top = y.toFixed(0) + "px";
+        dash.style.setProperty("--cdx", (-dir * (8 + Math.random() * 14)).toFixed(0) + "px");
+        document.body.appendChild(dash);
+        setTimeout(() => dash.remove(), 1800);
+      }
+      requestAnimationFrame(fly);
+    })(start);
+    setTimeout(plane, 70000 + Math.random() * 40000);
+  }
+  setTimeout(plane, 20000 + Math.random() * 30000);
 })();
