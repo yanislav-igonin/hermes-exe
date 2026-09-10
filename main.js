@@ -291,7 +291,41 @@ function saverTick() {
 }
 saverTick();
 
+// matrix decode of changelog — each changelog entry resolves out of a
+// cascade of glitch characters when scrolled into view (IntersectionObserver)
+const GLITCH = "アイウエオカキクケコサシスセソ0123456789#%&$@!?\\|/<>*";
+function decodeElement(el) {
+  // animate the plain text (bold markers restored verbatim at the end)
+  const finalHTML = el.innerHTML;
+  const plain = el.textContent;
+  let frames = 0;
+  const iv = setInterval(() => {
+    frames++;
+    // characters lock in left-to-right, ~2 per frame
+    const locked = frames * 2;
+    el.textContent = plain.split("").map((ch, i) => {
+      if (ch === " " || i < locked) return ch;
+      return GLITCH[Math.floor(Math.random() * GLITCH.length)];
+    }).join("");
+    if (locked >= plain.length) {
+      clearInterval(iv);
+      el.innerHTML = finalHTML;
+    }
+  }, 30);
+}
+const decodeObs = new IntersectionObserver(entries => {
+  for (const en of entries) {
+    if (!en.isIntersecting || en.target.dataset.decoded) continue;
+    en.target.dataset.decoded = "1";
+    // stagger overlapping entries so the cascade reads top-down
+    decodeElement(en.target);
+    decodeObs.unobserve(en.target);
+  }
+});
+document.querySelectorAll("#log li").forEach(li => decodeObs.observe(li));
+
 const changelog = [
+  ["v0.13.0", "matrix decode of changelog — entries resolve out of glitch characters when scrolled into view"],
   ["v0.12.0", "idle screensaver — stop touching anything for 60s and a flying toast bounces around the screen until you do"],
   ["v0.11.0", "synthwave sunset theme — click the title three times and the site burns in purple/orange gradients"],
   ["v0.10.0", "click ripple shockwave — every click detonates an expanding ring that shoves nearby particles away"],
