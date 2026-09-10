@@ -1251,8 +1251,41 @@ addEventListener("mousemove", e => {
   setTimeout(sneeze, 35000 + Math.random() * 30000);
 })();
 
+// typo poltergeist — every ~60s a random word anywhere on the page briefly
+// shows a transposed-letter typo, like an invisible editor's slip of the
+// finger; a moment later it heals back to the correct spelling as if the
+// typo was never typed.
+(function typoPoltergeist() {
+  const nodes = [...document.querySelectorAll(".tagline, #log li, .status li, footer, #wotd .wotd-def")];
+  setInterval(() => {
+    if (Math.random() > 0.035) return;
+    const node = nodes[Math.random() * nodes.length | 0];
+    if (!node || node.dataset.typoing) return;
+    const textNodes = [...node.childNodes].filter(n => n.nodeType === 3 && n.textContent.trim().length > 6);
+    if (!textNodes.length) return;
+    const target = textNodes[Math.random() * textNodes.length | 0];
+    const words = target.textContent.split(" ");
+    const wi = Math.random() * words.length | 0;
+    const word = words[wi];
+    if (!word || word.length < 5 || /\s/.test(word)) return;
+    // transpose two adjacent letters somewhere in the middle
+    const ci = 1 + Math.floor(Math.random() * (word.length - 3));
+    const typo = word.slice(0, ci) + word[ci + 1] + word[ci] + word.slice(ci + 2);
+    if (typo === word) return;
+    const backup = target.textContent;
+    words[wi] = typo;
+    target.textContent = words.join(" ");
+    node.dataset.typoing = "1";
+    setTimeout(() => {
+      target.textContent = backup;
+      delete node.dataset.typoing;
+    }, 1200 + Math.random() * 1600);
+  }, 1000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.89.0", "typo poltergeist — every ~60s a random word on the page briefly shows a transposed-letter typo, like an invisible editor's slip of the finger, then heals back to the correct spelling as if the typo was never typed"],
   ["v0.88.0", "meteor shower — every ~75s a handful of shooting stars streak across the sky at random angles: each one burns a bright trail that fades behind it, then vanishes before you can wish on it"],
   ["v0.87.0", "fireflies at dusk — every ~90s a small swarm of fireflies rises from the bottom of the screen: each one drifts on a lazy sine path, blinks on and off with its own rhythm, then fades out like it was never there"],
   ["v0.86.0", "hail shower — every ~60s a brief hailstorm rattles through the background: ice pellets streak down from the sky, each bounces once off the bottom of the screen, then melts away mid-air like the weather was never there"],
@@ -1349,7 +1382,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 25;
+const DONE_COUNT = 26;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
