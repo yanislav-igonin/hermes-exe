@@ -1298,3 +1298,50 @@ body.vaporwave .firefly {
 }
 body.vaporwave .eclipse-corona { background: radial-gradient(circle, transparent 58%, rgba(201, 166, 232, .2) 66%, rgba(255, 220, 250, .3) 70%, transparent 77%); }
 body.synthwave .eclipse-corona { background: radial-gradient(circle, transparent 58%, rgba(255, 140, 46, .2) 66%, rgba(255, 220, 170, .3) 70%, transparent 77%); }
+
+/* frost bloom: crystalline frost creeps in from a screen corner, grows inward,
+   then melts away */
+.frost-bloom {
+  position: fixed;
+  width: 46vmax;
+  height: 46vmax;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transform-origin: top left;
+  transform: rotate(var(--frost-rot, 0deg)) scale(var(--frost-sx, 1), var(--frost-sy, 1)) scale(.55);
+  background:
+    repeating-conic-gradient(from 0deg at 0 0,
+      rgba(190, 225, 255, .16) 0deg 1.2deg, transparent 1.2deg 7deg),
+    repeating-conic-gradient(from 3deg at 0 0,
+      rgba(225, 245, 255, .10) 0deg .6deg, transparent .6deg 11deg),
+    repeating-radial-gradient(circle at 0 0,
+      rgba(190, 225, 255, .12) 0 1.5px, transparent 1.5px 14px),
+    radial-gradient(circle at 0 0,
+      rgba(225, 245, 255, .28) 0%, rgba(190, 225, 255, .12) 22%, transparent 60%);
+  -webkit-mask-image: radial-gradient(circle at 0 0, black 0%, black 30%, transparent 68%);
+  mask-image: radial-gradient(circle at 0 0, black 0%, black 30%, transparent 68%);
+  filter: blur(.4px);
+  will-change: opacity, transform;
+}
+.frost-bloom.frost-on {
+  animation: frost-grow-melt var(--frost-dur, 11000ms) ease-in-out forwards;
+}
+@keyframes frost-grow-melt {
+  /* creeps in from the corner, holds a breath, then melts from the edge inward */
+  0%   { opacity: 0; transform: rotate(var(--frost-rot, 0deg)) scale(var(--frost-sx, 1), var(--frost-sy, 1)) scale(.35); }
+  30%  { opacity: .8; }
+  55%  { opacity: .85; transform: rotate(var(--frost-rot, 0deg)) scale(var(--frost-sx, 1), var(--frost-sy, 1)) scale(1); }
+  75%  { opacity: .6; }
+  100% { opacity: 0; transform: rotate(var(--frost-rot, 0deg)) scale(var(--frost-sx, 1), var(--frost-sy, 1)) scale(1.06); }
+}
+body.vaporwave .frost-bloom {
+  background:
+    repeating-conic-gradient(from 0deg at 0 0, rgba(201, 166, 232, .14) 0deg 1.2deg, transparent 1.2deg 7deg),
+    radial-gradient(circle at 0 0, rgba(235, 220, 255, .24) 0%, rgba(201, 166, 232, .1) 22%, transparent 60%);
+}
+body.synthwave .frost-bloom {
+  background:
+    repeating-conic-gradient(from 0deg at 0 0, rgba(255, 140, 46, .12) 0deg 1.2deg, transparent 1.2deg 7deg),
+    radial-gradient(circle at 0 0, rgba(255, 220, 170, .22) 0%, rgba(255, 140, 46, .09) 22%, transparent 60%);
+}

@@ -1616,8 +1616,38 @@ addEventListener("mousemove", e => {
   setTimeout(convene, 18000 + Math.random() * 20000);
 })();
 
+// frost bloom — every ~2-3 min a patch of crystalline frost creeps in from a
+// random screen corner, grows inward over a few seconds, then slowly melts
+// away and the page dries like winter was never there
+(function frostBloom() {
+  const frost = document.createElement("div");
+  frost.className = "frost-bloom";
+  document.body.appendChild(frost);
+  const corners = [
+    { top: "0", left: "0", sx: 1, sy: 1 },
+    { top: "0", right: "0", sx: -1, sy: 1 },
+    { bottom: "0", left: "0", sx: 1, sy: -1 },
+    { bottom: "0", right: "0", sx: -1, sy: -1 }
+  ];
+  function bloom() {
+    const c = corners[Math.floor(Math.random() * corners.length)];
+    const dur = 9000 + Math.random() * 4000;   // grow, hold, melt
+    for (const k of ["top", "left", "right", "bottom"]) frost.style[k] = "";
+    Object.assign(frost.style, c);
+    frost.style.setProperty("--frost-sx", c.sx);
+    frost.style.setProperty("--frost-sy", c.sy);
+    frost.style.setProperty("--frost-rot", (Math.random() * 60 - 30).toFixed(1) + "deg");
+    frost.style.setProperty("--frost-dur", dur.toFixed(0) + "ms");
+    frost.classList.add("frost-on");
+    setTimeout(() => frost.classList.remove("frost-on"), dur);
+    setTimeout(bloom, 120000 + Math.random() * 60000);
+  }
+  setTimeout(bloom, 20000 + Math.random() * 30000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.108.0", "frost bloom — every ~2-3 min a patch of crystalline frost creeps in from a random screen corner, thin ice patterns radiate and grow inward over a few seconds, then slowly melt away and the page dries like winter was never there"],
   ["v0.107.0", "firefly congregation — every ~60-100s a small swarm of fireflies gathers at a random point on the page, orbits it lazily with each one blinking on its own rhythm, then scatters into the dark like the summer night was never there"],
   ["v0.106.0", "eclipse umbra — every ~2-3 min a soft dark umbra sweeps diagonally across the page, carrying a bright ring of corona at its leading edge; the light dims while it passes, the particles flare like lanterns in the shadow, then the sun returns as if nothing was ever occluded"],
   ["v0.105.0", "aurora ribbon — every ~40-80s a soft green band of light unfurls across the top of the page, undulating on layered sine waves and occasionally flaring brighter, then dissolving back into the dark like the sky was never lit"],
