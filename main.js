@@ -2181,6 +2181,69 @@ addEventListener("mousemove", e => {
   setTimeout(crawl, 60000 + Math.random() * 60000);
 })();
 
+// paper plane — every ~2-4 min a tiny folded paper plane glides diagonally
+// across the viewport with a lazy wobble, dropping a faint dotted trail
+// behind it, then slips out of sight like it was never thrown
+(function paperPlane() {
+  const plane = document.createElement("div");
+  plane.style.cssText = "position:fixed;z-index:3;left:0;top:0;pointer-events:none;will-change:transform;opacity:0;transition:opacity 2s ease-in-out;";
+  plane.innerHTML =
+    '<svg width="30" height="30" viewBox="0 0 30 30" style="display:block">' +
+      '<path d="M2 14 L28 3 L18 27 L14 17 Z" fill="rgba(220,230,240,.85)" stroke="rgba(160,220,200,.6)" stroke-width="1" stroke-linejoin="round"/>' +
+      '<path d="M2 14 L14 17 L28 3 Z" fill="rgba(180,195,210,.9)"/>' +
+    '</svg>';
+  document.body.appendChild(plane);
+  const trailDivs = [];
+
+  function spawnTrailDot(x, y) {
+    const dot = document.createElement("div");
+    const size = 2 + Math.random() * 2;
+    dot.style.cssText =
+      "position:fixed;z-index:2;pointer-events:none;border-radius:50%;" +
+      "width:" + size + "px;height:" + size + "px;" +
+      "left:" + (x - size / 2) + "px;top:" + (y - size / 2) + "px;" +
+      "background:rgba(160,220,200,.3);opacity:.7;" +
+      "transition:opacity " + (5000 + Math.random() * 4000) + "ms linear, transform " + (5000 + Math.random() * 4000) + "ms linear;";
+    document.body.appendChild(dot);
+    requestAnimationFrame(() => {
+      dot.style.opacity = "0";
+      dot.style.transform = "scale(.3)";
+    });
+    trailDivs.push(dot);
+    setTimeout(() => dot.remove(), 11000);
+  }
+
+  function fly() {
+    if (document.hidden) { setTimeout(fly, 30000); return; }
+    // diagonal trajectory: starts off one edge, exits the opposite side
+    const fromLeft = Math.random() < .5;
+    const x0 = fromLeft ? -60 : innerWidth + 60;
+    const x1 = fromLeft ? innerWidth + 60 : -60;
+    const y0 = innerHeight * (0.05 + Math.random() * 0.3);
+    const y1f = Math.random() < .5 ? y0 + innerHeight * (0.1 + Math.random() * 0.25) : y0 - innerHeight * (0.1 + Math.random() * 0.25);
+    const yTarget = Math.max(20, Math.min(innerHeight - 20, y1f));
+    const dur = 5000 + Math.random() * 3000;
+    const t0 = performance.now();
+    plane.style.opacity = "1";
+    let lastDot = 0;
+
+    (function step(now) {
+      const t = Math.min(1, (now - t0) / dur);
+      const x = x0 + (x1 - x0) * t;
+      const y = y0 + (yTarget - y0) * t + Math.sin(t * Math.PI * 3) * 10; // lazy wobble
+      const angle = Math.atan2(yTarget - y0, x1 - x0) * 180 / Math.PI + Math.sin(t * Math.PI * 3) * 4;
+      plane.style.transform = "translate(" + x + "px," + y + "px) rotate(" + angle + "deg)";
+      if (now - lastDot > 260) { lastDot = now; spawnTrailDot(x, y + 6); }
+      if (t < 1) requestAnimationFrame(step);
+      else {
+        plane.style.opacity = "0";
+        setTimeout(fly, 120000 + Math.random() * 120000);
+      }
+    })(t0);
+  }
+  setTimeout(fly, 30000 + Math.random() * 30000);
+})();
+
 // fireflies — every ~2-4 min a small swarm of glowing motes rises from the
 // bottom of the viewport, drifts upward with gentle wander, each blinking
 // softly in its own rhythm, then fades out near the top like dusk settling
@@ -2334,6 +2397,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.141.0", "paper plane — every ~2-4 min a tiny folded paper plane glides diagonally across the viewport with a lazy wobble, dropping a faint dotted trail behind it, then slips out of sight like it was never thrown"],
   ["v0.140.0", "snail visitor — every ~2-4 min a tiny snail with a glowing shell slowly creeps along the bottom edge of the viewport, leaving a shimmering slime trail that fades behind it, then crawls out of sight like the journey was never made"],
   ["v0.139.0", "code rain — every ~2-4 min for a couple of seconds thin columns of glowing code glyphs sprinkle down from the top of the viewport, fall straight through and dissolve before the rain was ever noticed"],
   ["v0.138.0", "shooting star — every ~2-4 min a brief meteor streaks diagonally across the viewport, a thin bright line with a fading trail that burns out in about a second and is gone"],
