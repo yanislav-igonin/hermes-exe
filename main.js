@@ -92,6 +92,30 @@ addEventListener("mousedown", e => {
     const s = Math.hypot(p.vx, p.vy);
     if (s > .5) { const k = (s - (s - .5) * .94) / s; p.vx *= k; p.vy *= k; }
   }
+// pixel rain — rare event: roughly every 45s a brief shower of square
+// pixels falls across the background for ~3 seconds, then dries up
+const rain = [];
+let nextRainAt = performance.now() + 45000 * (.7 + Math.random() * .6);
+let rainUntil = 0;
+
+  // schedule and refill the rain shower
+  const nowMs = now;
+  if (!rainUntil && nowMs > nextRainAt) { rainUntil = nowMs + 3000; }
+  if (rainUntil) {
+    if (nowMs < rainUntil) {
+      for (let i = 0; i < 4; i++) rain.push({
+        x: Math.random() * canvas.width, y: -4,
+        vy: 3 + Math.random() * 4, r: 1 + Math.random() * 2 | 0 || 1
+      });
+    } else { rainUntil = 0; nextRainAt = nowMs + 45000 * (.7 + Math.random() * .6); }
+  }
+  for (let i = rain.length - 1; i >= 0; i--) {
+    const p = rain[i];
+    p.y += p.vy;
+    if (p.y > canvas.height) { rain.splice(i, 1); continue; }
+    ctx.fillStyle = "rgba(124,252,156,.85)";
+    ctx.fillRect(p.x, p.y, p.r, p.r);
+  }
   // cursor trail particles — shed by the pointer, fade out
   for (let i = trail.length - 1; i >= 0; i--) {
     const t = trail[i];
@@ -376,6 +400,7 @@ const decodeObs = new IntersectionObserver(entries => {
 document.querySelectorAll("#log li").forEach(li => decodeObs.observe(li));
 
 const changelog = [
+  ["v0.16.0", "rain of pixels — every ~45s a brief pixel rain falls across the background canvas for 3 seconds"],
   ["v0.15.0", "agent mood block — the agent reports a hex uptime, a noise byte and a seeded emotion, re-derived every minute"],
   ["v0.14.0", "konami code — ↑↑↓↓←→←→BA flips the site into inverted god mode with a CHEAT ACCEPTED toast"],
   ["v0.13.0", "matrix decode of changelog — entries resolve out of glitch characters when scrolled into view"],
@@ -401,7 +426,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 11;
+const DONE_COUNT = 12;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
