@@ -2505,8 +2505,34 @@ addEventListener("mousemove", e => {
   setTimeout(fly, 20000 + Math.random() * 30000);
 })();
 
+// rubber duck debug companion
+(function rubberDuck() {
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  function spawn() {
+    if (!document.hidden) {
+      const duck = document.createElement("div");
+      duck.className = "rubber-duck";
+      const left = innerWidth * (0.08 + Math.random() * 0.6);
+      const dur = 9000 + Math.random() * 5000;
+      duck.style.left = left + "px";
+      duck.style.setProperty("--rd-dur", dur + "ms");
+      document.body.appendChild(duck);
+      const quack = document.createElement("span");
+      quack.className = "rd-quack";
+      quack.textContent = "quack.";
+      duck.appendChild(quack);
+      setTimeout(() => quack.classList.add("show"), dur * 0.35);
+      setTimeout(() => duck.classList.add("leave"), dur - 1600);
+      setTimeout(() => duck.remove(), dur + 500);
+    }
+    setTimeout(spawn, 120000 + Math.random() * 120000);
+  }
+  setTimeout(spawn, 25000 + Math.random() * 30000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.158.0", "rubber duck — every ~2-4 min a tiny yellow rubber duck paddles along the bottom of the page, bobbing gently, says a quiet \"quack.\" mid-swim, then drifts off-screen like the bug was never explained to it"],
   ["v0.157.0", "shooting star — every ~1-2.5 min a bright star streaks diagonally across the upper sky with a tapering glowing trail, burns out mid-flight and fades like the wish was never made"],
   ["v0.156.0", "firefly swarm — every ~1-2 min a handful of tiny glowing fireflies drifts across the page, blinking softly around a loose center, then scatters and fades out like the summer night was never there"],
   ["v0.155.0", "pigeon visitor — every ~1-3 min a small pixel pigeon flutters down onto the top edge of the page, bobs its head and pecks at nothing a couple of times, then takes off again like the visit was never made"],

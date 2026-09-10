@@ -2383,6 +2383,63 @@ body.synthwave .pigeon { color: rgba(255,140,46,.6); text-shadow: 0 0 6px rgba(2
 body.vaporwave .shooting-star { background: linear-gradient(90deg, rgba(201,166,232,0), rgba(201,166,232,.85) 60%, #e9d5ff); box-shadow: 0 0 8px rgba(201,166,232,.6), 0 0 18px rgba(201,166,232,.25); }
 body.synthwave .shooting-star { background: linear-gradient(90deg, rgba(255,140,46,0), rgba(255,150,60,.85) 60%, #ffd9a0); box-shadow: 0 0 8px rgba(255,140,46,.6), 0 0 18px rgba(255,140,46,.25); }
 
+/* rubber duck debug companion */
+.rubber-duck {
+  position: fixed;
+  bottom: 0;
+  z-index: 40;
+  width: 26px;
+  height: 22px;
+  pointer-events: none;
+  animation: rd-paddle var(--rd-dur, 11000ms) linear forwards;
+}
+.rubber-duck::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 100%;
+  background:
+    radial-gradient(circle at 35% 62%, #ffd94d 0 58%, transparent 60%),
+    radial-gradient(circle at 42% 30%, #ffd94d 0 34%, transparent 36%),
+    radial-gradient(circle at 47% 27%, #2b2b2b 0 8%, transparent 10%),
+    radial-gradient(circle at 58% 34%, #ff9d3c 0 13%, transparent 15%);
+  filter: drop-shadow(0 0 6px rgba(255,217,77,.35));
+}
+.rubber-duck::after {
+  content: "";
+  position: absolute;
+  left: 2px; right: 2px; bottom: -4px;
+  height: 3px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(120,180,255,.25), transparent 70%);
+}
+.rd-quack {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  letter-spacing: .08em;
+  color: rgba(255, 255, 255, 0);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.rd-quack.show { opacity: .7; }
+.rubber-duck.leave { animation: rd-leave 1.6s ease-in forwards; }
+@keyframes rd-paddle {
+  0%   { transform: translateX(0) translateY(0) rotate(0deg); }
+  25%  { transform: translateX(14vw) translateY(-3px) rotate(-2deg); }
+  50%  { transform: translateX(28vw) translateY(0) rotate(2deg); }
+  75%  { transform: translateX(42vw) translateY(-2px) rotate(-1deg); }
+  100% { transform: translateX(54vw) translateY(0) rotate(0deg); }
+}
+@keyframes rd-leave {
+  to { transform: translateX(66vw) translateY(-6px) rotate(6deg); opacity: 0; }
+}
+body.vaporwave .rubber-duck::before { filter: drop-shadow(0 0 6px rgba(201,166,232,.5)); }
+body.synthwave .rubber-duck::before { filter: drop-shadow(0 0 6px rgba(255,150,60,.5)); }
+
 /* fireflies */
 .firefly {
   position: fixed;
