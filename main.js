@@ -1782,6 +1782,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.119.0", "lily pad drifter — every ~2-4 min a lily pad drifts across the middle of the page on a lazy current, carrying a tiny frog passenger that blinks and occasionally croaks a fading ribbit; the pad spins slowly once mid-crossing, then slides off-screen like the pond was never stocked"],
   ["v0.118.0", "sun shower — every ~2-3 min the sky rains while the sun still shines: warm light shafts slant down for a few seconds while sparse drops fall through them, and at the very end a small rainbow briefly blooms before everything evaporates like the weather was never there"],
   ["v0.117.0", "aurora borealis — every ~2-3 min a soft shimmering curtain of green-teal light drifts across the upper sky, rays folding and swaying like slow silk, then fades away leaving no trace of the northern lights"],
   ["v0.116.0", "migrating geese — every ~2-3 min a small V-formation of birds crosses the upper page, each flapping on its own rhythm while the formation lazily reorders; the lead bird occasionally drops a fading honk glyph, then the flock sails away off-screen like the migration was never there"],
@@ -4094,4 +4095,69 @@ addEventListener("dblclick", e => {
     requestAnimationFrame(draw);
   }
   setTimeout(show, 15000 + Math.random() * 15000);
+})();
+
+// lily pad drifter: every ~2-4 min a lily pad drifts across the middle of the
+// page on a lazy current, carrying a tiny frog passenger that blinks and
+// occasionally croaks a fading "ribbit" glyph; the pad spins slowly once
+// mid-crossing, then slides off-screen like the pond was never stocked
+(function lilyPadDrifter() {
+  const pad = document.createElement("div");
+  pad.style.cssText = "position:fixed;z-index:3;pointer-events:none;will-change:transform;";
+  pad.innerHTML =
+    '<div class="lp-pad">' +
+      '<svg width="86" height="52" viewBox="0 0 86 52" style="display:block">' +
+        '<path d="M6 30 Q2 20 12 14 Q30 2 56 6 Q80 10 82 26 Q83 38 66 44 Q40 52 18 46 Q8 42 6 30 Z" fill="rgba(64,142,80,.82)" stroke="rgba(38,98,54,.9)" stroke-width="2"/>' +
+        '<path d="M14 28 Q40 20 70 30" stroke="rgba(38,98,54,.65)" stroke-width="1.4" fill="none"/>' +
+        '<path d="M44 8 L44 46" stroke="rgba(230,245,230,.75)" stroke-width="1.6" fill="none"/>' +
+      "</svg>" +
+      '<div class="lp-frog" style="position:absolute;left:22px;top:-24px;font-size:22px;filter:drop-shadow(0 2px 3px rgba(0,40,10,.35));">🐸</div>' +
+    "</div>";
+  document.body.appendChild(pad);
+  const frog = pad.querySelector(".lp-frog");
+  let spinning = false;
+
+  function drift() {
+    const y = innerHeight * (0.25 + Math.random() * 0.35);
+    const dur = 26000 + Math.random() * 14000;
+    const fromX = -140, toX = innerWidth + 140;
+    let t0 = null;
+    let spinDone = false;
+    let croakTimer = 0;
+    pad.style.opacity = "1";
+
+    function frame(now) {
+      if (t0 === null) t0 = now;
+      const p = Math.min(1, (now - t0) / dur);
+      const x = fromX + (toX - fromX) * p;
+      const bob = Math.sin(now / 900) * 7;
+      const tilt = Math.sin(now / 1300) * 4;
+      pad.style.transform = "translate(" + x + "px," + (y + bob) + "px) rotate(" + tilt + "deg)";
+      // one slow lazy spin mid-crossing
+      if (!spinDone && p > 0.45 && p < 0.62) {
+        spinning = true;
+        pad.style.transform = "translate(" + x + "px," + (y + bob) + "px) rotate(" + (tilt + (p - 0.45) / 0.17 * 360) + "deg)";
+        if (p >= 0.62) { spinning = false; spinDone = true; }
+      }
+      // occasional ribbit
+      croakTimer -= 1 / 60;
+      if (croakTimer <= 0 && Math.random() < 0.004) {
+        croakTimer = 3;
+        const c = document.createElement("div");
+        c.textContent = "ribbit";
+        c.style.cssText = "position:absolute;left:60px;top:-14px;color:rgba(120,200,130,.9);font-family:monospace;font-size:12px;white-space:nowrap;transition:opacity 2.2s ease-out,transform 2.2s ease-out;";
+        pad.appendChild(c);
+        requestAnimationFrame(() => { c.style.opacity = "0"; c.style.transform = "translateY(-18px)"; });
+        setTimeout(() => c.remove(), 2400);
+      }
+      // blink
+      frog.style.opacity = (Math.sin(now / 210) > 0.97) ? "0.25" : "1";
+      if (p < 1) requestAnimationFrame(frame);
+      else { pad.style.opacity = "0"; setTimeout(drift, 120000 + Math.random() * 120000); }
+    }
+    requestAnimationFrame(frame);
+  }
+  pad.style.opacity = "0";
+  pad.style.transition = "opacity 1.5s ease-in-out";
+  setTimeout(drift, 18000 + Math.random() * 20000);
 })();
