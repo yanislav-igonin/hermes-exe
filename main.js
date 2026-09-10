@@ -2395,8 +2395,35 @@ addEventListener("mousemove", e => {
   setTimeout(crawl, 45000 + Math.random() * 45000);
 })();
 
+// meteor streak — every ~3-6 min a bright shooting star dashes across the top
+// of the viewport at a shallow angle, trailing sparks that fade as it burns out
+(function meteorStreak() {
+  const el = document.createElement("div");
+  el.className = "meteor";
+  document.body.appendChild(el);
+  function fly() {
+    if (!document.hidden) {
+      const startX = Math.random() * (innerWidth * 0.7);
+      const startY = 20 + Math.random() * (innerHeight * 0.25);
+      const drift = 300 + Math.random() * 300;
+      el.style.left = startX + "px";
+      el.style.top = startY + "px";
+      el.style.setProperty("--meteor-dx", drift + "px");
+      el.style.setProperty("--meteor-dy", drift * 0.35 + "px");
+      el.classList.add("fly");
+      setTimeout(() => {
+        el.classList.remove("fly");
+        schedule();
+      }, 1600);
+    } else schedule();
+  }
+  function schedule() { setTimeout(fly, 180000 + Math.random() * 180000); }
+  setTimeout(fly, 25000 + Math.random() * 40000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.142.0", "meteor streak — every ~3-6 min a bright shooting star dashes across the sky at a shallow angle, burning with a fading spark tail, gone before you can make a wish"],
   ["v0.141.0", "paper plane — every ~2-4 min a tiny folded paper plane glides diagonally across the viewport with a lazy wobble, dropping a faint dotted trail behind it, then slips out of sight like it was never thrown"],
   ["v0.140.0", "snail visitor — every ~2-4 min a tiny snail with a glowing shell slowly creeps along the bottom edge of the viewport, leaving a shimmering slime trail that fades behind it, then crawls out of sight like the journey was never made"],
   ["v0.139.0", "code rain — every ~2-4 min for a couple of seconds thin columns of glowing code glyphs sprinkle down from the top of the viewport, fall straight through and dissolve before the rain was ever noticed"],
@@ -2474,6 +2501,7 @@ const changelog = [
   ["v0.68.0", "chromatic aberration — press k and the lens slips: text tears into red and cyan ghosts jittering out of alignment, scanlines crawl over the page, then the channels snap back together like the tube warmed up again"],
   ["v0.67.0", "sonar ping — press m and a sonar sweep ripples out from the center of the page, pinging across the document while it counts every DOM node it echoes off of, then the readout fades like the ocean was never sounded"],
   ["v0.65.0", "gravity — press g and every block of text on the page falls, bounces off the bottom of the viewport, then floats back up to its place as if it never left the shelf"],
+  ["v0.66.0", "blackout — press b and the page plunges into darkness; only a flickering flashlight beam around your cursor reveals what is left, press b again and the lights come back as if nothing happened"],
   ["v0.64.0", "crash test — press x and every line of text on the page corrupts into garbage bytes like a bad memory read, then rebuilds itself in random order while the corruption flickers back, until the page remembers what it was trying to say"],
   ["v0.63.0", "tape worm — press w and a worm of characters slithers across the page, eating its way in a wavy path while leaving a fading trail of digested glyphs, until it crawls off the far edge like it was never fed"],
   ["v0.62.0", "click constellation — every click plants a star; once enough gather they link into a constellation that names itself, glows, then fades out like the sky was never mapped"],
@@ -2547,7 +2575,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 31;
+const DONE_COUNT = 32;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
