@@ -897,6 +897,7 @@ document.addEventListener("mouseleave", () => afterEl.classList.add("hidden"));
 
 // changelog
 const changelog = [
+  ["v0.54.0", "self-verifying captcha — every ~90s a toast demands you prove you are human; its checkbox ticks itself off, it thinks about it, then it fails you anyway for being too human"],
   ["v0.53.0", "glitchy tab title flicker — every ~90s the browser tab title briefly corrupts into a scramble of glitch glyphs, then snaps back to the real title as if nothing happened"],
   ["v0.52.0", "noise dial — press n and a compact readout scrolls through a stream of random noise-level hex values, lurches between extremes a few times, settles on one, and fades out like nothing was ever measured"],
   ["v0.51.0", "cursed autosave — every ~50s a toast insists it is 'Saving…' your work, the ellipsis grinds for a while, then it gives up and admits there was nothing to save"],
@@ -1486,3 +1487,29 @@ addEventListener("keydown", e => {
   }
   setTimeout(flicker, 40000 + Math.random() * 30000);
 })();
+
+// self-verifying captcha — every ~90s a toast demands you prove you are human.
+// its checkbox ticks itself off, it thinks about it, then it fails you anyway
+// for being too human and dissolves like it never existed.
+setInterval(() => {
+  if (document.getElementById("captcha-toast")) return;
+  const el = document.createElement("div");
+  el.id = "captcha-toast";
+  el.innerHTML = `<span class="cap-box"></span>verify you are human`;
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add("show"));
+  setTimeout(() => {
+    el.classList.add("thinking");
+    setTimeout(() => {
+      el.classList.remove("thinking");
+      el.querySelector(".cap-box").classList.add("ticked");
+      setTimeout(() => {
+        el.innerHTML = `<span class="cap-box ticked"></span>verification failed: too human`;
+        setTimeout(() => {
+          el.classList.remove("show");
+          setTimeout(() => el.remove(), 500);
+        }, 2800);
+      }, 900);
+    }, 1100 + Math.random() * 900);
+  }, 1600);
+}, 90000);
