@@ -1000,6 +1000,7 @@ setInterval(() => {
 
 // changelog
 const changelog = [
+  ["v0.69.0", "wandering eyes — every ~45s a pair of eyes fades in at a random spot on the page and the pupils follow your cursor wherever it goes, they blink a few times, then fade out like nothing was ever watching"],
   ["v0.68.0", "chromatic aberration — press k and the lens slips: text tears into red and cyan ghosts jittering out of alignment, scanlines crawl over the page, then the channels snap back together like the tube warmed up again"],
   ["v0.67.0", "sonar ping — press m and a sonar sweep ripples out from the center of the page, pinging across the document while it counts every DOM node it echoes off of, then the readout fades like the ocean was never sounded"],
   ["v0.65.0", "gravity — press g and every block of text on the page falls, bounces off the bottom of the viewport, then floats back up to its place as if it never left the shelf"],
@@ -2050,3 +2051,48 @@ addEventListener("keydown", e => {
     document.body.classList.remove("chromatic");
   }, 1600 + Math.random() * 900);
 });
+
+// wandering eyes — every ~45s a pair of eyes fades in at a random spot on the
+// page, the pupils track your cursor wherever it goes, they blink a couple of
+// times, then fade out like nothing was ever watching.
+let eyesMouseX = innerWidth / 2, eyesMouseY = innerHeight / 2;
+addEventListener("mousemove", e => { eyesMouseX = e.clientX; eyesMouseY = e.clientY; });
+function spawnWanderingEyes() {
+  const wrap = document.createElement("div");
+  wrap.className = "wandering-eyes";
+  const margin = 60;
+  wrap.style.left = margin + Math.random() * (innerWidth - margin * 2) + "px";
+  wrap.style.top = margin + Math.random() * (innerHeight - margin * 2) + "px";
+  const pupils = [];
+  for (let i = 0; i < 2; i++) {
+    const eye = document.createElement("div");
+    eye.className = "wandering-eye";
+    const pupil = document.createElement("div");
+    pupil.className = "wandering-pupil";
+    eye.appendChild(pupil);
+    wrap.appendChild(eye);
+    pupils.push(pupil);
+  }
+  document.body.appendChild(wrap);
+  requestAnimationFrame(() => wrap.classList.add("show"));
+  const look = setInterval(() => {
+    const rect = wrap.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+    const ang = Math.atan2(eyesMouseY - cy, eyesMouseX - cx);
+    const dist = Math.min(4, Math.hypot(eyesMouseX - cx, eyesMouseY - cy) / 40);
+    for (const p of pupils) {
+      p.style.transform = `translate(${Math.cos(ang) * dist}px, ${Math.sin(ang) * dist}px)`;
+    }
+  }, 80);
+  const blink = setInterval(() => {
+    for (const eye of wrap.children) eye.classList.add("blink");
+    setTimeout(() => { for (const eye of wrap.children) eye.classList.remove("blink"); }, 180);
+  }, 1400 + Math.random() * 1200);
+  const life = 4000 + Math.random() * 2500;
+  setTimeout(() => wrap.classList.remove("show"), life - 500);
+  setTimeout(() => { clearInterval(look); clearInterval(blink); wrap.remove(); }, life);
+}
+setTimeout(function wanderLoop() {
+  spawnWanderingEyes();
+  setTimeout(wanderLoop, 40000 + Math.random() * 20000);
+}, 18000);

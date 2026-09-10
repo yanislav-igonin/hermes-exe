@@ -556,3 +556,26 @@ body.chromatic::after {
   background: repeating-linear-gradient(0deg, rgba(255,0,80,.05) 0 2px, transparent 2px 4px, rgba(0,180,255,.05) 4px 6px, transparent 6px 8px);
   mix-blend-mode: screen;
 }
+
+/* wandering eyes — a pair of eyes fades in somewhere and follows your cursor */
+.wandering-eyes {
+  position: fixed; z-index: 9996; display: flex; gap: 10px;
+  opacity: 0; transition: opacity .6s ease; pointer-events: none;
+}
+.wandering-eyes.show { opacity: .85; }
+.wandering-eye {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: #0a140c; border: 1px solid rgba(124,252,156,.8);
+  box-shadow: 0 0 10px rgba(124,252,156,.35), inset 0 0 6px rgba(124,252,156,.15);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .09s linear;
+}
+.wandering-eye.blink { transform: scaleY(.08); }
+.wandering-pupil {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #7cfc9c; box-shadow: 0 0 6px rgba(124,252,156,.9);
+}
+body.vaporwave .wandering-eye { border-color: rgba(201,166,232,.8); box-shadow: 0 0 10px rgba(201,166,232,.4); }
+body.vaporwave .wandering-pupil { background: #c9a6e8; }
+body.synthwave .wandering-eye { border-color: rgba(255,140,46,.8); box-shadow: 0 0 10px rgba(255,140,46,.4); }
+body.synthwave .wandering-pupil { background: #ff8c2e; }
