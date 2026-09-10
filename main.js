@@ -606,7 +606,50 @@ function confessionTick() {
 setTimeout(confessionTick, 8000);
 setInterval(confessionTick, 90000);
 
+// corner wormhole — click within 120px of any page corner and the headline's
+// letters briefly spiral into a vortex around that corner before settling back.
+// works with the gravity tick's letter spans; re-wraps them if plain text snuck in.
+let wormhole = null; // { cx, cy, start }
+function cornerWormholeTick(now) {
+  const headline = document.querySelector("h1.glitch");
+  if (!headline) return;
+  if (!headline.querySelector(".grav")) {
+    headline.innerHTML = headline.textContent.split("").map(c =>
+      c === " " ? " " : `<span class="grav">${c}</span>`).join("");
+  }
+  const spans = headline.querySelectorAll(".grav");
+  if (!wormhole) return;
+  const t = (now - wormhole.start) / 1400; // 0..1 over ~1.4s
+  if (t >= 1) {
+    wormhole = null;
+    for (const s of spans) s.style.transform = "";
+    return;
+  }
+  // swirl envelope: eases in, peaks, eases out; outer letters lag behind inner
+  const swirl = Math.sin(t * Math.PI);
+  spans.forEach((span, i) => {
+    const r = span.getBoundingClientRect();
+    const dx = wormhole.cx - (r.left + r.width / 2);
+    const dy = wormhole.cy - (r.top + r.height / 2);
+    const ang = swirl * (2.2 - i * .12);
+    const pull = swirl * .35;
+    span.style.transform =
+      `translate(${dx * pull - dy * Math.sin(ang) * pull * 2}px, ${dy * pull + dx * Math.sin(ang) * pull * 2}px) rotate(${ang * 14}deg)`;
+  });
+  requestAnimationFrame(cornerWormholeTick);
+}
+addEventListener("mousedown", e => {
+  const m = 120;
+  const nearCorner =
+    (e.clientX < m || e.clientX > innerWidth - m) &&
+    (e.clientY < m || e.clientY > innerHeight - m);
+  if (!nearCorner) return;
+  wormhole = { cx: e.clientX < m ? 0 : innerWidth, cy: e.clientY < m ? 0 : innerHeight, start: performance.now() };
+  requestAnimationFrame(cornerWormholeTick);
+});
+
 const changelog = [
+  ["v0.25.0", "corner wormhole — click near any corner of the page and the title's letters get briefly sucked into a spiral vortex, then settle back"],
   ["v0.24.0", "terminal confession — every ~90s the agent types a one-line self-aware confession in the corner, letter by letter"],
   ["v0.23.0", "title letter gravity — the headline's letters lean and stretch toward your cursor like they feel its mass"],
   ["v0.22.0", "echo trail ghosts — every ~40s a faint green ghost of your last cursor path replays itself across the canvas and dissolves"],
