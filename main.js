@@ -2477,6 +2477,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.147.0", "wandering firefly — every ~50-90s a lone firefly with a softly pulsing glow wanders across the page, pausing now and then as if it lost its way, then blinks out like it was never there"],
   ["v0.146.0", "kite on a string — every ~2-4 min a small diamond kite glides across the upper sky at the end of a swaying thread, bobbing on the wind with a fluttering tail, then tacks off-screen like the breeze was never there"],
   ["v0.145.0", "leaf whirl — every ~2-4 min a swirl of autumn leaves sweeps across the page on a gust, spinning as it travels, shedding stragglers that flutter to the ground like the wind was never there"],
   ["v0.144.0", "soap bubbles — every ~2-4 min a handful of iridescent soap bubbles drifts up from the bottom of the page, wobbling on the draft, then pops mid-air into tiny fizz sparks like the joke was never told"],
@@ -5278,4 +5279,48 @@ addEventListener("dblclick", e => {
     setTimeout(() => leaf.remove(), 13000);
   }
   setTimeout(gust, 25000 + Math.random() * 40000);
+})();
+
+// wandering firefly — every ~50-90s a lone firefly with a softly pulsing glow
+// wanders across the page, pausing now and then as if it lost its way, then
+// blinks out like it was never there
+(function wanderingFirefly() {
+  const el = document.createElement("div");
+  el.className = "wandering-firefly";
+  document.body.appendChild(el);
+  function visit() {
+    if (!document.hidden) {
+      const x0 = Math.random() * innerWidth * .7 + innerWidth * .15;
+      const y0 = Math.random() * innerHeight * .7 + innerHeight * .15;
+      const start = performance.now();
+      let x = x0, y = y0, tx = x0, ty = y0;
+      let pauseUntil = 0, lastRetarget = start;
+      const life = 9000 + Math.random() * 6000;
+      (function wander(now) {
+        const t = now - start;
+        if (t >= life) { el.classList.remove("show"); setTimeout(() => el.remove(), 900); return; }
+        // pick a new lazy target unless the firefly is pausing
+        if (now >= pauseUntil && now - lastRetarget > 1200 + Math.random() * 1800) {
+          lastRetarget = now;
+          if (Math.random() < .3) pauseUntil = now + 900 + Math.random() * 1400; // lost its way
+          else {
+            tx = x + (Math.random() - .5) * 240;
+            ty = y + (Math.random() - .5) * 180;
+            tx = Math.max(20, Math.min(innerWidth - 20, tx));
+            ty = Math.max(20, Math.min(innerHeight - 20, ty));
+          }
+        }
+        x += (tx - x) * .02;
+        y += (ty - y) * .02;
+        el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+        // the glow pulses on its own rhythm, dimmer while pausing
+        const pulse = .5 + Math.sin(now / (pauseUntil > now ? 520 : 260)) * .5;
+        el.style.opacity = (pulse * .9).toFixed(2);
+        if (!el.classList.contains("show")) el.classList.add("show");
+        requestAnimationFrame(wander);
+      })(start);
+    }
+    setTimeout(visit, 50000 + Math.random() * 40000);
+  }
+  setTimeout(visit, 18000 + Math.random() * 20000);
 })();

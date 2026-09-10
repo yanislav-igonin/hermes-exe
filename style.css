@@ -1982,3 +1982,17 @@ body.synthwave #ghost-typewriter { color: #ff8c2e; text-shadow: 0 0 8px rgba(255
   0%   { opacity: .8; transform: translate(0, 0) rotate(0deg); }
   100% { opacity: 0; transform: translate(var(--lw-fw, -30px), 24vh) rotate(420deg); }
 }
+
+/* wandering firefly — a lone pulsing glow drifting across the page */
+.wandering-firefly {
+  position: fixed; left: 0; top: 0; z-index: 9994;
+  width: 4px; height: 4px;
+  pointer-events: none;
+  border-radius: 50%;
+  background: #d8ffa0;
+  box-shadow: 0 0 6px 2px rgba(216,255,160,.55), 0 0 16px 6px rgba(216,255,160,.18);
+  opacity: 0;
+  transition: opacity .5s ease-in-out;
+  will-change: transform, opacity;
+}
+.wandering-firefly.show { opacity: .9; }
