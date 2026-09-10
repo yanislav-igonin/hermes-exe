@@ -864,6 +864,7 @@ renderCopyYear(realYear);
 
 // changelog
 const changelog = [
+  ["v0.45.0", "vhs rewind — every ~80s the whole page hits a 'tracking error': rgb-split frames and jitter like an old tape scrambling, a '◄◄ REW' tag flashes in the corner, then the picture snaps back clean like the tape was never damaged"],
   ["v0.44.0", "copyright year poltergeist — the footer's © year occasionally flips to a wrong year from some other timeline (1970, 2077, 3000...), blinks, then heals back to the present"],
   ["v0.43.0", "breath hold — every ~60-90s the whole page freezes for a beat: every animation pauses mid-frame like the site is holding its breath, then it exhales and everything resumes as if nothing happened"],
   ["v0.42.0", "glitch flicker — every ~45-90s a handful of random glyphs on the page briefly corrupt into glitch characters (▓ ░ ▒ ▚) for a split second, then restore silently like nothing happened"],
@@ -1236,4 +1237,32 @@ const glyphRain = document.getElementById("glyphRain");
     }, HOLD_MS);
   }
   setTimeout(hold, 40000 + Math.random() * 40000);
+})();
+
+// vhs rewind — every ~80s the whole page hits a "tracking error": three frames
+// of chromatic rgb-split and jitter like an old tape scrambling, with a
+// "◄◄ REW" tag in the corner, then the picture snaps back clean like the tape
+// was never damaged.
+(function vhsRewind() {
+  const tag = document.createElement("div");
+  tag.id = "vhs-rewind";
+  tag.textContent = "◄◄ REW";
+  document.body.appendChild(tag);
+  function glitchFrames(left) {
+    if (left <= 0) {
+      document.body.classList.remove("vhs-glitch");
+      tag.classList.remove("show");
+      return;
+    }
+    document.body.classList.add("vhs-glitch");
+    tag.classList.add("show");
+    // re-roll the shift each frame so the split jumps like tape tracking
+    document.body.style.setProperty("--vhs-shift", ((2 + Math.random() * 4) | 0) + "px");
+    setTimeout(() => glitchFrames(left - 1), 90 + Math.random() * 60);
+  }
+  function loop() {
+    glitchFrames(3);
+    setTimeout(loop, 80000 + Math.random() * 40000);
+  }
+  setTimeout(loop, 50000 + Math.random() * 30000);
 })();

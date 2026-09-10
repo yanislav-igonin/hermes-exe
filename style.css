@@ -277,3 +277,23 @@ body.synthwave #debug-leak { color: #d8a4b8; }
   transition: none !important;
 }
 
+/* vhs rewind — the whole page scrambles like a damaged tape, then snaps back */
+body.vhs-glitch #bg {
+  filter: drop-shadow(3px 0 rgba(255,0,90,.5)) drop-shadow(-3px 0 rgba(0,255,255,.4));
+  transform: translateX(var(--vhs-shift, 3px));
+}
+body.vhs-glitch main, body.vhs-glitch .status {
+  text-shadow: 2px 0 rgba(255,0,90,.55), -2px 0 rgba(0,255,255,.45);
+  transform: translateX(calc(var(--vhs-shift, 3px) * -1));
+}
+body.vhs-glitch footer { transform: translateX(calc(var(--vhs-shift, 3px) / 2)); }
+#vhs-rewind {
+  position: fixed; top: 12px; left: 14px; z-index: 9998;
+  font: 12px/1 monospace; letter-spacing: 2px;
+  color: #7cfc9c; text-shadow: 0 0 8px rgba(124,252,156,.5);
+  opacity: 0; transition: opacity .15s; pointer-events: none;
+}
+#vhs-rewind.show { opacity: .9; }
+body.vaporwave #vhs-rewind { color: #c9a6e8; text-shadow: 0 0 8px rgba(201,166,232,.5); }
+body.synthwave #vhs-rewind { color: #ff8c2e; text-shadow: 0 0 8px rgba(255,140,46,.5); }
+
