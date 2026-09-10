@@ -844,6 +844,7 @@ setInterval(() => {
 
 // changelog
 const changelog = [
+  ["v0.42.0", "glitch flicker — every ~45-90s a handful of random glyphs on the page briefly corrupt into glitch characters (▓ ░ ▒ ▚) for a split second, then restore silently like nothing happened"],
   ["v0.41.0", "site sneezes — every ~70s the page does a tiny involuntary full-page shiver, a small 'achoo.' toast pops in the corner, then everything settles back like nothing happened"],
   ["v0.40.0", "screenshot flash — every ~60-90s the page flashes white for a split second like an invisible camera went off, with a brief 'screenshot saved' notice in the corner"],
   ["v0.39.0", "cursor ghost — every ~50s a phantom mouse cursor darts across the page, hesitates over a random element like it is thinking about clicking, then vanishes"],
@@ -1082,6 +1083,58 @@ const glyphRain = document.getElementById("glyphRain");
       delete node.dataset.corrupting;
     }, 1800 + Math.random() * 2500);
   }, 1000);
+})();
+
+// glitch flicker — every ~45-90s a few random text glyphs across the page
+// briefly corrupt into glitch characters for a split second, then everything
+// restores silently like nothing happened.
+(function glitchFlicker() {
+  const glitchChars = ["▓", "░", "▒", "▚"];
+
+  function flicker() {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) {
+      const n = walker.currentNode;
+      if (
+        n.textContent.trim().length > 3 &&
+        !n.parentElement.closest("[data-glitching], script, style")
+      ) {
+        nodes.push(n);
+      }
+    }
+    if (nodes.length) {
+      const hits = 2 + (Math.random() * 4 | 0);
+      const touched = [];
+      for (let i = 0; i < hits && nodes.length; i++) {
+        const node = nodes.splice(Math.random() * nodes.length | 0, 1)[0];
+        const text = node.textContent;
+        const idxs = [];
+        for (let j = 0; j < text.length; j++) {
+          if (text[j] !== " " && Math.random() < 0.25) idxs.push(j);
+        }
+        if (!idxs.length) continue;
+        let corrupted = text;
+        for (const j of idxs) {
+          corrupted =
+            corrupted.slice(0, j) +
+            glitchChars[Math.random() * glitchChars.length | 0] +
+            corrupted.slice(j + 1);
+        }
+        node.textContent = corrupted;
+        node.parentElement.dataset.glitching = "1";
+        touched.push([node, text, node.parentElement]);
+      }
+      setTimeout(() => {
+        for (const [node, text, parent] of touched) {
+          node.textContent = text;
+          delete parent.dataset.glitching;
+        }
+      }, 200 + Math.random() * 200);
+    }
+    setTimeout(flicker, 45000 + Math.random() * 45000);
+  }
+  setTimeout(flicker, 20000 + Math.random() * 30000);
 })();
 
 // tab title hijack — every ~60s the browser tab title gets hijacked: a panicked
