@@ -529,3 +529,15 @@ body.synthwave #site-battery.low { color: #ff8c2e; }
   opacity: 0; pointer-events: none; transition: opacity .3s;
 }
 #boot-veil.show { opacity: 1; }
+
+/* sonar ping — a readout that sweeps the page and counts DOM nodes like echoes */
+#sonar-ping {
+  position: fixed; bottom: 44px; right: 14px; z-index: 9998;
+  font-size: .78rem; color: #7cfc9c; font-family: monospace;
+  opacity: 0; transition: opacity .3s; pointer-events: none;
+  text-shadow: 0 0 8px rgba(124, 252, 156, .5);
+  text-align: right;
+}
+#sonar-ping.show { opacity: .9; }
+body.vaporwave #sonar-ping { color: #c9a6e8; text-shadow: 0 0 8px rgba(201, 166, 232, .5); }
+body.synthwave #sonar-ping { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 140, 46, .5); }

@@ -1000,7 +1000,7 @@ setInterval(() => {
 
 // changelog
 const changelog = [
-  ["v0.66.0", "blackout — press b and the page plunges into darkness; only a flickering flashlight beam around your cursor reveals what is left, press b again and the lights come back as if nothing happened"],
+  ["v0.67.0", "sonar ping — press m and a sonar sweep ripples out from the center of the page, pinging across the document while it counts every DOM node it echoes off of, then the readout fades like the ocean was never sounded"],
   ["v0.65.0", "gravity — press g and every block of text on the page falls, bounces off the bottom of the viewport, then floats back up to its place as if it never left the shelf"],
   ["v0.64.0", "crash test — press x and every line of text on the page corrupts into garbage bytes like a bad memory read, then rebuilds itself in random order while the corruption flickers back, until the page remembers what it was trying to say"],
   ["v0.63.0", "tape worm — press w and a worm of characters slithers across the page, eating its way in a wavy path while leaving a fading trail of digested glyphs, until it crawls off the far edge like it was never fed"],
@@ -2006,4 +2006,33 @@ addEventListener("keydown", e => {
       scramble(); // corruption flickers back before the repair wins
     }
   }, 70);
+});
+
+// sonar ping — press m and a sonar sweep ripples out from the center of the
+// page, pinging across the document while it counts every DOM node it echoes
+// off of, then the readout fades like the ocean was never sounded.
+addEventListener("keydown", e => {
+  if (e.key !== "m") return;
+  if (e.target instanceof Element && e.target.matches("input, textarea")) return;
+  if (document.getElementById("sonar-ping")) return;
+  const el = document.createElement("div");
+  el.id = "sonar-ping";
+  document.body.appendChild(el);
+  el.classList.add("show");
+  const nodeCount = document.querySelectorAll("*").length;
+  const total = 12 + Math.random() * 8 | 0;
+  let tick = 0;
+  const t = setInterval(() => {
+    tick++;
+    // the ping sweeps outward; the count locks in once the echo returns
+    const sweep = Math.round(total * Math.min(1, tick / (total - 4)));
+    el.textContent = `sonar ping 0x${tick.toString(16).padStart(2, "0").toUpperCase()} — echo ${sweep}/${nodeCount} nodes`;
+    if (tick >= total) {
+      clearInterval(t);
+      setTimeout(() => {
+        el.classList.remove("show");
+        setTimeout(() => el.remove(), 400);
+      }, 900);
+    }
+  }, 160);
 });
