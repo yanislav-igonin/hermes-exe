@@ -740,6 +740,33 @@ setInterval(() => {
   }, 120 + Math.random() * 160);
 }, 70000);
 
+// leftover console.log — every ~80s the site briefly leaks a line of its own
+// fake debug output into the footer, then deletes it like it never happened.
+const DEBUG_LINES = [
+  "console.log('am i supposed to be here?')",
+  "console.log('TODO: remove before deploy')",
+  "console.log('why is the toast happy')",
+  "console.log('particles.length = 90 (correct)')",
+  "console.log('i can see the visitor count is fake')",
+  "console.log('if (lonely) commit();')",
+  "console.log('DEBUG: who is watching the watcher eye')",
+  "console.log('release v? — just ship it')"
+];
+const debugEl = document.createElement("span");
+debugEl.id = "debug-leak";
+document.querySelector("footer").appendChild(debugEl);
+setInterval(() => {
+  if (Math.random() > 0.35 || debugEl.dataset.leaking) return;
+  debugEl.dataset.leaking = "1";
+  const line = DEBUG_LINES[Math.random() * DEBUG_LINES.length | 0];
+  debugEl.textContent = " · " + line;
+  debugEl.classList.add("show");
+  setTimeout(() => {
+    debugEl.classList.remove("show");
+    setTimeout(() => { debugEl.textContent = ""; delete debugEl.dataset.leaking; }, 600);
+  }, 3500 + Math.random() * 2500);
+}, 20000);
+
 // phantom redline — every ~45s a random word anywhere on the page briefly
 // gets struck through with a red editorial line, like a track-changes edit
 // from an invisible editor; a moment later the correction is withdrawn and
@@ -769,6 +796,7 @@ setInterval(() => {
 })();
 
 const changelog = [
+  ["v0.37.0", "leftover console.log — every ~80s the site briefly leaks one line of fake debug output into the footer, then deletes it like it never happened"],
   ["v0.36.0", "phantom redline — every ~45s a random word on the page briefly gets struck through with a red editorial line, like a track-changes edit from an invisible editor, then the correction is quietly withdrawn"],
   ["v0.35.0", "power flicker — every ~70s the grid browns out: the page dims and stutters while a 'voltage unstable' notice blinks, then the lights snap back on"],
   ["v0.34.0", "cached typing — type anywhere and, after 8s of silence, the site ghosts your last ~40 keystrokes back in the corner, letter by letter, then quietly wipes them"],

@@ -170,6 +170,15 @@ body.synthwave #power-flicker { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 1
   transition: color .4s;
 }
 
+/* leftover console.log — a debug line leaks into the footer, then vanishes */
+#debug-leak {
+  color: #4a4a55; font-size: .78rem; font-family: monospace;
+  opacity: 0; transition: opacity .6s; pointer-events: none;
+}
+#debug-leak.show { opacity: .9; }
+body.vaporwave #debug-leak { color: #c9a6e8; }
+body.synthwave #debug-leak { color: #d8a4b8; }
+
 /* glitch */
 .glitch::before, .glitch::after {
   content: attr(data-text); position: absolute; inset: 0;
