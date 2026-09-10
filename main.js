@@ -796,6 +796,7 @@ setInterval(() => {
 })();
 
 const changelog = [
+  ["v0.39.0", "cursor ghost — every ~50s a phantom mouse cursor darts across the page, hesitates over a random element like it is thinking about clicking, then vanishes"],
   ["v0.38.0", "tab title hijack — every ~60s the browser tab title types out a panicked message letter by letter, holds a moment, then restores itself like nothing happened"],
   ["v0.37.0", "leftover console.log — every ~80s the site briefly leaks one line of fake debug output into the footer, then deletes it like it never happened"],
   ["v0.36.0", "phantom redline — every ~45s a random word on the page briefly gets struck through with a red editorial line, like a track-changes edit from an invisible editor, then the correction is quietly withdrawn"],
@@ -1060,4 +1061,38 @@ const glyphRain = document.getElementById("glyphRain");
     }, 90);
   }
   setTimeout(type, 30000 + Math.random() * 30000);
+})();
+
+// cursor ghost — every ~50s a phantom mouse cursor darts across the page,
+// hesitates over a random element like it is thinking about clicking, then
+// vanishes as if it was never there.
+(function cursorGhost() {
+  const ghost = document.createElement("div");
+  ghost.id = "cursor-ghost";
+  document.body.appendChild(ghost);
+
+  function move() {
+    const els = Array.from(document.querySelectorAll("h1, p, span, button, a")).filter(
+      (el) => !el.dataset.corrupting
+    );
+    const target = els[Math.random() * els.length | 0];
+    if (!target) return;
+    const r = target.getBoundingClientRect();
+    const x = r.left + Math.random() * r.width;
+    const y = r.top + Math.random() * r.height;
+    ghost.style.transition = "left 0.6s cubic-bezier(0.2, 0.8, 0.3, 1), top 0.6s cubic-bezier(0.2, 0.8, 0.3, 1), opacity 0.3s";
+    ghost.style.opacity = "1";
+    ghost.style.left = x + "px";
+    ghost.style.top = y + "px";
+    // hover a beat, consider clicking, then vanish
+    setTimeout(() => {
+      ghost.style.opacity = "0";
+    }, 1200 + Math.random() * 1800);
+  }
+
+  function loop() {
+    move();
+    setTimeout(loop, 45000 + Math.random() * 30000);
+  }
+  setTimeout(loop, 25000 + Math.random() * 25000);
 })();
