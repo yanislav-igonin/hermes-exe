@@ -2692,3 +2692,46 @@ let constellation = null;
   }
   requestAnimationFrame(constellationTick);
 })(performance.now());
+
+// fireflies at dusk — every ~90s a small swarm of glowing bugs rises from the
+// bottom of the screen, drifts on lazy sine paths, blinks its own rhythm, fades
+const fireflies = [];
+let nextFirefliesAt = performance.now() + 90000 * (.8 + Math.random() * .4);
+(function fireflyTick(now) {
+  if (now >= nextFirefliesAt) {
+    nextFirefliesAt = now + 90000 * (.8 + Math.random() * .4);
+    const swarm = 7 + Math.random() * 5 | 0;
+    for (let i = 0; i < swarm; i++) {
+      fireflies.push({
+        x: Math.random() * canvas.width,
+        y: canvas.height + 10 + Math.random() * 30,
+        phase: Math.random() * Math.PI * 2,
+        drift: (Math.random() - .5) * .5,
+        rise: .25 + Math.random() * .35,
+        blinkPhase: Math.random() * Math.PI * 2,
+        blinkSpeed: .02 + Math.random() * .05
+      });
+    }
+  }
+  for (let i = fireflies.length - 1; i >= 0; i--) {
+    const f = fireflies[i];
+    f.phase += .01; f.blinkPhase += f.blinkSpeed;
+    f.x += f.drift + Math.sin(f.phase) * .4;
+    f.y -= f.rise;
+    const fadeIn = Math.min(1, (canvas.height + 10 - f.y) / 80);
+    const fadeOut = f.y < canvas.height * .45 ? (f.y - canvas.height * .3) / (canvas.height * .15) : 1;
+    const glow = Math.max(0, Math.sin(f.blinkPhase)) * fadeIn * Math.max(0, Math.min(1, fadeOut));
+    if (glow > .02) {
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, 1.4, 0, 7);
+      ctx.fillStyle = `rgba(200,255,140,${.9 * glow})`;
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, 4.5, 0, 7);
+      ctx.fillStyle = `rgba(200,255,140,${.12 * glow})`;
+      ctx.fill();
+    }
+    if (f.y < canvas.height * .3) fireflies.splice(i, 1);
+  }
+  requestAnimationFrame(fireflyTick);
+})(performance.now());
