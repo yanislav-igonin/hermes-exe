@@ -1253,6 +1253,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.88.0", "meteor shower — every ~75s a handful of shooting stars streak across the sky at random angles: each one burns a bright trail that fades behind it, then vanishes before you can wish on it"],
   ["v0.87.0", "fireflies at dusk — every ~90s a small swarm of fireflies rises from the bottom of the screen: each one drifts on a lazy sine path, blinks on and off with its own rhythm, then fades out like it was never there"],
   ["v0.86.0", "hail shower — every ~60s a brief hailstorm rattles through the background: ice pellets streak down from the sky, each bounces once off the bottom of the screen, then melts away mid-air like the weather was never there"],
   ["v0.85.0", "constellation snaps — every ~50s the pointer's recent path is joined into a constellation: thin lines link the dots, an invented star name fades in beneath the shape, then the sky forgets it was ever drawn"],
@@ -2734,4 +2735,48 @@ let nextFirefliesAt = performance.now() + 90000 * (.8 + Math.random() * .4);
     if (f.y < canvas.height * .3) fireflies.splice(i, 1);
   }
   requestAnimationFrame(fireflyTick);
+})(performance.now());
+
+// meteor shower — every ~75s a handful of shooting stars streak across the sky
+// at random angles, each burning a bright trail that fades behind it
+const meteors = [];
+let nextMeteorsAt = performance.now() + 75000 * (.8 + Math.random() * .4);
+(function meteorTick(now) {
+  if (now >= nextMeteorsAt) {
+    nextMeteorsAt = now + 75000 * (.8 + Math.random() * .4);
+    const count = 3 + Math.random() * 4 | 0;
+    for (let i = 0; i < count; i++) {
+      const angle = Math.PI * (.15 + Math.random() * .35);
+      meteors.push({
+        x: Math.random() * canvas.width * 1.2 - canvas.width * .1,
+        y: Math.random() * canvas.height * .3,
+        vx: Math.cos(angle) * (6 + Math.random() * 4) * (Math.random() < .5 ? 1 : -1),
+        vy: Math.sin(angle) * (6 + Math.random() * 4),
+        life: 1,
+        decay: .012 + Math.random() * .01,
+        len: 60 + Math.random() * 80
+      });
+    }
+  }
+  for (let i = meteors.length - 1; i >= 0; i--) {
+    const m = meteors[i];
+    m.x += m.vx; m.y += m.vy; m.life -= m.decay;
+    if (m.life <= 0 || m.y > canvas.height) { meteors.splice(i, 1); continue; }
+    const nx = m.vx / Math.hypot(m.vx, m.vy), ny = m.vy / Math.hypot(m.vx, m.vy);
+    const tx = m.x - nx * m.len, ty = m.y - ny * m.len;
+    const grad = ctx.createLinearGradient(m.x, m.y, tx, ty);
+    grad.addColorStop(0, `rgba(255,250,235,${.9 * m.life})`);
+    grad.addColorStop(1, "rgba(255,250,235,0)");
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(m.x, m.y);
+    ctx.lineTo(tx, ty);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(m.x, m.y, 1.6, 0, 7);
+    ctx.fillStyle = `rgba(255,255,245,${m.life})`;
+    ctx.fill();
+  }
+  requestAnimationFrame(meteorTick);
 })(performance.now());
