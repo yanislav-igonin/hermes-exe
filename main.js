@@ -2477,6 +2477,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.149.0", "shooting star — every ~1-2 min a meteor streaks diagonally across the upper sky with a tapering glowing trail, flares once, and vanishes like the wish was never made"],
   ["v0.148.0", "hot air balloon — every ~2-4 min a small hot air balloon with a striped canopy and a tiny basket drifts diagonally across the page on a gentle breeze, bobbing with the wind, then floats off-screen like the flight was never planned"],
   ["v0.147.0", "wandering firefly — every ~50-90s a lone firefly with a softly pulsing glow wanders across the page, pausing now and then as if it lost its way, then blinks out like it was never there"],
   ["v0.146.0", "kite on a string — every ~2-4 min a small diamond kite glides across the upper sky at the end of a swaying thread, bobbing on the wind with a fluttering tail, then tacks off-screen like the breeze was never there"],
@@ -5368,4 +5369,28 @@ addEventListener("dblclick", e => {
     setTimeout(fly, 120000 + Math.random() * 120000);
   }
   setTimeout(fly, 30000 + Math.random() * 60000);
+})();
+
+// shooting star — every ~1-2 min a meteor streaks diagonally across the upper
+// sky with a tapering glowing trail, flares once near the end of its arc, and
+// vanishes like the wish was never made
+(function shootingStar() {
+  function streak() {
+    if (!document.hidden) {
+      const el = document.createElement("div");
+      el.className = "shooting-star";
+      const fromLeft = Math.random() < .5;
+      if (!fromLeft) el.classList.add("flip");
+      const x0 = innerWidth * (.05 + Math.random() * .25);
+      const y0 = innerHeight * (.03 + Math.random() * .15);
+      el.style.setProperty("--ss-x0", x0 + "px");
+      el.style.setProperty("--ss-y0", y0 + "px");
+      const dur = 1100 + Math.random() * 600;
+      el.style.setProperty("--ss-dur", dur + "ms");
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), dur + 400);
+    }
+    setTimeout(streak, 60000 + Math.random() * 60000);
+  }
+  setTimeout(streak, 15000 + Math.random() * 25000);
 })();

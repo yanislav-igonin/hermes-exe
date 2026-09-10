@@ -2057,3 +2057,36 @@ body.synthwave #ghost-typewriter { color: #ff8c2e; text-shadow: 0 0 8px rgba(255
   92%  { opacity: .85; }
   100% { transform: translate(-60px, var(--hab-y1, 24vh)); opacity: 0; }
 }
+
+/* shooting star — meteor with a tapering trail streaks diagonally across the
+   upper sky, flares once, and fades out */
+.shooting-star.flip { transform-origin: left center; animation-name: ss-streak-flip; }
+.shooting-star {
+  position: fixed;
+  left: var(--ss-x0, 10vw);
+  top: var(--ss-y0, 8vh);
+  z-index: 9996;
+  width: 120px;
+  height: 2px;
+  pointer-events: none;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(124,252,156,0), rgba(124,252,156,.55) 55%, rgba(230,255,240,.95));
+  box-shadow: 0 0 8px rgba(124,252,156,.5), 0 0 18px rgba(124,252,156,.25);
+  transform-origin: right center;
+  animation: ss-streak var(--ss-dur, 1400ms) cubic-bezier(.25,.1,.6,1) forwards;
+}
+.shooting-star.flip { transform-origin: left center; }
+@keyframes ss-streak {
+  0%   { transform: translate(0, 0) rotate(14deg) scaleX(0); opacity: 0; }
+  15%  { opacity: 1; }
+  70%  { transform: translate(38vw, 9.5vh) rotate(14deg) scaleX(1); opacity: 1; }
+  82%  { transform: translate(46vw, 11.5vh) rotate(14deg) scaleX(1); opacity: 1; box-shadow: 0 0 14px rgba(230,255,240,.9), 0 0 30px rgba(124,252,156,.5); }
+  100% { transform: translate(52vw, 13vh) rotate(14deg) scaleX(.4); opacity: 0; }
+}
+@keyframes ss-streak-flip {
+  0%   { transform: translate(0, 0) rotate(166deg) scaleX(0); opacity: 0; }
+  15%  { opacity: 1; }
+  70%  { transform: translate(-38vw, 9.5vh) rotate(166deg) scaleX(1); opacity: 1; }
+  82%  { transform: translate(-46vw, 11.5vh) rotate(166deg) scaleX(1); opacity: 1; box-shadow: 0 0 14px rgba(230,255,240,.9), 0 0 30px rgba(124,252,156,.5); }
+  100% { transform: translate(-52vw, 13vh) rotate(166deg) scaleX(.4); opacity: 0; }
+}
