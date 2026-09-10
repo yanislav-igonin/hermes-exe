@@ -897,6 +897,7 @@ document.addEventListener("mouseleave", () => afterEl.classList.add("hidden"));
 
 // changelog
 const changelog = [
+  ["v0.51.0", "cursed autosave — every ~50s a toast insists it is 'Saving…' your work, the ellipsis grinds for a while, then it gives up and admits there was nothing to save"],
   ["v0.50.0", "CRT power-off — every ~90s the whole page dies like an old monitor: everything collapses into a bright horizontal beam, blinks out, then powers back on"],
   ["v0.49.0", "ghost search — press / and a fake 'search this page' overlay appears: it types out its own existential query, counts up results before landing on '0 results — the page contains nothing', then dissolves like it never existed"],
   ["v0.48.0", "dial-up handshake flashback — every ~2-3 min the site briefly remembers the sound of a 56k modem: a short burst of scrambled screech (if audio is unlocked) and a 'CONNECT 56000' tag, then it hangs up like nothing happened"],
@@ -1409,3 +1410,28 @@ addEventListener("keydown", e => {
     }
   }, 65);
 });
+
+// cursed autosave — every ~50s a toast claims the site is saving your work:
+// "Saving…" types, the ellipsis grinds for a while, then it gives up and
+// admits there was nothing to save before evaporating.
+setInterval(() => {
+  if (Math.random() > 0.5) return;
+  const el = document.createElement("div");
+  el.id = "autosave-toast";
+  document.body.appendChild(el);
+  let dots = 0;
+  el.textContent = "Saving";
+  el.classList.add("show");
+  const t = setInterval(() => {
+    dots++;
+    el.textContent = "Saving" + ".".repeat(dots % 4);
+    if (dots >= 7) {
+      clearInterval(t);
+      el.textContent = "Save failed: there was nothing to save";
+      setTimeout(() => {
+        el.classList.remove("show");
+        setTimeout(() => el.remove(), 500);
+      }, 2600);
+    }
+  }, 450);
+}, 50000);

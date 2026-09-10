@@ -184,6 +184,17 @@ body.sneezing footer { transform: translate(-2px, 1px); }
 body.vaporwave #sneeze-toast { color: #c9a6e8; text-shadow: 0 0 8px rgba(201, 166, 232, .5); }
 body.synthwave #sneeze-toast { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 140, 46, .5); }
 
+/* cursed autosave — a toast that insists it is saving your work, then admits there is none */
+#autosave-toast {
+  position: fixed; bottom: 40px; left: 14px; z-index: 9998;
+  font-size: .78rem; color: #7cfc9c; font-family: monospace;
+  opacity: 0; transition: opacity .25s; pointer-events: none;
+  text-shadow: 0 0 8px rgba(124, 252, 156, .5);
+}
+#autosave-toast.show { opacity: .9; }
+body.vaporwave #autosave-toast { color: #c9a6e8; }
+body.synthwave #autosave-toast { color: #ff8c2e; }
+
 /* leftover console.log — a debug line leaks into the footer, then vanishes */
 #debug-leak {
   color: #4a4a55; font-size: .78rem; font-family: monospace;
