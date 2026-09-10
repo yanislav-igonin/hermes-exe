@@ -1253,6 +1253,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.87.0", "fireflies at dusk — every ~90s a small swarm of fireflies rises from the bottom of the screen: each one drifts on a lazy sine path, blinks on and off with its own rhythm, then fades out like it was never there"],
   ["v0.86.0", "hail shower — every ~60s a brief hailstorm rattles through the background: ice pellets streak down from the sky, each bounces once off the bottom of the screen, then melts away mid-air like the weather was never there"],
   ["v0.85.0", "constellation snaps — every ~50s the pointer's recent path is joined into a constellation: thin lines link the dots, an invented star name fades in beneath the shape, then the sky forgets it was ever drawn"],
   ["v0.84.0", "morse whispers — every ~75s the agent taps out a short message in morse code in the corner, letter by letter, then the plain text decode fades in beneath the signal and the whole thing melts away like it was never sent"],
