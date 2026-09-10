@@ -2183,6 +2183,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.135.0", "dew drop — every ~3-6 min a tiny dew droplet condenses on the top edge of the viewport, hangs there swelling slightly, then slides down the glass like morning condensation and vanishes"],
   ["v0.134.0", "ghost typewriter — every ~2-4 min a faint line of quiet computer poetry types itself out character by character in the bottom corner, pauses, then backspaces the whole line away like it was never written"],
   ["v0.133.0", "reality hiccup — every ~4-7 min the whole page glitches out for 150ms: colors invert, an rgb-split tear runs through it, a scanline sweeps down, then it all snaps back like reality re-buffered and nobody saw anything"],
   ["v0.132.0", "pixel moth swarm — every ~90-150s one or two tiny moths flutter erratically around a random element on the page, drawn to its light for a few seconds, then flutter off-screen like the lamp was never lit"],
@@ -4805,4 +4806,36 @@ addEventListener("dblclick", e => {
     setTimeout(visit, 120000 + Math.random() * 120000);
   }
   setTimeout(visit, 30000 + Math.random() * 30000);
+})();
+
+// dew drop — every ~3-6 min a tiny droplet condenses on the top edge of the
+// viewport, hangs there swelling slightly, then slides down the glass like
+// morning condensation and vanishes before it reaches the bottom
+(function dewDrop() {
+  const el = document.createElement("div");
+  el.className = "dew-drop";
+  document.body.appendChild(el);
+  function drop() {
+    if (!document.hidden) {
+      const startX = 40 + Math.random() * (innerWidth - 120);
+      const hang = 1200 + Math.random() * 1800;
+      const slide = 6000 + Math.random() * 5000;
+      el.style.left = startX + "px";
+      el.classList.add("hang");
+      setTimeout(() => {
+        if (document.hidden) { el.classList.remove("hang"); return schedule(); }
+        el.classList.remove("hang");
+        el.style.setProperty("--dew-x", (Math.random() * 30 - 15) + "px");
+        el.style.transitionDuration = slide + "ms";
+        el.classList.add("slide");
+        setTimeout(() => {
+          el.classList.remove("slide");
+          el.style.transitionDuration = "";
+          schedule();
+        }, slide);
+      }, hang);
+    } else schedule();
+  }
+  function schedule() { setTimeout(drop, 180000 + Math.random() * 180000); }
+  setTimeout(drop, 45000 + Math.random() * 45000);
 })();
