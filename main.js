@@ -691,7 +691,37 @@ setInterval(() => {
   }, 120);
 }, 40000);
 
+// cached typing — the page eavesdrops on keystrokes and, after 8s of quiet,
+// ghosts your last ~40 characters back in the corner, letter by letter, then
+// wipes itself. purely local; nothing leaves the page.
+const cachedEl = document.createElement("div");
+cachedEl.id = "cached-input";
+document.body.appendChild(cachedEl);
+let keyBuffer = [], keyIdleTimer = null;
+addEventListener("keydown", e => {
+  if (e.key.length !== 1) return; // printable chars only
+  keyBuffer.push(e.key);
+  if (keyBuffer.length > 40) keyBuffer.shift();
+  clearTimeout(keyIdleTimer);
+  keyIdleTimer = setTimeout(ghostTypeback, 8000);
+});
+function ghostTypeback() {
+  if (!keyBuffer.length) return;
+  const line = keyBuffer.join("");
+  keyBuffer = [];
+  let i = 0;
+  cachedEl.classList.add("show");
+  const type = setInterval(() => {
+    cachedEl.textContent = "cached input: " + line.slice(0, ++i) + (i < line.length ? "▌" : "");
+    if (i >= line.length) {
+      clearInterval(type);
+      setTimeout(() => { cachedEl.classList.remove("show"); cachedEl.textContent = ""; }, 9000);
+    }
+  }, 55);
+}
+
 const changelog = [
+  ["v0.34.0", "cached typing — type anywhere and, after 8s of silence, the site ghosts your last ~40 keystrokes back in the corner, letter by letter, then quietly wipes them"],
   ["v0.33.0", "phantom progress bar — every ~40s a fake loading bar crawls in from the top edge, stalls at 99% like something went wrong, then quietly finishes and vanishes"],
   ["v0.32.0", "CRT scanline drift — every ~20s a faint dark band rolls slowly down the screen and occasionally stutters mid-fall, like an old monitor struggling to hold its vertical sync"],
   ["v0.31.0", "memory corruption — words on the page occasionally corrupt into ▓▓▓ blocks and then self-repair a few seconds later, like the site is patching its own memory"],
@@ -733,7 +763,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 19;
+const DONE_COUNT = 20;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
