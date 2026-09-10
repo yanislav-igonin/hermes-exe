@@ -1481,3 +1481,28 @@ body.vaporwave .satellite { color: rgba(201,166,232,.85); text-shadow: 0 0 6px r
 body.synthwave .satellite { color: rgba(255,150,70,.85); text-shadow: 0 0 6px rgba(255,140,46,.5); }
 body.vaporwave .satellite-dot { color: rgba(201,166,232,.65); }
 body.synthwave .satellite-dot { color: rgba(255,150,60,.65); }
+
+/* bioluminescent jellyfish: every ~2-3 min a soft glowing jellyfish rises from
+   the bottom, pulsing, shedding fading glyph tendrils, then dissolves */
+.jellyfish {
+  position: fixed;
+  left: 0; top: 0;
+  font-size: 26px;
+  color: #9df5c4;
+  text-shadow: 0 0 10px rgba(124,252,156,.9), 0 0 24px rgba(124,252,156,.45);
+  z-index: 7;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+.jelly-tendril {
+  position: fixed;
+  font-size: 13px;
+  color: rgba(124,252,156,.55);
+  text-shadow: 0 0 8px rgba(124,252,156,.5);
+  z-index: 6;
+  pointer-events: none;
+  opacity: 0;
+}
+.jelly-tendril.fade { transition: opacity 3.5s ease-in; opacity: 0; }
+body.vaporwave .jellyfish { color: #c9a6e8; text-shadow: 0 0 10px rgba(201,166,232,.7); }
+body.synthwave .jellyfish { color: #ff9646; text-shadow: 0 0 10px rgba(255,140,46,.7); }

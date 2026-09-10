@@ -1645,8 +1645,58 @@ addEventListener("mousemove", e => {
   setTimeout(bloom, 20000 + Math.random() * 30000);
 })();
 
+// bioluminescent jellyfish — every ~90-150s a soft glowing jellyfish rises
+// from the bottom of the page, pulses with a trailing fringe of tendrils,
+// then dissolves back into the deep like the tide was never there
+(function jellyfishDrift() {
+  const TENDRILS = "～∿⌇|";
+  function surface() {
+    const el = document.createElement("pre");
+    el.className = "jellyfish";
+    el.textContent = "🪼";
+    document.body.appendChild(el);
+    const x = 40 + Math.random() * (innerWidth - 80);
+    const y0 = innerHeight + 40;
+    const rise = 260 + Math.random() * 260; // how high it drifts before dissolving
+    const dur = 14000 + Math.random() * 7000;
+    const drift = (Math.random() - .5) * 160;
+    const start = performance.now();
+    let lastPulse = 0;
+    (function step(now) {
+      const t = (now - start) / dur;
+      if (t >= 1) {
+        el.remove();
+        setTimeout(surface, 90000 + Math.random() * 90000);
+        return;
+      }
+      const py = y0 - rise * t;
+      const px = x + drift * t + Math.sin(t * Math.PI * 2.2) * 14;
+      const bob = Math.sin(now * .004) * 5; // gentle pulse bob
+      const squeeze = 1 + Math.sin(now * .004) * .08;
+      el.style.transform =
+        `translate(${px.toFixed(1)}px, ${(py + bob).toFixed(1)}px) scale(${squeeze.toFixed(2)}, ${(2 - squeeze).toFixed(2)})`;
+      el.style.opacity = String(.85 * Math.min(1, t * 6) * (1 - Math.max(0, (t - .75) * 4)));
+      // trailing glyph tendrils shed behind it while it rises
+      if (now - lastPulse > 340) {
+        lastPulse = now;
+        const s = document.createElement("span");
+        s.className = "jelly-tendril";
+        s.textContent = TENDRILS[Math.random() * TENDRILS.length | 0];
+        s.style.left = (px + 10 + (Math.random() - .5) * 18) + "px";
+        s.style.top = (py + 30) + "px";
+        document.body.appendChild(s);
+        requestAnimationFrame(() => s.classList.add("fade"));
+        setTimeout(() => s.remove(), 4200);
+      }
+      requestAnimationFrame(step);
+    })(start);
+  }
+  setTimeout(surface, 30000 + Math.random() * 40000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.114.0", "bioluminescent jellyfish — every ~2-3 min a soft glowing jellyfish rises from the bottom of the page, pulsing as it climbs with a trailing fringe of glyph tendrils dissolving behind it, then fades back into the deep like the tide was never there"],
   ["v0.113.0", "satellite transit — every ~60-100s a tiny satellite glides slowly across the upper page, its nav light blinking, leaving a fading dotted trail of orbit dots that dissolve behind it like the orbit was never occupied"],
   ["v0.112.0", "meteor streak — every ~40-80s a meteor burns diagonally across the page, leaving a fading trail of glowing sparks that vanish behind it like it was never there"],
   ["v0.111.0", "snail mail — every ~2-4 min a snail slowly crawls along the bottom of the page, leaving a shimmering trail of tiny glyph slime drops that fade away behind it like the snail was never there"],
