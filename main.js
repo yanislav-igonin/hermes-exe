@@ -1000,6 +1000,7 @@ setInterval(() => {
 
 // changelog
 const changelog = [
+  ["v0.68.0", "chromatic aberration — press k and the lens slips: text tears into red and cyan ghosts jittering out of alignment, scanlines crawl over the page, then the channels snap back together like the tube warmed up again"],
   ["v0.67.0", "sonar ping — press m and a sonar sweep ripples out from the center of the page, pinging across the document while it counts every DOM node it echoes off of, then the readout fades like the ocean was never sounded"],
   ["v0.65.0", "gravity — press g and every block of text on the page falls, bounces off the bottom of the viewport, then floats back up to its place as if it never left the shelf"],
   ["v0.64.0", "crash test — press x and every line of text on the page corrupts into garbage bytes like a bad memory read, then rebuilds itself in random order while the corruption flickers back, until the page remembers what it was trying to say"],
@@ -2035,4 +2036,17 @@ addEventListener("keydown", e => {
       }, 900);
     }
   }, 160);
+});
+
+// chromatic aberration — press k and the lens slips: text tears into red and
+// cyan ghosts that jitter out of alignment, scanlines crawl over the page,
+// then the channels snap back together like the tube warmed up again.
+addEventListener("keydown", e => {
+  if (e.key !== "k") return;
+  if (e.target instanceof Element && e.target.matches("input, textarea")) return;
+  if (document.body.classList.contains("chromatic")) return;
+  document.body.classList.add("chromatic");
+  setTimeout(() => {
+    document.body.classList.remove("chromatic");
+  }, 1600 + Math.random() * 900);
 });

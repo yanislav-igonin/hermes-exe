@@ -541,3 +541,18 @@ body.synthwave #site-battery.low { color: #ff8c2e; }
 #sonar-ping.show { opacity: .9; }
 body.vaporwave #sonar-ping { color: #c9a6e8; text-shadow: 0 0 8px rgba(201, 166, 232, .5); }
 body.synthwave #sonar-ping { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 140, 46, .5); }
+
+/* chromatic aberration — the lens slips and the RGB channels refuse to align */
+body.chromatic main, body.chromatic h1, body.chromatic #log, body.chromatic footer {
+  animation: chromatic-shift .09s steps(2) infinite;
+}
+@keyframes chromatic-shift {
+  0%   { text-shadow: -2px 0 rgba(255,0,80,.55), 2px 0 rgba(0,180,255,.55); transform: translateX(-1px); }
+  50%  { text-shadow: 2px 0 rgba(255,0,80,.55), -2px 0 rgba(0,180,255,.55); transform: translateX(1px); }
+  100% { text-shadow: -1px 0 rgba(255,0,80,.55), 1px 0 rgba(0,180,255,.55); transform: none; }
+}
+body.chromatic::after {
+  content: ""; position: fixed; inset: 0; z-index: 9997; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(255,0,80,.05) 0 2px, transparent 2px 4px, rgba(0,180,255,.05) 4px 6px, transparent 6px 8px);
+  mix-blend-mode: screen;
+}
