@@ -1362,8 +1362,78 @@ addEventListener("mousemove", e => {
   setTimeout(seizure, 45000 + Math.random() * 30000);
 })();
 
+// firefly summit — every ~2.5 min a small swarm of glowing bugs convenes in a
+// random corner of the page: each drifts its own lazy loop while blinking off
+// rhythm, then the whole summit flashes in unison once before scattering like
+// the meeting never happened.
+(function fireflySummit() {
+  const SUMMIT = "summit-firefly";
+  function convene() {
+    const corner = Math.random() * 4 | 0;
+    const px = corner % 2 === 0 ? 70 + Math.random() * 60 : innerWidth - 70 - Math.random() * 60;
+    const py = corner < 2 ? 70 + Math.random() * 60 : innerHeight - 70 - Math.random() * 60;
+    const bugs = [];
+    const swarm = 6 + Math.random() * 5 | 0;
+    for (let i = 0; i < swarm; i++) {
+      const el = document.createElement("span");
+      el.className = SUMMIT;
+      el.style.left = "0px"; el.style.top = "0px";
+      document.body.appendChild(el);
+      const loop = 14 + Math.random() * 22; // lazy loop radius, px
+      bugs.push({
+        el, loop,
+        cx: px + (Math.random() - .5) * loop * 1.6,
+        cy: py + (Math.random() - .5) * loop * 1.6,
+        ox: px, oy: py,          // scatter heading, decided up front
+        phase: Math.random() * Math.PI * 2,
+        speed: .9 + Math.random() * .9,
+        blinkPhase: Math.random() * Math.PI * 2,
+        blinkSpeed: .03 + Math.random() * .05
+      });
+    }
+    // the meeting: ~4s of everyone mumbling at their own rhythm…
+    const start = performance.now();
+    const MUMBLE = 4000, FLASH_AT = 4200, SCATTER_AT = 5000, LIFE = 8200;
+    (function step(now) {
+      const t = now - start;
+      let unity = 0;
+      if (t > FLASH_AT) unity = Math.max(0, 1 - (t - FLASH_AT) / 700); // one shared flash
+      for (const b of bugs) {
+        if (t < SCATTER_AT) {
+          // gather: each bug orbits its own spot around the meeting point
+          b.phase += .02 * b.speed;
+          b.blinkPhase += b.blinkSpeed;
+          const gx = b.cx + Math.cos(b.phase) * b.loop;
+          const gy = b.cy + Math.sin(b.phase * 1.3) * b.loop * .8;
+          const own = Math.max(0, Math.sin(b.blinkPhase)) * (1 - unity);
+          const glow = Math.min(1, own + unity);
+          b.el.style.transform = `translate(${gx}px, ${gy}px)`;
+          b.el.style.opacity = (.25 + .65 * glow).toFixed(2);
+          if (glow > .8) b.el.classList.add("bright"); else b.el.classList.remove("bright");
+        } else {
+          // scatter: heading fixed, everyone leaves like it never happened
+          b.phase += .04;
+          b.blinkPhase += .01;
+          const s = (t - SCATTER_AT) / (LIFE - SCATTER_AT);
+          const d = s * (90 + b.loop * 4);
+          const gx = b.ox + (b.cx - b.ox) * 2 + Math.cos(b.phase) * b.loop * .5;
+          const gy = b.oy + (b.cy - b.oy) * 2 + Math.sin(b.phase) * b.loop * .4;
+          b.el.style.transform = `translate(${gx + (gx - b.ox) * .12 + (gx - b.ox) / 40 * d / 8}px, ${gy + (gy - b.oy) * .12}px)`;
+          b.el.style.opacity = Math.max(0, (1 - s) * .8).toFixed(2);
+          b.el.classList.remove("bright");
+        }
+      }
+      if (t < LIFE) requestAnimationFrame(step);
+      else { for (const b of bugs) b.el.remove(); }
+    })(start);
+    setTimeout(convene, 140000 + Math.random() * 70000);
+  }
+  setTimeout(convene, 60000 + Math.random() * 40000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.93.0", "firefly summit — every ~2.5 min a small swarm of glowing bugs convenes in a random corner of the page: each drifts its own lazy loop while blinking off rhythm, then the whole summit flashes bright in unison once before scattering outward like the meeting never happened"],
   ["v0.92.0", "broken clock — every ~90s a tiny corner clock loses its mind for a few seconds, blinking out impossible times from some other timeline (26:61, 32 oct 1983, yesterday next tuesday...), then synchronizes back to the true time and vanishes like it was never wrong at all"],
   ["v0.91.0", "ascii snail — every ~3 min a small snail crawls along the very bottom of the page at its own lazy pace, leaving a fading slime trail of glyphs behind it, then exits the far edge like it was never in a hurry at all"],
   ["v0.90.0", "ascii whale — every ~2 min a giant ascii whale surfaces at the bottom of the page, glides across it bobbing on a lazy sine while exhaling a glyph spray, then dives out of view like it was never there"],
@@ -1464,7 +1534,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 27;
+const DONE_COUNT = 28;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +

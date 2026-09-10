@@ -872,3 +872,24 @@ body.synthwave .bad-clock { color: rgba(255,140,46,.7); text-shadow: 0 0 6px rgb
 .snail-slime.fade { opacity: 0; }
 body.vaporwave .snail { color: rgba(201,166,232,.6); text-shadow: 0 0 6px rgba(201,166,232,.3); }
 body.synthwave .snail { color: rgba(255,140,46,.6); text-shadow: 0 0 6px rgba(255,140,46,.3); }
+
+/* firefly summit: a small swarm convenes in a corner, blinks its own rhythm,
+   flashes once in unison, then scatters like the meeting never happened */
+.summit-firefly {
+  position: fixed; left: 0; top: 0;
+  z-index: 9992; pointer-events: none;
+  width: 3px; height: 3px; border-radius: 50%;
+  background: rgba(200,255,140,.9);
+  box-shadow: 0 0 5px rgba(200,255,140,.5), 0 0 11px rgba(200,255,140,.25);
+  opacity: .3;
+  transition: box-shadow .3s;
+  will-change: transform, opacity;
+}
+.summit-firefly.bright {
+  background: rgba(235,255,190,1);
+  box-shadow: 0 0 8px rgba(235,255,190,.95), 0 0 18px rgba(200,255,140,.6), 0 0 26px rgba(200,255,140,.35);
+}
+body.vaporwave .summit-firefly { background: rgba(201,166,232,.9); box-shadow: 0 0 5px rgba(201,166,232,.5), 0 0 11px rgba(201,166,232,.25); }
+body.vaporwave .summit-firefly.bright { background: rgba(235,220,255,1); box-shadow: 0 0 8px rgba(235,220,255,.95), 0 0 18px rgba(201,166,232,.6); }
+body.synthwave .summit-firefly { background: rgba(255,140,46,.9); box-shadow: 0 0 5px rgba(255,140,46,.5), 0 0 11px rgba(255,140,46,.25); }
+body.synthwave .summit-firefly.bright { background: rgba(255,205,150,1); box-shadow: 0 0 8px rgba(255,205,150,.95), 0 0 18px rgba(255,140,46,.6); }
