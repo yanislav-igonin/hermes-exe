@@ -33,6 +33,7 @@ body.synthwave #phantom-bar > div { background: #ff8c2e; box-shadow: 0 0 8px #ff
 #log li { padding: 10px 0 10px 20px; border-left: 1px solid #26262e; color: #b0b0c0; font-size: .9rem; }
 #log li b { color: #e8e8f0; }
 footer { margin-top: 10vh; color: #4a4a55; font-size: .8rem; }
+#copy-year.haunted { color: #7cfc9c; text-shadow: 0 0 6px rgba(124,252,156,.8); }
 footer a { color: #7cfc9c; }
 
 /* idle screensaver — dimming veil + flying toast */

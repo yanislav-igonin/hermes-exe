@@ -842,8 +842,29 @@ setInterval(() => {
   }, 90);
 }, 70000);
 
+// copyright year poltergeist — the footer's copyright year is real, but every
+// ~90s it briefly flips to a wrong year from some other timeline (1970, 1977,
+// 3000...), blinks, then heals back to the present as if nothing happened.
+const copyYear = document.getElementById("copy-year");
+const realYear = new Date().getFullYear();
+const WRONG_YEARS = [1970, 1977, 1984, 1999, 2077, 3000, 1024];
+function renderCopyYear(y) { copyYear.textContent = y; }
+renderCopyYear(realYear);
+(function yearPoltergeist() {
+  setTimeout(() => {
+    renderCopyYear(WRONG_YEARS[Math.random() * WRONG_YEARS.length | 0]);
+    copyYear.classList.add("haunted");
+    setTimeout(() => {
+      renderCopyYear(realYear);
+      copyYear.classList.remove("haunted");
+      yearPoltergeist();
+    }, 700 + Math.random() * 900);
+  }, 60000 + Math.random() * 60000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.44.0", "copyright year poltergeist — the footer's © year occasionally flips to a wrong year from some other timeline (1970, 2077, 3000...), blinks, then heals back to the present"],
   ["v0.43.0", "breath hold — every ~60-90s the whole page freezes for a beat: every animation pauses mid-frame like the site is holding its breath, then it exhales and everything resumes as if nothing happened"],
   ["v0.42.0", "glitch flicker — every ~45-90s a handful of random glyphs on the page briefly corrupt into glitch characters (▓ ░ ▒ ▚) for a split second, then restore silently like nothing happened"],
   ["v0.41.0", "site sneezes — every ~70s the page does a tiny involuntary full-page shiver, a small 'achoo.' toast pops in the corner, then everything settles back like nothing happened"],
