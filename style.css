@@ -1763,6 +1763,61 @@ body.synthwave #ghost-typewriter { color: #ff8c2e; text-shadow: 0 0 8px rgba(255
   100% { transform: translateY(var(--el-to, 112vh)); opacity: 0; }
 }
 
+/* snail visitor — a tiny snail creeping along the bottom edge with a glowing slime trail */
+.snail {
+  position: fixed; bottom: 6px; left: 0; z-index: 9996;
+  width: 20px; height: 14px; pointer-events: none;
+  transform: translateX(var(--sn-from, -6vw)) scaleX(var(--sn-flip, 1));
+  opacity: 0;
+}
+.snail::before { /* shell */
+  content: ""; position: absolute; right: 1px; bottom: 2px;
+  width: 11px; height: 11px; border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(10, 12, 14, .9) 0 22%, transparent 24%),
+    repeating-radial-gradient(circle at 50% 50%, rgba(120, 255, 170, .55) 0 1.5px, rgba(30, 40, 34, .9) 1.5px 3px);
+  border: 1px solid rgba(120, 255, 170, .5);
+  box-shadow: 0 0 7px rgba(80, 220, 140, .45);
+  animation: snail-pulse 2.4s ease-in-out infinite;
+}
+.snail::after { /* body */
+  content: ""; position: absolute; left: 0; right: 0; bottom: 1px;
+  height: 4px; border-radius: 4px;
+  background: linear-gradient(90deg, rgba(140, 255, 190, .35), rgba(140, 255, 190, .85));
+  box-shadow: 0 0 5px rgba(120, 255, 170, .5);
+}
+.snail.crawl {
+  opacity: 1;
+  animation: snail-crawl var(--sn-dur, 28s) linear forwards;
+}
+@keyframes snail-crawl {
+  0% { transform: translateX(var(--sn-from, -6vw)) scaleX(var(--sn-flip, 1)); opacity: 0; }
+  4% { opacity: 1; }
+  96% { opacity: 1; }
+  100% { transform: translateX(var(--sn-to, 106vw)) scaleX(var(--sn-flip, 1)); opacity: 0; }
+}
+@keyframes snail-pulse {
+  0%, 100% { box-shadow: 0 0 5px rgba(80, 220, 140, .3); }
+  50% { box-shadow: 0 0 10px rgba(80, 220, 140, .6); }
+}
+.snail-trail {
+  position: fixed; bottom: 5px; left: 0; z-index: 9995;
+  height: 2px; width: 0; pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(140, 255, 190, .55));
+  box-shadow: 0 0 6px rgba(120, 255, 170, .4);
+  opacity: 0; border-radius: 2px;
+}
+.snail-trail.crawl {
+  animation: snail-trail-grow var(--sn-dur, 28s) linear forwards, snail-trail-fade 6s linear calc(var(--sn-dur, 28s)) forwards;
+}
+@keyframes snail-trail-grow {
+  0% { left: var(--sn-from, -6vw); width: 0; opacity: .8; }
+  4% { opacity: .8; }
+  96% { opacity: .8; }
+  100% { left: var(--sn-from, -6vw); width: 112vw; opacity: .8; }
+}
+@keyframes snail-trail-fade { to { opacity: 0; } }
+
 /* code rain — thin columns of glowing code glyphs sprinkling down from the top */
 .code-rain {
   position: fixed; inset: 0; z-index: 9995;

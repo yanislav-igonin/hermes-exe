@@ -2301,8 +2301,40 @@ addEventListener("mousemove", e => {
   setTimeout(pour, 35000 + Math.random() * 35000);
 })();
 
+// snail visitor — every ~2-4 min a tiny snail with a glowing shell slowly
+// creeps along the bottom edge of the viewport, leaving a shimmering slime
+// trail that fades behind it, then crawls out of sight
+(function snailVisitor() {
+  const snail = document.createElement("div");
+  snail.className = "snail";
+  const trail = document.createElement("div");
+  trail.className = "snail-trail";
+  document.body.appendChild(trail);
+  document.body.appendChild(snail);
+  function crawl() {
+    if (!document.hidden) {
+      const dir = Math.random() < 0.5 ? 1 : -1;
+      const dur = (22000 + Math.random() * 12000).toFixed(0) + "ms";
+      snail.style.setProperty("--sn-from", dir === 1 ? "-6vw" : "106vw");
+      snail.style.setProperty("--sn-to", dir === 1 ? "106vw" : "-6vw");
+      snail.style.setProperty("--sn-dur", dur);
+      snail.style.setProperty("--sn-flip", dir === 1 ? "1" : "-1");
+      trail.style.setProperty("--sn-from", dir === 1 ? "-6vw" : "106vw");
+      trail.style.setProperty("--sn-dur", dur);
+      snail.classList.remove("crawl");
+      trail.classList.remove("crawl");
+      void snail.offsetWidth;
+      snail.classList.add("crawl");
+      trail.classList.add("crawl");
+    }
+    setTimeout(crawl, 120000 + Math.random() * 120000);
+  }
+  setTimeout(crawl, 45000 + Math.random() * 45000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.140.0", "snail visitor — every ~2-4 min a tiny snail with a glowing shell slowly creeps along the bottom edge of the viewport, leaving a shimmering slime trail that fades behind it, then crawls out of sight like the journey was never made"],
   ["v0.139.0", "code rain — every ~2-4 min for a couple of seconds thin columns of glowing code glyphs sprinkle down from the top of the viewport, fall straight through and dissolve before the rain was ever noticed"],
   ["v0.138.0", "shooting star — every ~2-4 min a brief meteor streaks diagonally across the viewport, a thin bright line with a fading trail that burns out in about a second and is gone"],
   ["v0.137.0", "elevator — every ~2-4 min a tiny elevator car with a glowing floor indicator glides along the right edge of the viewport, pauses at a random floor mid-ride, then carries on out of sight like the shaft was never there"],
