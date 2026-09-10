@@ -2107,8 +2107,83 @@ addEventListener("mousemove", e => {
   setTimeout(streak, 45000 + Math.random() * 60000);
 })();
 
+// garden snail — every ~3-6 min a tiny snail crosses the bottom of the page
+// at a glacial pace, leaving a slowly fading slime trail behind it, antennae
+// twitching as it goes, then vanishes like the garden was never crossed
+(function gardenSnail() {
+  const snail = document.createElement("div");
+  snail.style.cssText = "position:fixed;z-index:3;bottom:0;left:0;pointer-events:none;will-change:transform;opacity:0;transition:opacity 3s ease-in-out;";
+  snail.innerHTML =
+    '<svg width="58" height="34" viewBox="0 0 58 34" style="display:block">' +
+      // slime trail is drawn as separate fixed divs behind the snail
+      '<g fill="rgba(8,14,10,.92)">' +
+        // shell — a spiral-ish blob with a highlight
+        '<path d="M14 30 A 14 12 0 1 1 41 30 Q 27 34 14 30 Z" fill="rgba(150,110,80,.9)"/>' +
+        '<path d="M20 27 A 8 7 0 1 1 35 27 Q 27 30 20 27 Z" fill="rgba(100,70,50,.85)"/>' +
+        '<circle cx="27" cy="24" r="2.2" fill="rgba(150,110,80,.9)"/>' +
+        // body — low profile foot poking out ahead of the shell
+        '<path d="M8 33 Q 8 27 16 27 L 48 27 Q 55 27 55 31 L 55 33 Z" fill="rgba(8,14,10,.92)"/>' +
+        // tentacles (animated via CSS transform on their own group)
+        '<g id="snail-tentacles">' +
+          '<line x1="49" y1="28" x2="52" y2="19" stroke="rgba(8,14,10,.92)" stroke-width="1.6" stroke-linecap="round"/>' +
+          '<line x1="53" y1="28" x2="57" y2="20" stroke="rgba(8,14,10,.92)" stroke-width="1.6" stroke-linecap="round"/>' +
+        '</g>' +
+      '</g>' +
+    '</svg>';
+  document.body.appendChild(snail);
+  const tentacles = snail.querySelector("#snail-tentacles");
+  const trailDivs = [];
+
+  function spawnTrailDot(x, y) {
+    const dot = document.createElement("div");
+    const size = 3 + Math.random() * 3;
+    dot.style.cssText =
+      "position:fixed;z-index:2;pointer-events:none;border-radius:50%;" +
+      "width:" + size + "px;height:" + size + "px;" +
+      "left:" + (x - size / 2) + "px;top:" + (y - size / 2) + "px;" +
+      "background:rgba(160,220,180,.28);opacity:.8;" +
+      "transition:opacity " + (6000 + Math.random() * 4000) + "ms linear, transform " + (6000 + Math.random() * 4000) + "ms linear;";
+    document.body.appendChild(dot);
+    requestAnimationFrame(() => {
+      dot.style.opacity = "0";
+      dot.style.transform = "scale(.3)";
+    });
+    trailDivs.push(dot);
+    setTimeout(() => dot.remove(), 12000);
+  }
+
+  function crawl() {
+    const dir = Math.random() < .5 ? 1 : -1;
+    const scale = .8 + Math.random() * .4;
+    const y0 = innerHeight - 34 * scale - 2;
+    let x = dir > 0 ? -80 : innerWidth + 80;
+    const target = dir > 0 ? innerWidth + 80 : -80;
+    snail.style.opacity = "1";
+    let lastDot = 0;
+
+    (function step(now) {
+      // glacial pace: ~18-30 px/s
+      x += dir * (0.018 + Math.random() * 0.005) * 16;
+      const bob = Math.sin(now / 300) * 0.8; // nearly imperceptible
+      snail.style.transform =
+        "translate(" + x + "px," + (y0 + bob) + "px) scaleX(" + (dir * scale) + ") scaleY(" + scale + ")";
+      // antennae twitch slowly
+      tentacles.setAttribute("transform", "rotate(" + (Math.sin(now / 700) * 7) + " 50 28)");
+      // drop a slime dot every ~90px
+      if (now - lastDot > 4500) { lastDot = now; spawnTrailDot(x + 20 * dir, y0 + 32 * scale); }
+      if ((dir > 0 && x < target) || (dir < 0 && x > target)) requestAnimationFrame(step);
+      else {
+        snail.style.opacity = "0";
+        setTimeout(crawl, 180000 + Math.random() * 180000);
+      }
+    })(performance.now());
+  }
+  setTimeout(crawl, 60000 + Math.random() * 60000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.131.0", "garden snail — every ~3-6 min a tiny snail crosses the bottom of the page at a glacial pace, leaving a slowly fading slime trail behind it, antennae twitching as it goes, then vanishes like the garden was never crossed"],
   ["v0.130.0", "pollen counter — every ~2-4 min a tiny readout surfaces in the corner reporting the local pollen count in grains/m³, recalculated from thin air each time, then drifts away like the allergy season was never measured"],
   ["v0.129.0", "page hiccup — every ~60-100s the page involuntarily hiccups: a few tiny jumps with a small \"hic\" toast in the corner, then everything settles like the spasm never happened"],
   ["v0.128.0", "shooting star — every ~2-4 min a bright meteor streaks diagonally across the upper sky with a sparkling tail, burns out mid-flight like the wish was never made, and fades back into the noise"],
