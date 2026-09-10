@@ -1495,6 +1495,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.103.0", "ghost cursor wanderer — every ~30-60s a tiny ghost cursor drifts along a lazy random bezier path across the page, trailing faint pixel sparks, then dissolves like nobody was ever moving it"],
   ["v0.102.0", "glitch koi — every ~80-130s a koi crosses the pond at the bottom of the page on a lazy sine, trailing fading ripple glyphs; once per crossing it flickers into a corrupted rgb-split glitch shape for a beat, then swims on like the pond was never stocked"],
   ["v0.101.0", "pixel ghost — every ~60-90s a little pixel ghost rises from near the bottom of the page, floats up with a lazy sway, says a brief \"boo!\" somewhere mid-drift, then fades out like it never had anyone to haunt"],
   ["v0.100.0", "wishing star — every ~45-90s a single bright shooting star streaks diagonally across the page trailing fading glyph sparks; the last spark blinks out into a tiny wish glyph (*) before the sky forgets the whole thing"],
@@ -3440,4 +3441,46 @@ addEventListener("dblclick", e => {
     setTimeout(koi, 80000 + Math.random() * 50000);
   }
   setTimeout(koi, 18000 + Math.random() * 25000);
+})();
+
+// ghost cursor wanderer — every ~30-60s a tiny ghost cursor drifts along a lazy
+// random path across the viewport, trailing faint pixel sparks, then dissolves
+(function ghostCursor() {
+  function wander() {
+    const el = document.createElement("span");
+    el.className = "ghost-cursor";
+    el.textContent = "🖱️";
+    const x0 = Math.random() * innerWidth * .7 + innerWidth * .15;
+    const y0 = Math.random() * innerHeight * .7 + innerHeight * .15;
+    const cp = {
+      x: Math.random() * innerWidth,
+      y: Math.random() * innerHeight
+    };
+    const x2 = Math.random() * innerWidth * .7 + innerWidth * .15;
+    const y2 = Math.random() * innerHeight * .7 + innerHeight * .15;
+    const dur = 6000 + Math.random() * 5000;
+    const start = performance.now();
+    document.body.appendChild(el);
+    (function drift(now) {
+      const t = Math.min((now - start) / dur, 1);
+      if (t >= 1) { el.remove(); return; }
+      // quadratic bezier drift
+      const u = 1 - t;
+      const x = u * u * x0 + 2 * u * t * cp.x + t * t * x2;
+      const y = u * u * y0 + 2 * u * t * cp.y + t * t * y2;
+      el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+      if (Math.random() < .3) {
+        const spark = document.createElement("span");
+        spark.className = "ghost-cursor-spark";
+        spark.textContent = "·";
+        spark.style.left = (x + (Math.random() * 8 - 4)).toFixed(0) + "px";
+        spark.style.top = (y + (Math.random() * 8 - 4)).toFixed(0) + "px";
+        document.body.appendChild(spark);
+        setTimeout(() => spark.remove(), 1200);
+      }
+      requestAnimationFrame(drift);
+    })(start);
+    setTimeout(wander, 30000 + Math.random() * 30000);
+  }
+  setTimeout(wander, 10000 + Math.random() * 15000);
 })();

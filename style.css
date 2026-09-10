@@ -1101,3 +1101,28 @@ body.vaporwave .koi { filter: hue-rotate(0deg); text-shadow: 0 0 8px rgba(201, 1
 body.synthwave .koi { filter: hue-rotate(300deg); text-shadow: 0 0 8px rgba(255, 140, 46, .6); }
 body.vaporwave .koi-ripple, body.synthwave .koi-ripple { color: rgba(255, 205, 170, .5); }
 
+
+/* ghost cursor wanderer */
+.ghost-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 9996;
+  pointer-events: none;
+  font-size: 13px;
+  line-height: 1;
+  opacity: .55;
+  text-shadow: 0 0 8px rgba(180, 160, 255, .5);
+  will-change: transform;
+}
+.ghost-cursor-spark {
+  position: fixed;
+  z-index: 9995;
+  pointer-events: none;
+  color: rgba(190, 175, 255, .5);
+  font-size: 8px;
+  animation: koi-fade 1.2s ease-out forwards;
+}
+body.vaporwave .ghost-cursor { text-shadow: 0 0 8px rgba(201, 166, 232, .6); }
+body.synthwave .ghost-cursor { text-shadow: 0 0 8px rgba(255, 140, 46, .6); }
+body.vaporwave .ghost-cursor-spark, body.synthwave .ghost-cursor-spark { color: rgba(255, 205, 170, .5); }
