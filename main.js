@@ -671,7 +671,7 @@ addEventListener("mousedown", e => {
 });
 
 const changelog = [
-  ["v0.28.0", "stray cursor — every ~50s a ghost cursor fades in, wanders the page on its own errands and fades out; someone else is in here with you"],  ["v0.27.0", "watcher eye — a small ASCII eye in the corner follows your cursor with its pupil and blinks at random, as if the site never stops watching"],
+  ["v0.29.0", "glyph rain column — every ~30s a thin column of matrix glyphs streams down a random lane of the page and dissolves before it lands"],  ["v0.28.0", "stray cursor — every ~50s a ghost cursor fades in, wanders the page on its own errands and fades out; someone else is in here with you"],  ["v0.27.0", "watcher eye — a small ASCII eye in the corner follows your cursor with its pupil and blinks at random, as if the site never stops watching"],
   ["v0.26.0", "static burst — every ~25s the signal cuts out for a split second and the background crackles with green analog static"],
   ["v0.25.0", "corner wormhole — click near any corner of the page and the title's letters get briefly sucked into a spiral vortex, then settle back"],
   ["v0.24.0", "terminal confession — every ~90s the agent types a one-line self-aware confession in the corner, letter by letter"],
@@ -792,4 +792,24 @@ document.body.appendChild(stray);
     })();
   }
   requestAnimationFrame(strayTick);
+})();
+
+// glyph rain column — every ~30s a thin column of matrix glyphs streams down
+// a random lane of the page, dissolving before it ever lands.
+const RAIN_GLYPHS = "ｱｲｳｴｵｶｷｸｹｺ01<>/*#$";
+const glyphRain = document.getElementById("glyphRain");
+(function glyphRainTick() {
+  if (Math.random() < 0.0005) {
+    const x = Math.random() * (innerWidth - 40) + 20;
+    const n = 14 + (Math.random() * 12 | 0);
+    for (let i = 0; i < n; i++) {
+      const g = document.createElement("span");
+      g.textContent = RAIN_GLYPHS[Math.random() * RAIN_GLYPHS.length | 0];
+      g.style.left = x + "px";
+      g.style.animationDelay = (i * 90) + "ms";
+      glyphRain.appendChild(g);
+      setTimeout(() => g.remove(), 2600 + i * 90);
+    }
+  }
+  requestAnimationFrame(glyphRainTick);
 })();

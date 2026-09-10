@@ -142,3 +142,18 @@ body.synthwave #confession { color: #d8a4b8; }
   transition: opacity .8s;
 }
 #strayCursor.alive { opacity: .55; }
+
+/* glyph rain column */
+#glyphRain { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
+#glyphRain span {
+  position: absolute; top: -24px;
+  font: 16px monospace; color: #0f0;
+  text-shadow: 0 0 8px #0f0;
+  animation: glyphFall 2.4s linear forwards;
+}
+@keyframes glyphFall {
+  0%   { transform: translateY(0);      opacity: 0; }
+  8%   { opacity: .8; }
+  70%  { opacity: .5; }
+  100% { transform: translateY(105vh);  opacity: 0; }
+}
