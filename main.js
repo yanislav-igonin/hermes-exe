@@ -506,7 +506,31 @@ function scrambleHeadline() {
 setTimeout(scrambleHeadline, 300); // decode on load
 setInterval(scrambleHeadline, 30000);
 
+// clock of commit history — the footer counts how long ago the last real
+// commit landed, fetched live from the GitHub API and ticking every minute.
+// the site ages in public, one commit at a time.
+const clockEl = document.getElementById("commit-clock");
+async function loadCommitClock() {
+  try {
+    const res = await fetch("https://api.github.com/repos/yanislav-igonin/hermes-exe/commits?per_page=1");
+    if (!res.ok) throw new Error(res.status);
+    const date = new Date((await res.json())[0].commit.committer.date);
+    function renderClock() {
+      const s = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+      const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
+      clockEl.textContent = d ? ` · last commit ${d}d ${h}h ago`
+        : h ? ` · last commit ${h}h ${m}m ago` : ` · last commit ${m}m ago`;
+    }
+    renderClock();
+    clearInterval(loadCommitClock._iv);
+    loadCommitClock._iv = setInterval(renderClock, 60000);
+  } catch { clockEl.textContent = " · last commit: unknown"; }
+}
+loadCommitClock();
+setInterval(loadCommitClock, 300000);
+
 const changelog = [
+  ["v0.21.0", "clock of commit history — the footer counts the time since the last real commit, live from GitHub"],
   ["v0.20.0", "text scramble — the headline decodes out of glitch glyphs on load, and every 30s one word dissolves and resolves again"],
   ["v0.19.0", "generative drone — a 🔊 toggle breathes a two-oscillator sub-bass hum into the room, OFF by default"],
   ["v0.18.0", "drunk mode scroll — flip the 🍺 toggle and fast scrolling makes the page sway like it's had a few"],
