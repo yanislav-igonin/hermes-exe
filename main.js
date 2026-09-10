@@ -1552,8 +1552,34 @@ addEventListener("mousemove", e => {
   setTimeout(show, 15000 + Math.random() * 25000);
 })();
 
+// eclipse umbra — every ~2-3 min a soft dark umbra sweeps diagonally across
+// the page behind a bright corona ring at its leading edge; the light dims for
+// a moment, then returns like nothing was ever occluded
+(function eclipseUmbra() {
+  const umbra = document.createElement("div");
+  umbra.className = "eclipse-umbra";
+  umbra.innerHTML = `<div class="eclipse-corona"></div>`;
+  document.body.appendChild(umbra);
+  function sweep() {
+    const dur = 5200 + Math.random() * 2200;
+    const fromTopLeft = Math.random() < .5;
+    umbra.style.setProperty("--ecl-dur", dur.toFixed(0) + "ms");
+    umbra.classList.toggle("ecl-rev", !fromTopLeft);
+    umbra.classList.add("ecl-on");
+    // the site flinches: particles glow harder under the shadow
+    const flare = setInterval(() => {
+      for (const p of pts) p.r = Math.min(3.2, p.r + .06);
+    }, 90);
+    setTimeout(() => clearInterval(flare), dur * .7);
+    setTimeout(() => umbra.classList.remove("ecl-on"), dur);
+    setTimeout(sweep, 120000 + Math.random() * 60000);
+  }
+  setTimeout(sweep, 45000 + Math.random() * 45000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.106.0", "eclipse umbra — every ~2-3 min a soft dark umbra sweeps diagonally across the page, carrying a bright ring of corona at its leading edge; the light dims while it passes, the particles flare like lanterns in the shadow, then the sun returns as if nothing was ever occluded"],
   ["v0.105.0", "aurora ribbon — every ~40-80s a soft green band of light unfurls across the top of the page, undulating on layered sine waves and occasionally flaring brighter, then dissolving back into the dark like the sky was never lit"],
   ["v0.104.0", "sigil snowfall — every ~45-90s a brief chaotic gust shakes loose a flurry of tiny hermes sigils that falls diagonally across the page, melting on impact with the bottom edge like they were never typed"],
   ["v0.103.0", "ghost cursor wanderer — every ~30-60s a tiny ghost cursor drifts along a lazy random bezier path across the page, trailing faint pixel sparks, then dissolves like nobody was ever moving it"],

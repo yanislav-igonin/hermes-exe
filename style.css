@@ -1183,3 +1183,66 @@ body.synthwave .sigil-flake { color: rgba(255, 205, 150, .65); text-shadow: 0 0 
   55%  { transform: rotate(calc(var(--aurora-tilt, 0deg) * .8)) translateY(-2%) scaleY(.85); filter: blur(14px) brightness(1.5); }
   100% { transform: rotate(calc(var(--aurora-tilt, 0deg) * -.6)) translateY(1%) scaleY(1.1); }
 }
+
+/* eclipse umbra — a soft shadow sweeps diagonally with a bright corona ring */
+.eclipse-umbra {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9991;
+  opacity: 0;
+}
+.eclipse-umbra::before {
+  /* the umbra itself: a huge soft dark disc traveling off-screen */
+  content: "";
+  position: absolute;
+  left: -80%;
+  top: -80%;
+  width: 110%;
+  height: 110%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, rgba(2, 8, 4, .82) 0%, rgba(2, 8, 4, .55) 55%, rgba(2, 8, 4, 0) 78%);
+  will-change: transform;
+}
+.eclipse-umbra.eclipse-on {
+  opacity: 1;
+  animation: ecl-sweep var(--ecl-dur, 6000ms) ease-in-out forwards;
+}
+.eclipse-umbra.ecl-rev.eclipse-on { animation-name: ecl-sweep-rev; }
+@keyframes ecl-sweep {
+  0%   { transform: translate(0, 0); }
+  100% { transform: translate(180%, 120%); }
+}
+@keyframes ecl-sweep-rev {
+  0%   { transform: translate(-180%, 0); }
+  100% { transform: translate(0, 120%); }
+}
+.eclipse-corona {
+  /* the bright ring riding at the shadow's leading edge */
+  position: absolute;
+  left: -40%;
+  top: -40%;
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(circle, transparent 58%, rgba(124, 252, 156, .16) 66%, rgba(220, 255, 230, .28) 70%, transparent 77%);
+  filter: blur(6px);
+  will-change: transform, opacity;
+}
+.eclipse-umbra.eclipse-on .eclipse-corona {
+  animation: ecl-corona var(--ecl-dur, 6000ms) ease-in-out forwards;
+}
+@keyframes ecl-corona {
+  0%   { opacity: 0; transform: translate(0, 0) scale(.8); }
+  35%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(212%, 158%) scale(1.15); }
+}
+.eclipse-umbra.ecl-rev.eclipse-on .eclipse-corona { animation-name: ecl-corona-rev; }
+@keyframes ecl-corona-rev {
+  0%   { opacity: 0; transform: translate(-212%, 0) scale(.8); }
+  35%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(0, 158%) scale(1.15); }
+}
+body.vaporwave .eclipse-corona { background: radial-gradient(circle, transparent 58%, rgba(201, 166, 232, .2) 66%, rgba(255, 220, 250, .3) 70%, transparent 77%); }
+body.synthwave .eclipse-corona { background: radial-gradient(circle, transparent 58%, rgba(255, 140, 46, .2) 66%, rgba(255, 220, 170, .3) 70%, transparent 77%); }
