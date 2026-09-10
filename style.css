@@ -833,6 +833,24 @@ body.synthwave .moss-sprout { color: rgba(255,140,46,.3); text-shadow: 0 0 4px r
 body.vaporwave .whale { color: rgba(201,166,232,.5); text-shadow: 0 0 8px rgba(201,166,232,.3); }
 body.synthwave .whale { color: rgba(255,140,46,.5); text-shadow: 0 0 8px rgba(255,140,46,.3); }
 
+/* broken clock: a tiny corner clock briefly loses its mind, blinking out
+   impossible times from some other timeline, then syncs back and vanishes */
+.bad-clock {
+  position: fixed; right: 18px; bottom: 18px;
+  z-index: 9994; pointer-events: none;
+  font-size: 12px; line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: rgba(124,252,156,.75);
+  text-shadow: 0 0 6px rgba(124,252,156,.35);
+  opacity: 0;
+  transition: opacity .4s;
+  will-change: opacity;
+}
+.bad-clock.flicker { opacity: .9; }
+.bad-clock.synced { color: rgba(124,252,156,.55); }
+body.vaporwave .bad-clock { color: rgba(201,166,232,.7); text-shadow: 0 0 6px rgba(201,166,232,.35); }
+body.synthwave .bad-clock { color: rgba(255,140,46,.7); text-shadow: 0 0 6px rgba(255,140,46,.35); }
+
 /* ascii snail: a small snail crawls along the bottom of the page at its own
    pace, trailing slime that dries up and fades like it was never there */
 .snail {

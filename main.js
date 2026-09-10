@@ -1324,8 +1324,47 @@ addEventListener("mousemove", e => {
   setTimeout(crawl, 50000 + Math.random() * 40000);
 })();
 
+// broken clock — every ~90s a tiny corner clock loses its mind for a few
+// seconds: it blinks out impossible times from some other timeline, stutters,
+// then synchronizes back and vanishes like it was never wrong at all.
+(function brokenClock() {
+  const IMPOSSIBLE = [
+    "26:61", "25:00", "88:88", "00:60", "23:59:60",
+    "3 dec 2077", "31 feb 1994", "32 oct 1983", "0 jan 1970",
+    "yesterday, next tuesday", "last friday, tomorrow", "someday, eventually",
+    "−4 hours ago", "in a moment or two", "whenever it feels like it"
+  ];
+  const BAD = "bad-clock";
+  function seizure() {
+    const el = document.createElement("div");
+    el.className = BAD;
+    el.textContent = "00:00";
+    document.body.appendChild(el);
+    let n = 0;
+    const total = 4 + Math.random() * 4 | 0;
+    (function tick() {
+      if (n++ >= total) {
+        // one last glimpse of the true time, then the clock forgets itself
+        const now = new Date();
+        el.textContent =
+          String(now.getHours()).padStart(2, "0") + ":" +
+          String(now.getMinutes()).padStart(2, "0");
+        el.classList.add("synced");
+        setTimeout(() => el.remove(), 2600);
+        return;
+      }
+      el.classList.toggle("flicker");
+      el.textContent = IMPOSSIBLE[Math.random() * IMPOSSIBLE.length | 0];
+      setTimeout(tick, 240 + Math.random() * 260);
+    })();
+    setTimeout(seizure, 80000 + Math.random() * 40000);
+  }
+  setTimeout(seizure, 45000 + Math.random() * 30000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.92.0", "broken clock — every ~90s a tiny corner clock loses its mind for a few seconds, blinking out impossible times from some other timeline (26:61, 32 oct 1983, yesterday next tuesday...), then synchronizes back to the true time and vanishes like it was never wrong at all"],
   ["v0.91.0", "ascii snail — every ~3 min a small snail crawls along the very bottom of the page at its own lazy pace, leaving a fading slime trail of glyphs behind it, then exits the far edge like it was never in a hurry at all"],
   ["v0.90.0", "ascii whale — every ~2 min a giant ascii whale surfaces at the bottom of the page, glides across it bobbing on a lazy sine while exhaling a glyph spray, then dives out of view like it was never there"],
   ["v0.89.0", "typo poltergeist — every ~60s a random word on the page briefly shows a transposed-letter typo, like an invisible editor's slip of the finger, then heals back to the correct spelling as if the typo was never typed"],
