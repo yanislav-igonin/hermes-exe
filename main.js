@@ -2477,6 +2477,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.155.0", "pigeon visitor — every ~1-3 min a small pixel pigeon flutters down onto the top edge of the page, bobs its head and pecks at nothing a couple of times, then takes off again like the visit was never made"],
   ["v0.154.0", "meteor streak — every ~30-90s a shooting star crosses the top of the page, a glowing point dragging a fading comet tail, burning out mid-flight like it was never there"],
   ["v0.153.0", "streetlamp flicker — every ~1-2 min a random element on the page flickers like a dying streetlamp, dipping and sputtering a couple of times, then glows steady again like the bulb was never dying"],
   ["v0.152.0", "garden snail — every ~2-4 min a tiny snail with a spiraled shell slowly creeps along the bottom edge of the page, antennae twitching, leaving a fading slime trail behind it, then slides off-screen like the commute was never made"],
@@ -5535,4 +5536,51 @@ addEventListener("dblclick", e => {
     setTimeout(streak, 30000 + Math.random() * 60000);
   }
   setTimeout(streak, 12000 + Math.random() * 20000);
+})();
+
+// pigeon visitor — every ~1-3 min a small pixel pigeon flutters down onto the
+// top edge of the page, bobs its head and pecks at nothing a couple of times,
+// then takes off again like the visit was never made
+(function pigeonVisitor() {
+  const frames = ["🕊", "🕊️", " bird", " bird"];
+  function visit() {
+    if (!document.hidden) {
+      const el = document.createElement("div");
+      el.className = "pigeon";
+      el.textContent = frames[0];
+      const x = innerWidth * (0.08 + Math.random() * 0.8);
+      el.style.left = x + "px";
+      document.body.appendChild(el);
+      // descend
+      el.style.transform = "translateY(-40px)";
+      el.style.transition = "transform 900ms ease-in";
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        el.style.transform = "translateY(0)";
+      }));
+      setTimeout(() => {
+        el.classList.add("flap");
+        // bob and peck a couple of times
+        let pecks = 2 + (Math.random() * 3 | 0);
+        const peck = () => {
+          el.style.transform = "translateY(2px) scaleY(.85)";
+          setTimeout(() => {
+            el.style.transform = "translateY(0) scaleY(1)";
+            if (--pecks > 0) setTimeout(peck, 500 + Math.random() * 600);
+            else {
+              el.classList.remove("flap");
+              // take off
+              el.style.transition = "transform 1200ms ease-out, opacity 1200ms ease-in";
+              const dx = (Math.random() < .5 ? -1 : 1) * (60 + Math.random() * 120);
+              el.style.transform = "translate(" + dx + "px,-60px)";
+              el.style.opacity = "0";
+              setTimeout(() => el.remove(), 1300);
+            }
+          }, 220);
+        };
+        setTimeout(peck, 700);
+      }, 900);
+    }
+    setTimeout(visit, 60000 + Math.random() * 120000);
+  }
+  setTimeout(visit, 15000 + Math.random() * 25000);
 })();

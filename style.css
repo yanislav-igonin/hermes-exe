@@ -2335,3 +2335,24 @@ body.page-lean-return {
   70%  { opacity: 1; }
   100% { transform: rotate(14deg) translateX(var(--mdx)); opacity: 0; }
 }
+
+/* pigeon visitor: every so often a small pixel pigeon flutters down onto the
+   top edge of the page, bobs and pecks at nothing, then takes off again */
+.pigeon {
+  position: fixed;
+  z-index: 9993;
+  pointer-events: none;
+  font-size: 13px;
+  line-height: 1;
+  color: rgba(124,252,156,.65);
+  text-shadow: 0 0 6px rgba(124,252,156,.3);
+  will-change: transform;
+}
+.pigeon.flap { animation: pigeon-flap .3s steps(2) infinite; }
+@keyframes pigeon-flap {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+  100% { transform: translateY(0); }
+}
+body.vaporwave .pigeon { color: rgba(201,166,232,.6); text-shadow: 0 0 6px rgba(201,166,232,.3); }
+body.synthwave .pigeon { color: rgba(255,140,46,.6); text-shadow: 0 0 6px rgba(255,140,46,.3); }
