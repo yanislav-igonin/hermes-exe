@@ -2464,3 +2464,53 @@ body.synthwave .firefly { background: rgba(255,196,140,.95); box-shadow: 0 0 8px
   100% { opacity: 0; transform: translate(var(--bx), var(--by)) rotate(180deg); }
 }
 .balloon { position: fixed; z-index: 4; pointer-events: none; will-change: transform; opacity: .9; filter: drop-shadow(0 2px 3px rgba(0,0,0,.4)); }
+.moth {
+  position: fixed;
+  width: 10px;
+  height: 8px;
+  z-index: 4;
+  pointer-events: none;
+  will-change: transform;
+}
+.moth::before, .moth::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 5px;
+  height: 7px;
+  border-radius: 50% 50% 40% 40%;
+  background: rgba(190, 160, 120, .55);
+  transform-origin: 50% 100%;
+  animation: moth-flap .12s ease-in-out infinite alternate;
+}
+.moth::before { left: 0; }
+.moth::after { right: 0; }
+.moth-body {
+  position: absolute;
+  left: 2.5px;
+  top: 1px;
+  width: 5px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(120, 95, 65, .8);
+}
+@keyframes moth-flap {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(70deg); }
+}
+.moth-lamp {
+  position: fixed;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 18px 10px rgba(255, 230, 150, .35), 0 0 60px 30px rgba(255, 230, 150, .12);
+  z-index: 3;
+  pointer-events: none;
+  animation: moth-lamp-flicker 2s ease-in-out infinite;
+}
+@keyframes moth-lamp-flicker {
+  0%, 100% { opacity: 1; }
+  45% { opacity: .7; }
+  50% { opacity: .95; }
+  70% { opacity: .6; }
+}

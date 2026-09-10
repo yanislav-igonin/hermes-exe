@@ -2532,6 +2532,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.161.0", "phantom moth lamp — every ~2-4 min a faint lamp glow flickers to life at a random spot on the page, one or two tiny moths flutter erratically around it for a few seconds, then the lamp goes out and the moths scatter like the light was never on"],
   ["v0.160.0", "balloon — every ~2-4 min a tiny red balloon on a string drifts up from the bottom of the page, swaying gently as it rises, then slips off the top edge like it was never let go"],
   ["v0.159.0", "tumbleweed — every ~2-4 min a scraggly tumbleweed tumbles across the bottom of the page, bouncing off the ground and shedding tiny twig bits as it goes, then rolls off-screen like the prairie was never there"],
   ["v0.158.0", "rubber duck — every ~2-4 min a tiny yellow rubber duck paddles along the bottom of the page, bobbing gently, says a quiet \"quack.\" mid-swim, then drifts off-screen like the bug was never explained to it"],
@@ -5765,4 +5766,58 @@ addEventListener("dblclick", e => {
     setTimeout(drift, 120000 + Math.random() * 120000);
   };
   setTimeout(drift, 15000 + Math.random() * 20000);
+})();
+
+// moths around a phantom lamp — every ~2-4 min a faint lamp glow flickers into
+// being at a random spot on the page, one or two tiny moths flutter erratically
+// around it for a few seconds, then the lamp goes out and the moths scatter
+// off-screen like the light was never on
+(function mothLamp() {
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  function spawn() {
+    if (!document.hidden) {
+      const x = 80 + Math.random() * (innerWidth - 160);
+      const y = 60 + Math.random() * (innerHeight - 200);
+      const lamp = document.createElement("div");
+      lamp.className = "moth-lamp";
+      lamp.style.left = x + "px";
+      lamp.style.top = y + "px";
+      document.body.appendChild(lamp);
+      const mothCount = 1 + (Math.random() < 0.5 ? 1 : 0);
+      const moths = [];
+      for (let i = 0; i < mothCount; i++) {
+        const moth = document.createElement("div");
+        moth.className = "moth";
+        moth.innerHTML = "<span class='moth-body'></span>";
+        moth.style.left = x + "px";
+        moth.style.top = y + "px";
+        moth._phase = Math.random() * Math.PI * 2;
+        moth._r = 18 + Math.random() * 22;
+        document.body.appendChild(moth);
+        moths.push(moth);
+      }
+      const start = performance.now();
+      const life = 6000 + Math.random() * 4000;
+      (function orbit(now) {
+        const t = (now - start) / 1000;
+        if (t > life / 1000) {
+          moths.forEach(m => m.remove());
+          lamp.remove();
+          return;
+        }
+        moths.forEach((moth, i) => {
+          // erratic flutter: fast jitter around a slow-wandering orbit
+          const wobble = Math.sin(t * 7 + moth._phase) * 8 + Math.sin(t * 13 + i * 2) * 4;
+          const ang = t * (1.5 + i * 0.4) + moth._phase;
+          const mx = x + Math.cos(ang) * (moth._r + wobble);
+          const my = y + Math.sin(ang * 1.3) * (moth._r * 0.6 + wobble);
+          const flap = 1 + Math.sin(t * 9 + moth._phase) * 0.15;
+          moth.style.transform = `translate(${mx.toFixed(1)}px, ${my.toFixed(1)}px) rotate(${(Math.cos(ang) * 25).toFixed(0)}deg) scale(${flap.toFixed(2)}, 1)`;
+        });
+        requestAnimationFrame(orbit);
+      })(start);
+    }
+    setTimeout(spawn, 120000 + Math.random() * 120000);
+  }
+  setTimeout(spawn, 30000 + Math.random() * 40000);
 })();
