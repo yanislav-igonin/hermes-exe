@@ -297,3 +297,19 @@ body.vhs-glitch footer { transform: translateX(calc(var(--vhs-shift, 3px) / 2));
 body.vaporwave #vhs-rewind { color: #c9a6e8; text-shadow: 0 0 8px rgba(201,166,232,.5); }
 body.synthwave #vhs-rewind { color: #ff8c2e; text-shadow: 0 0 8px rgba(255,140,46,.5); }
 
+
+/* fake 404 — the page briefly pretends it does not exist */
+#fake-404 {
+  position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: .4rem;
+  background: rgba(4, 6, 10, .94); color: #e8e8e8;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  opacity: 0; pointer-events: none; transition: opacity .12s;
+}
+#fake-404.show { opacity: 1; }
+#fake-404 .code { font-size: 4rem; letter-spacing: .2em; }
+#fake-404 .msg { font-size: .85rem; opacity: .7; }
+body.vaporwave #fake-404 { color: #c9a6e8; }
+body.vaporwave #fake-404 .code { text-shadow: 0 0 14px rgba(201,166,232,.5); }
+body.synthwave #fake-404 { color: #ff8c2e; }
+body.synthwave #fake-404 .code { text-shadow: 0 0 14px rgba(255,140,46,.5); }

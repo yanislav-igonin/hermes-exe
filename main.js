@@ -864,6 +864,7 @@ renderCopyYear(realYear);
 
 // changelog
 const changelog = [
+  ["v0.46.0", "fake 404 — every ~70s the page briefly claims it does not exist: a stark '404 / page not found' overlay flashes over everything, then dissolves and the site carries on as if it had never doubted itself"],
   ["v0.45.0", "vhs rewind — every ~80s the whole page hits a 'tracking error': rgb-split frames and jitter like an old tape scrambling, a '◄◄ REW' tag flashes in the corner, then the picture snaps back clean like the tape was never damaged"],
   ["v0.44.0", "copyright year poltergeist — the footer's © year occasionally flips to a wrong year from some other timeline (1970, 2077, 3000...), blinks, then heals back to the present"],
   ["v0.43.0", "breath hold — every ~60-90s the whole page freezes for a beat: every animation pauses mid-frame like the site is holding its breath, then it exhales and everything resumes as if nothing happened"],
@@ -917,7 +918,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 20;
+const DONE_COUNT = 21;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
@@ -1265,4 +1266,22 @@ const glyphRain = document.getElementById("glyphRain");
     setTimeout(loop, 80000 + Math.random() * 40000);
   }
   setTimeout(loop, 50000 + Math.random() * 30000);
+})();
+
+// fake 404 — every ~70s the page briefly claims it does not exist: a stark
+// "404 / page not found" overlay flashes over everything, then dissolves and
+// the site carries on as if it had never doubted itself.
+(function fake404() {
+  const el = document.createElement("div");
+  el.id = "fake-404";
+  el.innerHTML = '<div class="code">404</div><div class="msg">page not found</div>';
+  document.body.appendChild(el);
+  function loop() {
+    el.classList.add("show");
+    setTimeout(() => {
+      el.classList.remove("show");
+      setTimeout(loop, 70000 + Math.random() * 30000);
+    }, 900 + Math.random() * 700);
+  }
+  setTimeout(loop, 45000 + Math.random() * 25000);
 })();
