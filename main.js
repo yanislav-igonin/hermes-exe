@@ -897,6 +897,7 @@ document.addEventListener("mouseleave", () => afterEl.classList.add("hidden"));
 
 // changelog
 const changelog = [
+  ["v0.57.0", "glitch key — press g and the whole page rgb-splits and tears for a moment while a corner readout dumps random corrupted memory fragments, then everything reassembles like nothing was ever broken"],
   ["v0.56.0", "self-diagnostics scan — press x and a corner readout runs a fake system check: stats count up with ASCII bars, one of them suddenly crashes to 0% with a FAULT flag, panics, recovers, then the whole report fades out like nothing was ever diagnosed"],
   ["v0.55.0", "fortune decoder — press f and a corner readout types out a hex-stamped machine fortune: coordinates, an entropy byte, then a dubious prophecy, before fading out like nothing was ever foretold"],
   ["v0.54.0", "self-verifying captcha — every ~90s a toast demands you prove you are human; its checkbox ticks itself off, it thinks about it, then it fails you anyway for being too human"],
@@ -1594,4 +1595,39 @@ addEventListener("keydown", e => {
       }, 2800);
     }
   }, 38);
+});
+
+// glitch key — press g and the whole page rgb-splits and tears for a
+// moment while a corner readout dumps random corrupted memory fragments,
+// then everything reassembles itself like nothing was ever broken.
+addEventListener("keydown", e => {
+  if (e.key !== "g") return;
+  if (e.target instanceof Element && e.target.matches("input, textarea")) return;
+  if (document.getElementById("glitch-readout")) return;
+  const el = document.createElement("div");
+  el.id = "glitch-readout";
+  document.body.appendChild(el);
+  el.classList.add("show");
+  const junk = () => String.fromCharCode(0x30a0 + Math.random() * 96 | 0);
+  const addr = () => "0x" + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, "0").toUpperCase();
+  let frame = 0;
+  const total = 14 + Math.floor(Math.random() * 8);
+  const t = setInterval(() => {
+    frame++;
+    const shift = (Math.random() * 10 - 5).toFixed(1) + "px";
+    const skew = (Math.random() * 2 - 1).toFixed(2) + "deg";
+    document.body.style.setProperty("--rgb-shift", shift);
+    document.body.style.setProperty("--rgb-skew", skew);
+    document.body.classList.toggle("rgb-glitch", frame <= total);
+    el.textContent = "MEM DUMP " + addr() + "\n" +
+      Array.from({ length: 4 }, () => addr() + "  " + Array.from({ length: 8 }, junk).join(" ")).join("\n");
+    if (frame >= total) {
+      clearInterval(t);
+      document.body.classList.remove("rgb-glitch");
+      setTimeout(() => {
+        el.classList.remove("show");
+        setTimeout(() => el.remove(), 400);
+      }, 900);
+    }
+  }, 60);
 });

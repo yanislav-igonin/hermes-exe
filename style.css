@@ -433,6 +433,26 @@ body.synthwave #ghost-search { color: #ff8c2e; border-color: rgba(255,140,46,.4)
 body.vaporwave #diag { color: #c9a6e8; text-shadow: 0 0 8px rgba(201, 166, 232, .5); }
 body.synthwave #diag { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 140, 46, .5); }
 
+/* glitch key — press g and the page rgb-splits and tears for a moment */
+body.rgb-glitch main, body.rgb-glitch .status {
+  text-shadow: 3px 0 rgba(255,0,90,.6), -3px 0 rgba(0,255,255,.5);
+  transform: translateX(calc(var(--rgb-shift, 4px) * -1)) skewX(calc(var(--rgb-skew, 0deg)));
+}
+body.rgb-glitch #bg {
+  filter: drop-shadow(4px 0 rgba(255,0,90,.5)) drop-shadow(-4px 0 rgba(0,255,255,.4));
+  transform: translateX(var(--rgb-shift, 4px));
+}
+body.rgb-glitch footer { transform: translateX(calc(var(--rgb-shift, 4px) / 2)); }
+#glitch-readout {
+  position: fixed; bottom: 90px; left: 14px; z-index: 9998;
+  max-width: 300px; font: 11px/1.5 monospace; white-space: pre;
+  color: #ff5aa0; text-shadow: 0 0 8px rgba(255,90,160,.5);
+  opacity: 0; transition: opacity .3s; pointer-events: none;
+}
+#glitch-readout.show { opacity: .9; }
+body.vaporwave #glitch-readout { color: #c9a6e8; text-shadow: 0 0 8px rgba(201,166,232,.5); }
+body.synthwave #glitch-readout { color: #ff8c2e; text-shadow: 0 0 8px rgba(255,140,46,.5); }
+
 /* fortune decoder — press f and a corner terminal types out a prophecy */
 #fortune {
   position: fixed; bottom: 14px; right: 14px; z-index: 9998;
