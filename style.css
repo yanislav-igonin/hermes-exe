@@ -691,3 +691,22 @@ body.synthwave .waterfall-drop { color: #ff8c2e; text-shadow: 0 0 5px rgba(255,1
   image-rendering: pixelated;
   mix-blend-mode: screen;
 }
+
+/* the click ink spill: a rare click knocks over an inkwell — ascii blots
+   spill out of the click point, spread out and evaporate like the ink
+   was never spilled */
+.ink-blot {
+  position: fixed; z-index: 9993; pointer-events: none;
+  color: #d9f7b2;
+  text-shadow: 0 0 6px rgba(217,247,178,.5);
+  opacity: 0;
+  animation: ink-spread var(--idur, 3s) ease-out forwards;
+}
+@keyframes ink-spread {
+  0% { opacity: 0; transform: translate(0, 0) scale(.4); }
+  12% { opacity: .85; }
+  70% { opacity: .55; }
+  100% { opacity: 0; transform: translate(var(--ix, 40px), var(--iy, 40px)) scale(1.3); }
+}
+body.vaporwave .ink-blot { color: #c9a6e8; text-shadow: 0 0 6px rgba(201,166,232,.5); }
+body.synthwave .ink-blot { color: #ff8c2e; text-shadow: 0 0 6px rgba(255,140,46,.5); }

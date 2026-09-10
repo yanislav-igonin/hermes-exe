@@ -1141,6 +1141,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.77.0", "click ink spill — once in a while a click knocks over an inkwell: ascii blots spill out of the click point, spread across the page in random directions, then evaporate like the ink was never spilled"],
   ["v0.76.0", "static burst — every ~55s the signal briefly breaks into a frame of tv static, random monochrome pixels hissing across the screen for a split second before the picture snaps back clean like the interference was never tuned in"],
   ["v0.75.0", "waterfall glyphs — every ~50s a cascade of ascii glyphs pours out of a random spot near the top of the page, streams down in overlapping columns and evaporates before it can puddle, like the site briefly sprang a leak"],
   ["v0.74.0", "crt block cursor — a chunky fake cursor built from block glyphs trails your real one with lag, jitters like a tired tube, and randomly flickers between shapes so it never settles into the same cursor twice"],
@@ -1225,7 +1226,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 24;
+const DONE_COUNT = 25;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
@@ -2339,6 +2340,37 @@ addEventListener("click", e => {
     }, STATIC_DURATION);
   };
   setInterval(() => {
-    if (Math.random() < 1 / 3) burst();
+  if (Math.random() < 1 / 3) burst();
   }, STATIC_INTERVAL);
-})();
+  })();
+
+  // click ink spill — once in a while a click knocks over an inkwell: ascii
+  // blots spill out of the click point, spread across the page in random
+  // directions, then evaporate like the ink was never spilled
+  let inkT = 0;
+  addEventListener("click", e => {
+  const now = performance.now();
+  if (now - inkT < 8000 || Math.random() > 1 / 14) return;
+  inkT = now;
+  const blots = ["●", "◉", "◍", "▪", "◆", "▓"];
+  const drops = [];
+  const count = 6 + (Math.random() * 5 | 0);
+  for (let i = 0; i < count; i++) {
+  const el = document.createElement("span");
+  el.className = "ink-blot";
+  el.textContent = blots[Math.random() * blots.length | 0];
+  const ang = Math.random() * Math.PI * 2;
+  const dist = 20 + Math.random() * 140;
+  el.style.left = e.clientX + "px";
+  el.style.top = e.clientY + "px";
+  el.style.fontSize = (8 + Math.random() * 16).toFixed(0) + "px";
+  el.style.setProperty("--ix", (Math.cos(ang) * dist).toFixed(0) + "px");
+  el.style.setProperty("--iy", (Math.sin(ang) * dist).toFixed(0) + "px");
+  el.style.setProperty("--idur", (2.2 + Math.random() * 1.8).toFixed(2) + "s");
+  el.style.animationDelay = (Math.random() * 250).toFixed(0) + "ms";
+  document.body.appendChild(el);
+  drops.push(el);
+  }
+  const longest = 4300;
+  setTimeout(() => drops.forEach(d => d.remove()), longest);
+  });
