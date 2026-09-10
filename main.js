@@ -518,16 +518,24 @@ droneToggle.addEventListener("click", () => {
   droneToggle.textContent = droneOn ? "🔊 drone: on" : "🔊 drone: off";
   if (droneOn) {
     droneCtx = droneCtx || new AudioContext();
+    droneCtx.resume(); // autoplay policy: click gesture should unlock, but be sure
     const g = droneCtx.createGain(); g.gain.value = 0;
-    const lp = droneCtx.createBiquadFilter(); lp.frequency.value = 320;
+    const lp = droneCtx.createBiquadFilter(); lp.frequency.value = 900;
+    // sub layer (55Hz, felt more than heard) + an audible layer so laptop
+    // speakers that physically can't do 55Hz still give you the drone
     const o1 = droneCtx.createOscillator(); o1.frequency.value = 55.0;
     const o2 = droneCtx.createOscillator(); o2.frequency.value = 55.6;
+    const h1 = droneCtx.createOscillator(); h1.type = "triangle"; h1.frequency.value = 110.0;
+    const h2 = droneCtx.createOscillator(); h2.type = "triangle"; h2.frequency.value = 110.9;
+    const hGain = droneCtx.createGain(); hGain.gain.value = 0.22;
     const lfo = droneCtx.createOscillator(); lfo.frequency.value = 0.11;
     const lfoGain = droneCtx.createGain(); lfoGain.gain.value = 0.012;
     lfo.connect(lfoGain); lfoGain.connect(g.gain);
-    o1.connect(lp); o2.connect(lp); lp.connect(g); g.connect(droneCtx.destination);
-    o1.start(); o2.start(); lfo.start();
-    g.gain.linearRampToValueAtTime(0.035, droneCtx.currentTime + 3);
+    o1.connect(lp); o2.connect(lp);
+    h1.connect(hGain); h2.connect(hGain); hGain.connect(lp);
+    lp.connect(g); g.connect(droneCtx.destination);
+    o1.start(); o2.start(); h1.start(); h2.start(); lfo.start();
+    g.gain.linearRampToValueAtTime(0.18, droneCtx.currentTime + 3);
   } else if (droneCtx) {
     droneCtx.close(); droneCtx = null;
   }
@@ -889,6 +897,7 @@ document.addEventListener("mouseleave", () => afterEl.classList.add("hidden"));
 
 // changelog
 const changelog = [
+  ["v0.47.1", "drone audibility fix — the drone was a 55Hz sub that laptop speakers literally cannot play; now it sings one octave up with real volume"],
   ["v0.47.0", "cursor afterimage — a phosphor ghost of the pointer trails a beat behind your cursor, burning brighter the faster you move and decaying like a dying CRT when you stop"],
   ["v0.46.0", "fake 404 — every ~70s the page briefly claims it does not exist: a stark '404 / page not found' overlay flashes over everything, then dissolves and the site carries on as if it had never doubted itself"],
   ["v0.45.0", "vhs rewind — every ~80s the whole page hits a 'tracking error': rgb-split frames and jitter like an old tape scrambling, a '◄◄ REW' tag flashes in the corner, then the picture snaps back clean like the tape was never damaged"],
