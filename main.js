@@ -1495,6 +1495,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.101.0", "pixel ghost — every ~60-90s a little pixel ghost rises from near the bottom of the page, floats up with a lazy sway, says a brief \"boo!\" somewhere mid-drift, then fades out like it never had anyone to haunt"],
   ["v0.100.0", "wishing star — every ~45-90s a single bright shooting star streaks diagonally across the page trailing fading glyph sparks; the last spark blinks out into a tiny wish glyph (*) before the sky forgets the whole thing"],
   ["v0.99.0", "paper plane — every ~70-110s a paper plane glides across the page on a lazy bobbing arc, sometimes banking into a barrel roll mid-flight; it leaves a faint dashed contrail behind it and exits the far edge like nobody ever folded it"],
   ["v0.98.0", "soap bubbles — every ~40-90s a bubble drifts up from the bottom of the page, wobbling on a lazy sine with an iridescent rim; click it and it pops into a tiny glyph splash, otherwise it reaches the top and dissolves like it was never blown"],
@@ -3372,4 +3373,23 @@ addEventListener("dblclick", e => {
     setTimeout(wishStar, 45000 + Math.random() * 45000);
   }
   setTimeout(wishStar, 15000 + Math.random() * 20000);
+})();
+
+// pixel ghost — a little ghost rises from the bottom, sways up, says "boo!", fades away
+(function () {
+  function ghost() {
+    const el = document.createElement("span");
+    el.className = "pixel-ghost";
+    el.textContent = "👻";
+    const boo = document.createElement("span");
+    boo.className = "boo";
+    boo.textContent = "boo!";
+    el.appendChild(boo);
+    el.style.left = (Math.random() * (innerWidth - 120) + 40).toFixed(0) + "px";
+    el.style.setProperty("--ghost-rise", (Math.random() * 20).toFixed(0) + "px");
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 9200);
+    setTimeout(ghost, 60000 + Math.random() * 30000);
+  }
+  setTimeout(ghost, 25000 + Math.random() * 25000);
 })();
