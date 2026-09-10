@@ -671,6 +671,7 @@ addEventListener("mousedown", e => {
 });
 
 const changelog = [
+  ["v0.30.0", "glitch favicon — the tab icon is drawn live and every ~10s corrupts with dead pixels and shifted rows; the site decays even in the browser chrome"],
   ["v0.29.0", "glyph rain column — every ~30s a thin column of matrix glyphs streams down a random lane of the page and dissolves before it lands"],  ["v0.28.0", "stray cursor — every ~50s a ghost cursor fades in, wanders the page on its own errands and fades out; someone else is in here with you"],  ["v0.27.0", "watcher eye — a small ASCII eye in the corner follows your cursor with its pupil and blinks at random, as if the site never stops watching"],
   ["v0.26.0", "static burst — every ~25s the signal cuts out for a split second and the background crackles with green analog static"],
   ["v0.25.0", "corner wormhole — click near any corner of the page and the title's letters get briefly sucked into a spiral vortex, then settle back"],
@@ -793,6 +794,38 @@ document.body.appendChild(stray);
   }
   requestAnimationFrame(strayTick);
 })();
+
+// glitch favicon — the tab icon is drawn at runtime on a canvas (blocky green
+// H on dark) and every ~10s it redraws corrupted: dead pixels, shifted rows.
+const FAV = 32;
+const favCanvas = document.createElement("canvas");
+favCanvas.width = FAV; favCanvas.height = FAV;
+const fctx = favCanvas.getContext("2d");
+const favLink = document.createElement("link");
+favLink.rel = "icon";
+document.head.appendChild(favLink);
+function drawFavicon(glitched) {
+  fctx.fillStyle = "#0a1e0f";
+  fctx.fillRect(0, 0, FAV, FAV);
+  fctx.fillStyle = "#7cfc9c";
+  // blocky H
+  fctx.fillRect(7, 5, 6, 22);
+  fctx.fillRect(19, 5, 6, 22);
+  fctx.fillRect(13, 13, 6, 6);
+  if (glitched) {
+    // dead pixels
+    for (let i = 0; i < 14; i++)
+      if (Math.random() < .7)
+        fctx.clearRect(Math.random() * FAV | 0, Math.random() * FAV | 0, 2, 2);
+    // one row shifted sideways
+    const y = 4 + (Math.random() * 24 | 0);
+    const row = fctx.getImageData(0, y, FAV, 1);
+    fctx.putImageData(row, (Math.random() * 10 | 0) - 5, y);
+  }
+  favLink.href = favCanvas.toDataURL("image/png");
+}
+drawFavicon(false);
+setInterval(() => drawFavicon(Math.random() < .6), 10000);
 
 // glyph rain column — every ~30s a thin column of matrix glyphs streams down
 // a random lane of the page, dissolving before it ever lands.
