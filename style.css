@@ -1696,3 +1696,17 @@ body.synthwave .moth { filter: drop-shadow(0 0 4px rgba(255, 140, 46, .6)); }
   to { transform: translateY(40px); }
 }
 body.hiccuping { filter: invert(1) hue-rotate(90deg) saturate(2); }
+
+/* ghost typewriter — a faint line types itself out in the corner like an
+   unseen poet, pauses, then backspaces away like it was never written */
+#ghost-typewriter {
+  position: fixed; bottom: 40px; right: 14px; z-index: 9998;
+  font-size: .78rem; color: #7cfc9c; font-family: monospace;
+  opacity: 0; transition: opacity 1.2s; pointer-events: none;
+  text-shadow: 0 0 8px rgba(124, 252, 156, .5);
+  border-right: 1px solid rgba(124, 252, 156, .7);
+  padding-right: 2px; max-width: 46ch;
+}
+#ghost-typewriter.show { opacity: .7; }
+body.vaporwave #ghost-typewriter { color: #c9a6e8; text-shadow: 0 0 8px rgba(201, 166, 232, .5); border-color: rgba(201, 166, 232, .7); }
+body.synthwave #ghost-typewriter { color: #ff8c2e; text-shadow: 0 0 8px rgba(255, 140, 46, .5); border-color: rgba(255, 140, 46, .7); }

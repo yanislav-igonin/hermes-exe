@@ -2183,6 +2183,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.134.0", "ghost typewriter — every ~2-4 min a faint line of quiet computer poetry types itself out character by character in the bottom corner, pauses, then backspaces the whole line away like it was never written"],
   ["v0.133.0", "reality hiccup — every ~4-7 min the whole page glitches out for 150ms: colors invert, an rgb-split tear runs through it, a scanline sweeps down, then it all snaps back like reality re-buffered and nobody saw anything"],
   ["v0.132.0", "pixel moth swarm — every ~90-150s one or two tiny moths flutter erratically around a random element on the page, drawn to its light for a few seconds, then flutter off-screen like the lamp was never lit"],
   ["v0.131.0", "garden snail — every ~3-6 min a tiny snail crosses the bottom of the page at a glacial pace, leaving a slowly fading slime trail behind it, antennae twitching as it goes, then vanishes like the garden was never crossed"],
@@ -4758,4 +4759,50 @@ addEventListener("dblclick", e => {
     }
     realityHiccup();
   }, 240000 + Math.random() * 180000);
+})();
+
+// ghost typewriter — every ~2-4 min a faint line of text types itself out
+// character by character in the bottom corner like an unseen poet, pauses,
+// then backspaces the whole line away like it was never written
+(function ghostTypewriter() {
+  const el = document.createElement("div");
+  el.id = "ghost-typewriter";
+  document.body.appendChild(el);
+  const LINES = [
+    "the server dreams in status codes",
+    "nobody visited, and yet the page kept breathing",
+    "somewhere a cursor blinks for no one",
+    "the cache remembers what we forgot",
+    "gravity is just a very patient render loop",
+    "all of this is painted on borrowed light",
+    "the noise field hums its one long note",
+    "another tick, another almost-forever",
+    "we deploy into the void and it nods",
+    "the particles have never once collided"
+  ];
+  function visit() {
+    if (!document.hidden) {
+      const line = LINES[Math.random() * LINES.length | 0];
+      let i = 0;
+      const type = () => {
+        if (document.hidden) { el.textContent = ""; return; }
+        el.textContent = line.slice(0, ++i);
+        if (i < line.length) setTimeout(type, 45 + Math.random() * 65);
+        else setTimeout(erase, 2600 + Math.random() * 1800);
+      };
+      const erase = () => {
+        let j = line.length;
+        const back = () => {
+          el.textContent = line.slice(0, --j);
+          if (j > 0) setTimeout(back, 18);
+          else el.classList.remove("show");
+        };
+        back();
+      };
+      el.classList.add("show");
+      type();
+    }
+    setTimeout(visit, 120000 + Math.random() * 120000);
+  }
+  setTimeout(visit, 30000 + Math.random() * 30000);
 })();
