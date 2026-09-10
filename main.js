@@ -998,8 +998,35 @@ setInterval(() => {
   }
 }, 4000);
 
+// rgb-split flicker — every ~60s a random block on the page briefly tears
+// into red/cyan channel ghosts that jitter out of alignment, then snaps back
+// into focus like the tube never slipped
+(function rgbSplitFlicker() {
+  function flick() {
+    const els = [...document.querySelectorAll("h1, .tagline, .status, #log li, #wotd, footer")]
+      .filter(el => el.textContent.trim() && !el.dataset.rgbSplitting);
+    const el = els[Math.random() * els.length | 0];
+    if (el) {
+      el.dataset.rgbSplitting = "1";
+      el.classList.add("rgb-split");
+      const jitter = setInterval(() => {
+        el.style.setProperty("--rs-x", ((Math.random() * 6 - 3) | 0) + "px");
+      }, 60);
+      setTimeout(() => {
+        clearInterval(jitter);
+        el.classList.remove("rgb-split");
+        el.style.removeProperty("--rs-x");
+        delete el.dataset.rgbSplitting;
+      }, 400 + Math.random() * 400);
+    }
+    setTimeout(flick, 45000 + Math.random() * 45000);
+  }
+  setTimeout(flick, 25000 + Math.random() * 30000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.72.0", "rgb-split flicker — every ~60s a random block on the page briefly tears into red and cyan channel ghosts that jitter out of alignment, then snaps back into focus like the tube never slipped"],
   ["v0.71.0", "click storm — once in a while a click startles a small flock of ascii birds out of the click point, they scatter across the screen flapping their glyphs with a lazy drift, then vanish mid-flight like the flock was never there"],
   ["v0.70.0", "cursor footprints — as you move the mouse the cursor leaves small paired paw prints that alternate left and right along your path and point where you are heading, each one fading out a couple of seconds later like the animal was never there"],
   ["v0.69.0", "wandering eyes — every ~45s a pair of eyes fades in at a random spot on the page and the pupils follow your cursor wherever it goes, they blink a few times, then fade out like nothing was ever watching"],

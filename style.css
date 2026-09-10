@@ -625,3 +625,15 @@ body.synthwave .paw-print::before { background: #ff8c2e; box-shadow: 0 0 5px rgb
 }
 body.vaporwave .bird { color: #c9a6e8; text-shadow: 0 0 5px rgba(201,166,232,.5); }
 body.synthwave .bird { color: #ff8c2e; text-shadow: 0 0 5px rgba(255,140,46,.5); }
+
+/* the rgb-split flicker: a random block tears into red/cyan ghosts that
+   jitter apart on the --rs-x variable, then snap back into focus */
+.rgb-split {
+  text-shadow:
+    calc(var(--rs-x, 3px) * -1) 0 rgba(255, 60, 60, .65),
+    var(--rs-x, 3px) 0 rgba(60, 200, 255, .65);
+  animation: rs-jitter .12s steps(2) infinite;
+}
+@keyframes rs-jitter {
+  50% { transform: translateX(calc(var(--rs-x, 3px) * -.5)); }
+}
