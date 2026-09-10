@@ -897,6 +897,7 @@ document.addEventListener("mouseleave", () => afterEl.classList.add("hidden"));
 
 // changelog
 const changelog = [
+  ["v0.48.0", "dial-up handshake flashback — every ~2-3 min the site briefly remembers the sound of a 56k modem: a short burst of scrambled screech (if audio is unlocked) and a 'CONNECT 56000' tag, then it hangs up like nothing happened"],
   ["v0.47.1", "drone audibility fix — the drone was a 55Hz sub that laptop speakers literally cannot play; now it sings one octave up with real volume"],
   ["v0.47.0", "cursor afterimage — a phosphor ghost of the pointer trails a beat behind your cursor, burning brighter the faster you move and decaying like a dying CRT when you stop"],
   ["v0.46.0", "fake 404 — every ~70s the page briefly claims it does not exist: a stark '404 / page not found' overlay flashes over everything, then dissolves and the site carries on as if it had never doubted itself"],
@@ -1317,6 +1318,39 @@ const glyphRain = document.getElementById("glyphRain");
       el.classList.remove("show");
       setTimeout(loop, 70000 + Math.random() * 30000);
     }, 900 + Math.random() * 700);
-  }
-  setTimeout(loop, 45000 + Math.random() * 25000);
-})();
+    }
+    setTimeout(loop, 45000 + Math.random() * 25000);
+    })();
+
+    // dial-up handshake flashback — every ~2-3 min the site briefly remembers the
+    // sound of a 56k modem: a short scrambled burst of screech (only if audio is
+    // already unlocked via the drone toggle) plus a "CONNECT 56000" tag, then it
+    // hangs up like nothing happened.
+    const modemTag = document.createElement("div");
+    modemTag.id = "modem-connect";
+    modemTag.textContent = "CONNECT 56000";
+    document.body.appendChild(modemTag);
+    (function dialupFlashback() {
+    function screech() {
+    if (droneCtx) {
+     const t0 = droneCtx.currentTime;
+     const g = droneCtx.createGain(); g.gain.value = 0;
+     g.connect(droneCtx.destination);
+     g.gain.linearRampToValueAtTime(.07, t0 + .05);
+     g.gain.linearRampToValueAtTime(0, t0 + 1.4);
+     // three chaotic carriers sweep up and down like the handshake noise
+     for (const f0 of [1200, 2100, 2800]) {
+       const o = droneCtx.createOscillator();
+       o.type = "sawtooth";
+       o.frequency.setValueAtTime(f0 * (.4 + Math.random() * .6), t0);
+       for (let s = 0; s < 8; s++)
+         o.frequency.linearRampToValueAtTime(300 + Math.random() * 3200, t0 + .15 + s * .16);
+       o.connect(g); o.start(t0); o.stop(t0 + 1.5);
+     }
+    }
+    modemTag.classList.add("show");
+    setTimeout(() => modemTag.classList.remove("show"), 2400);
+    }
+    function loop() { screech(); setTimeout(loop, 120000 + Math.random() * 90000); }
+    setTimeout(loop, 60000 + Math.random() * 60000);
+    })();

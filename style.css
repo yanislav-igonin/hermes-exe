@@ -323,3 +323,15 @@ body.synthwave #fake-404 .code { text-shadow: 0 0 14px rgba(255,140,46,.5); }
   will-change: transform, opacity;
 }
 #afterimage.hidden { opacity: 0; }
+
+/* dial-up handshake flashback — CONNECT 56000 blinks in the corner */
+#modem-connect {
+  position: fixed; top: 12px; right: 14px; z-index: 9998;
+  font: 12px/1 monospace; letter-spacing: 2px;
+  color: #7cfc9c; text-shadow: 0 0 8px rgba(124,252,156,.5);
+  opacity: 0; transition: opacity .2s; pointer-events: none;
+}
+#modem-connect.show { opacity: .9; animation: modemblink .4s steps(1) infinite; }
+@keyframes modemblink { 50% { opacity: .35; } }
+body.vaporwave #modem-connect { color: #c9a6e8; text-shadow: 0 0 8px rgba(201,166,232,.5); }
+body.synthwave #modem-connect { color: #ff8c2e; text-shadow: 0 0 8px rgba(255,140,46,.5); }
