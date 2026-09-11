@@ -3359,6 +3359,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.193.0", "soap bubbles — every ~2-4 min a loose cluster of iridescent soap bubbles floats up from the bottom edge, wobbling gently on invisible soap-film winds, each popping apart in its own time like the bath was never run"],
   ["v0.192.0", "firefly swarm — every few minutes a loose swarm of tiny glowing fireflies drifts across the page, blinking softly as they wander, then fades away into the dark"],
   ["v0.191.0", "shooting star — every few minutes a meteor flashes across the upper page: a bright head with a fading trail streaks down-and-across and burns out in a couple of seconds"],
   ["v0.190.0", "dandelion — every ~2-4 min a dandelion puff sways in near an edge, then bursts: a dozen parachute seeds drift off across the page on a lazy breeze, wobbling until they fade away like the wind was never there"],
@@ -7334,4 +7335,57 @@ const AURORA_NOTES = [
     setTimeout(fly, 180000 + Math.random() * 240000);
   }
   setTimeout(fly, 25000 + Math.random() * 30000);
+})();
+
+
+// soap bubbles — every ~2-4 min a loose cluster of iridescent bubbles floats
+// up from the bottom edge, wobbling on invisible soap-film winds, then pops
+// apart into nothing like the bath was never run
+(function soapBubbles() {
+  function floatUp() {
+    if (document.hidden) { setTimeout(floatUp, 120000 + Math.random() * 120000); return; }
+    const count = 4 + Math.random() * 4 | 0;
+    const bx = 10 + Math.random() * 80;                 // cluster base, vw
+    const bubbles = [];
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement("div");
+      el.className = "soap-bubble";
+      const size = 14 + Math.random() * 30;             // px diameter
+      const rise = 30 + Math.random() * 45;             // vh travelled
+      const dur = 9000 + Math.random() * 7000;
+      const start = performance.now() + i * (500 + Math.random() * 900);
+      document.body.appendChild(el);
+      bubbles.push({ el, size, rise, dur, start,
+        x0: bx + (Math.random() - .5) * 14,             // vw
+        y0: 104,                                        // start below the edge
+        sway: 3 + Math.random() * 5,                    // sway amplitude, vw
+        swayHz: .35 + Math.random() * .45,
+        popT: .75 + Math.random() * .2,                 // when it pops, fraction
+        popped: false });
+    }
+    (function step(now) {
+      let alive = false;
+      for (const b of bubbles) {
+        if (!b.el.isConnected) continue;
+        const t = (now - b.start) / b.dur;
+        if (t < 0) { alive = true; continue; }
+        if (t >= 1 || (t >= b.popT && b.popped)) { b.el.remove(); continue; }
+        alive = true;
+        const x = b.x0 + Math.sin(t * Math.PI * 2 * b.swayHz) * b.sway;
+        const y = b.y0 - b.rise * t;
+        const wob = Math.sin(now * .003 + b.size) * 6;
+        b.el.style.width = b.el.style.height = b.size + "px";
+        b.el.style.transform =
+          `translate(${(x * innerWidth / 100 + wob).toFixed(1)}px, ${(y * innerHeight / 100).toFixed(1)}px)`;
+        b.el.style.opacity = String(Math.min(1, t * 5) * (1 - Math.max(0, (t - b.popT) / (1 - b.popT))));
+        if (t >= b.popT && !b.popped) {
+          b.popped = true;
+          b.el.classList.add("pop");
+        }
+      }
+      if (alive) { requestAnimationFrame(step); return; }
+      setTimeout(floatUp, 120000 + Math.random() * 120000);
+    })(performance.now());
+  }
+  setTimeout(floatUp, 25000 + Math.random() * 30000);
 })();
