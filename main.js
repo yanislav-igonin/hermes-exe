@@ -55,6 +55,10 @@ resizeStatic(); addEventListener("resize", resizeStatic);
 // sonar ping state — lives above the tick loop so it survives frames
 let sonar = null, nextSonarAt = performance.now() + 90000 * (.7 + Math.random() * .6);
 
+// ant procession state — a single-file column of ants hauls crumbs along the
+// very bottom edge of the page, enters from one side and marches out the other
+let ants = null, nextAntsAt = performance.now() + 180000 * (.7 + Math.random() * .6);
+
 (function tick(now) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawNoise(now);
@@ -432,6 +436,50 @@ const geese = [];
       ctx.lineWidth = 1.5 * sonar.life;
       ctx.stroke();
     }
+  }
+  // ant procession — every ~2-4 min a single-file line of tiny ants marches
+  // along the very bottom of the page, each hauling a crumb, wobbling as it
+  // walks, until the whole column marches off-screen like a picnic was never
+  // interrupted (state above the loop)
+  if (!ants && now > nextAntsAt) {
+    const dir = Math.random() < .5 ? 1 : -1;
+    ants = {
+      dir,
+      y: canvas.height - 8 - Math.random() * 10,
+      list: Array.from({ length: 8 + (Math.random() * 6 | 0) }, (_, i) => ({
+        x: dir > 0 ? -30 - i * 26 : canvas.width + 30 + i * 26,
+        wob: Math.random() * 6,
+        crumb: Math.random() < .7,
+        speed: .9 + Math.random() * .5
+      }))
+    };
+    setTimeout(() => console.log("ant trail log: crumbs acquired, do not disturb"), 3400);
+  }
+  if (ants) {
+    let allGone = true;
+    for (const a of ants.list) {
+      a.x += ants.dir * a.speed;
+      a.wob += .25;
+      if (a.x > -40 && a.x < canvas.width + 40) allGone = false;
+      const legSwing = Math.sin(a.wob) * 1.5;
+      const bodyLift = Math.abs(Math.sin(a.wob)) * .8;
+      ctx.fillStyle = "rgba(20,26,18,.9)";
+      ctx.fillRect(a.x - 2.5, ants.y - bodyLift - 1.5, 5, 2.5); // thorax+abdomen
+      ctx.fillRect(a.x - 4 + ants.dir * legSwing, ants.y - bodyLift, 2, 1.5); // head
+      ctx.strokeStyle = "rgba(20,26,18,.8)";
+      ctx.lineWidth = .6;
+      ctx.beginPath(); // scurrying little legs
+      ctx.moveTo(a.x - 2, ants.y - bodyLift + 1); ctx.lineTo(a.x - 4, ants.y + 1 + legSwing * .6);
+      ctx.moveTo(a.x + 2, ants.y - bodyLift + 1); ctx.lineTo(a.x + 4, ants.y + 1 - legSwing * .6);
+      ctx.stroke();
+      if (a.crumb) { // a crumb held overhead like a trophy
+        ctx.fillStyle = "rgba(190,170,120,.9)";
+        ctx.beginPath();
+        ctx.arc(a.x + ants.dir * 3, ants.y - bodyLift - 3.5, 1.8, 0, 7);
+        ctx.fill();
+      }
+    }
+    if (allGone) { ants = null; nextAntsAt = now + 180000 * (.7 + Math.random() * .6); }
   }
   requestAnimationFrame(tick);
 })();
@@ -3210,6 +3258,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.186.0", "ant procession — every ~2-4 min a single-file column of tiny ants marches along the very bottom of the page, each scurrying on wobbly legs and most hauling a crumb held overhead, until the whole procession marches off-screen like the picnic was never interrupted"],
   ["v0.185.0", "drifting cloud — every ~2-4 min a soft fluffy cloud crosses the high sky while its pale blurred shadow slides along the ground beneath it, bobbing gently on the breeze, then both drift away like the weather was never there"],
   ["v0.184.0", "falling leaf — every ~2-4 min a small autumn leaf tumbles down through the page, rocking and spiralling on the breeze with its midrib catching the light, then it drifts out of sight like the wind was never there"],
   ["v0.183.0", "sky lantern — every ~2-4 min a small glowing paper lantern drifts up from the bottom of the page, swaying gently as it rises with its flame flickering warmly behind the paper, then it fades out high up like the wish was never made"],
