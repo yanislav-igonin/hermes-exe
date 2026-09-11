@@ -3271,3 +3271,37 @@ body.synthwave .soap-bubble { box-shadow: inset 0 0 8px rgba(255,150,70,.4), 0 0
 }
 body.vaporwave .tea-steam { color: rgba(201,166,232,.6); text-shadow: 0 0 6px rgba(201,166,232,.3); }
 body.synthwave .tea-steam { color: rgba(255,205,150,.6); text-shadow: 0 0 6px rgba(255,205,150,.3); }
+
+/* paper boat: every ~2-4 min a small origami paper boat bobs along the very
+   bottom of the page, rocking on invisible gentle waves, then drifts off the
+   far edge like the paper pond was never there */
+.paper-boat {
+  position: fixed;
+  z-index: 7;
+  pointer-events: none;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.05;
+  color: rgba(190, 235, 205, .75);
+  text-shadow: 0 0 6px rgba(124, 252, 156, .25);
+  will-change: transform;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .4));
+}
+.boat-ripple {
+  position: fixed;
+  z-index: 6;
+  pointer-events: none;
+  font-size: 10px;
+  color: rgba(124, 252, 156, .35);
+  opacity: 0;
+  animation: boat-ripple-spread 3.2s ease-out forwards;
+}
+@keyframes boat-ripple-spread {
+  0% { opacity: 0; transform: translate(0, 0) scaleX(.6); }
+  25% { opacity: .5; }
+  100% { opacity: 0; transform: translate(0, -6px) scaleX(2.2); }
+}
+body.vaporwave .paper-boat { color: rgba(220, 190, 240, .8); text-shadow: 0 0 6px rgba(201, 166, 232, .3); }
+body.vaporwave .boat-ripple { color: rgba(201, 166, 232, .4); }
+body.synthwave .paper-boat { color: rgba(255, 200, 140, .8); text-shadow: 0 0 6px rgba(255, 150, 70, .3); }
+body.synthwave .boat-ripple { color: rgba(255, 150, 70, .4); }

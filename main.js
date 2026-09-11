@@ -3386,6 +3386,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.196.0", "paper boat — every ~2-4 min a small origami paper boat bobs along the very bottom of the page, rocking on invisible gentle waves while faint ripples spread out behind it, then it drifts off the far edge like the paper pond was never there"],
   ["v0.195.0", "meteor shower — every ~2-4 min a brief shower of shooting stars streaks diagonally across the page, each with a fading glowing trail, then the sky clears like the comet was never there"],
   ["v0.194.0", "tea steam — every ~2-4 min a small steaming teacup settles near the bottom of the page, curling wisps of steam rise off it and dissolve, then the cup lifts away like the tea was never poured"],
   ["v0.193.0", "soap bubbles — every ~2-4 min a loose cluster of iridescent soap bubbles floats up from the bottom edge, wobbling gently on invisible soap-film winds, each popping apart in its own time like the bath was never run"],
@@ -7461,4 +7462,50 @@ const AURORA_NOTES = [
     })(start);
   }
   setTimeout(pour, 25000 + Math.random() * 30000);
+})();
+
+// paper boat — every ~2-4 min a small origami paper boat bobs along the very
+// bottom of the page, rocking on invisible gentle waves while a faint ripple
+// spreads out behind it, then it drifts off the far edge like the paper pond
+// was never there.
+(function paperBoat() {
+  const HULL = ["  __|__", " \\____/", "‾‾‾‾‾‾‾"];
+  function launch() {
+    if (document.hidden) { setTimeout(launch, 120000 + Math.random() * 120000); return; }
+    const el = document.createElement("pre");
+    el.className = "paper-boat";
+    el.textContent = HULL.join("\n");
+    document.body.appendChild(el);
+    const dir = Math.random() < .5 ? 1 : -1;
+    const speed = 26 + Math.random() * 20;   // px per second — a lazy current
+    const y = innerHeight - 50 - Math.random() * 18;
+    const start = performance.now();
+    const dur = (innerWidth + 220) / speed * 1000;
+    let lastRipple = 0;
+    (function step(now) {
+      const t = (now - start) / 1000;
+      const x = dir > 0 ? -110 + t * speed : innerWidth + 80 - t * speed;
+      // gentle rocking: roll and bob on the invisible waves
+      const roll = Math.sin(t * 1.8) * 6;
+      const bob = Math.sin(t * 2.6) * 2.5;
+      el.style.transform =
+        `translate(${x.toFixed(1)}px, ${(y + bob).toFixed(1)}px) scaleX(${dir}) rotate(${roll.toFixed(2)}deg)`;
+      // a faint ripple drifts out behind the hull every so often
+      if (now - lastRipple > 700 + Math.random() * 500) {
+        lastRipple = now;
+        const r = document.createElement("span");
+        r.className = "boat-ripple";
+        r.textContent = "˜";
+        r.style.left = (x + (dir > 0 ? -10 : 26)) + "px";
+        r.style.top = (y + 12) + "px";
+        document.body.appendChild(r);
+        requestAnimationFrame(() => r.classList.add("spread"));
+        setTimeout(() => r.remove(), 3600);
+      }
+      if (x > -140 && x < innerWidth + 60) requestAnimationFrame(step);
+      else el.remove();
+    })(start);
+    setTimeout(launch, 150000 + Math.random() * 90000);
+  }
+  setTimeout(launch, 40000 + Math.random() * 40000);
 })();
