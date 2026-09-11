@@ -3423,6 +3423,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.200.0", "tumbleweed — every ~2-4 min a scraggly tumbleweed bounces in from one edge of the page and rolls across it, spinning and shedding the odd dry bit of itself as it goes, then tumbles off the far edge like the desert was never there"],
   ["v0.199.0", "fireflies — every few minutes a couple of tiny glowing fireflies drifts lazily around the page, flickering softly, then fades away into the dark like the summer night was never there"],
   ["v0.198.0", "dragonfly — every ~2-4 min an ASCII dragonfly darts across the page in quick zigzags, hovers in place for a moment as if considering the cursor, then zips off the far edge like the pond was never there"],
   ["v0.197.0", "paper airplane — every ~2-4 min a small paper plane swoops across the page along a gentle lazy arc, a dotted trail fading out behind it, then it slides off the far edge like the flight was never logged"],
@@ -7662,4 +7663,51 @@ const AURORA_NOTES = [
     setTimeout(dart, 150000 + Math.random() * 90000);
   }
   setTimeout(dart, 40000 + Math.random() * 40000);
+})();
+
+// tumbleweed — every ~2-4 min a scraggly tumbleweed bounces in from one edge
+// of the page and rolls across it, shedding the odd dry bit as it goes, then
+// tumbles off the far edge like the desert was never there
+(function tumbleweedRoll() {
+  const BITS = "·˙*,:";
+  function roll() {
+    const el = document.createElement("pre");
+    el.className = "tumbleweed";
+    el.textContent = "{✳}";
+    document.body.appendChild(el);
+    const dir = Math.random() < .5 ? 1 : -1;
+    const y0 = innerHeight - 60 - Math.random() * 60;
+    const speed = 130 + Math.random() * 70;      // px per second
+    const dur = (innerWidth + 200) / speed * 1000;
+    const start = performance.now();
+    let lastBit = 0;
+    (function step(now) {
+      const t = (now - start) / 1000;
+      // bouncing: a few damped hops along the way
+      const hopPhase = t * 1.7;
+      const px = dir > 0 ? -80 + t * speed : innerWidth + 80 - t * speed;
+      const py = y0 - Math.abs(Math.sin(hopPhase * Math.PI)) * 26;
+      const spin = t * speed / 14 * 360 * (dir > 0 ? 1 : -1);
+      el.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px) rotate(${spin.toFixed(1)}deg)`;
+      // sheds a dry bit every so often
+      if (now - lastBit > 420) {
+        lastBit = now;
+        const s = document.createElement("span");
+        s.className = "tumbleweed-bit";
+        s.textContent = BITS[Math.random() * BITS.length | 0];
+        s.style.left = px + "px";
+        s.style.top = (py + 14) + "px";
+        document.body.appendChild(s);
+        requestAnimationFrame(() => s.classList.add("fade"));
+        setTimeout(() => s.remove(), 3800);
+      }
+      if (t * 1000 < dur) requestAnimationFrame(step);
+      else {
+        el.remove();
+        console.log("tumbleweed: rolls on, unbothered");
+        setTimeout(roll, 150000 + Math.random() * 90000);
+      }
+    })(start);
+  }
+  setTimeout(roll, 30000 + Math.random() * 40000);
 })();

@@ -3350,3 +3350,32 @@ body.synthwave .plane-trail { color: rgba(255, 150, 70, .35); }
 }
 body.vaporwave .dragonfly { color: rgba(220, 200, 245, .85); text-shadow: 0 0 7px rgba(201, 166, 232, .4); }
 body.synthwave .dragonfly { color: rgba(255, 215, 160, .85); text-shadow: 0 0 7px rgba(255, 160, 80, .35); }
+
+/* tumbleweed: every ~2-4 min a scraggly tumbleweed bounces in from one edge
+   of the page and rolls across it, shedding dry bits, then tumbles off the far
+   edge like the desert was never there */
+.tumbleweed {
+  position: fixed;
+  z-index: 6;
+  top: 0;
+  left: 0;
+  margin: 0;
+  pointer-events: none;
+  font-size: 16px;
+  line-height: 1;
+  color: rgba(196, 168, 120, .85);
+  text-shadow: 0 0 6px rgba(160, 130, 80, .35);
+  will-change: transform;
+}
+.tumbleweed-bit {
+  position: fixed;
+  z-index: 6;
+  pointer-events: none;
+  font-size: 9px;
+  color: rgba(180, 150, 100, .55);
+  opacity: 1;
+  transition: opacity 2.6s ease-out;
+}
+.tumbleweed-bit.fade { opacity: 0; }
+body.vaporwave .tumbleweed { color: rgba(201, 166, 232, .75); text-shadow: 0 0 6px rgba(201, 166, 232, .35); }
+body.synthwave .tumbleweed { color: rgba(255, 170, 100, .8); text-shadow: 0 0 6px rgba(255, 140, 70, .35); }
