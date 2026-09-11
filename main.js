@@ -2560,6 +2560,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.163.0", "shooting star — every ~2-4 min a meteor streaks diagonally across the sky with a fading ember trail, then a wish is whispered in the console a beat later like the sky was never there"],
   ["v0.162.0", "pixel dust — every click bursts a small puff of 20-40 tiny colored squares that scatter outward from the click point, drift and sink gently, then fade away over about a second like the impact was never made"],
   ["v0.161.0", "phantom moth lamp — every ~2-4 min a faint lamp glow flickers to life at a random spot on the page, one or two tiny moths flutter erratically around it for a few seconds, then the lamp goes out and the moths scatter like the light was never on"],
   ["v0.160.0", "balloon — every ~2-4 min a tiny red balloon on a string drifts up from the bottom of the page, swaying gently as it rises, then slips off the top edge like it was never let go"],
@@ -2732,7 +2733,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 34;
+const DONE_COUNT = 35;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
@@ -5849,4 +5850,61 @@ addEventListener("dblclick", e => {
     setTimeout(spawn, 120000 + Math.random() * 120000);
   }
   setTimeout(spawn, 30000 + Math.random() * 40000);
+})();
+
+// shooting star — every ~2-4 min a meteor streaks diagonally across the
+// background canvas with a fading ember trail; a second later a wish is
+// whispered in the console, granted only if you happened to be looking
+(function shootingStar() {
+  const WISHES = [
+    "wish granted: one more commit before dawn",
+    "wish denied: the queue is full, try again at 3am",
+    "wish received — filed under 'someday'",
+    "wish logged, awaiting atmospheric review",
+    "wish overheard and quietly ignored"
+  ];
+  function streak() {
+    const fromLeft = Math.random() < .5;
+    const x0 = fromLeft ? -40 : canvas.width + 40;
+    const y0 = Math.random() * canvas.height * .35;
+    const x1 = fromLeft ? canvas.width * (.5 + Math.random() * .4) : canvas.width * (.1 + Math.random() * .4);
+    const y1 = y0 + canvas.height * (.25 + Math.random() * .3);
+    const dur = 700 + Math.random() * 500;
+    const start = performance.now();
+    const embers = [];
+    let lastEmber = 0;
+    (function fly(now) {
+      const t = Math.min(1, (now - start) / dur);
+      const x = x0 + (x1 - x0) * t, y = y0 + (y1 - y0) * t;
+      if (now - lastEmber > 24) {
+        lastEmber = now;
+        embers.push({ x, y, born: now });
+      }
+      for (let i = embers.length - 1; i >= 0; i--) {
+        const e = embers[i], age = now - e.born;
+        if (age > 900) { embers.splice(i, 1); continue; }
+        const life = 1 - age / 900;
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, 1.6 * life + .3, 0, 7);
+        ctx.fillStyle = `rgba(220,255,235,${.8 * life})`;
+        ctx.fill();
+      }
+      // bright head with a short streak behind it
+      const dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy) || 1;
+      const tail = .06 + t * .04;
+      const grad = ctx.createLinearGradient(x - dx / len * len * tail, y - dy / len * len * tail, x, y);
+      grad.addColorStop(0, "rgba(220,255,235,0)");
+      grad.addColorStop(1, "rgba(230,255,240,.9)");
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(x - dx / len * len * tail, y - dy / len * len * tail);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      if (t < 1) requestAnimationFrame(fly);
+      else setTimeout(() => console.log(`✦ a shooting star crosses the sky — ${WISHES[Math.random() * WISHES.length | 0]}`), 600 + Math.random() * 800);
+    })(start);
+    setTimeout(streak, 120000 + Math.random() * 120000);
+  }
+  setTimeout(streak, 20000 + Math.random() * 30000);
 })();
