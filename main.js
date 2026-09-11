@@ -85,6 +85,12 @@ let butterfly = null, nextButterflyAt = performance.now() + 180000 * (.7 + Math.
 // glinting solar panels and a blinking light, then passes over the horizon
 let satellite = null, nextSatelliteAt = performance.now() + 200000 * (.7 + Math.random() * .6);
 
+// bird flock state — every ~2-4 min a small loose flock of silhouetted birds
+// flutters across the page at a random height, each bird flapping on its own
+// out-of-phase beat while the group wobbles along together, then they clear
+// off over the far edge like the sky was never theirs
+let flock = null, nextFlockAt = performance.now() + 180000 * (.7 + Math.random() * .6);
+
 (function tick(now) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawNoise(now);
@@ -891,6 +897,45 @@ const geese = [];
       }
       ctx.restore();
     }
+  }
+  // bird flock — every ~2-4 min a loose flock of small birds flutters across
+  // the page at a random height, wings beating out of phase, drifting and
+  // wobbling as they go, then they clear off over the far edge like the sky
+  // was never theirs (state above the loop)
+  if (!flock && now > nextFlockAt) {
+    const dir = Math.random() < .5 ? 1 : -1;
+    flock = {
+      dir,
+      x: dir > 0 ? -50 : canvas.width + 50,
+      y: canvas.height * (.12 + Math.random() * .3),
+      t: 0,
+      birds: Array.from({ length: 4 + (Math.random() * 4 | 0) }, () => ({
+        ox: (Math.random() - .5) * 70,
+        oy: (Math.random() - .5) * 46,
+        flap: Math.random() * 7,
+        speed: .9 + Math.random() * .5
+      }))
+    };
+    setTimeout(() => console.log("flock log: heading nowhere in particular"), 6000);
+  }
+  if (flock) {
+    const f = flock;
+    f.t += .016;
+    f.x += 1.3 * f.dir;
+    let allGone = true;
+    for (const b of f.birds) {
+      const bx = f.x + b.ox * f.dir, by = f.y + b.oy + Math.sin(f.t * 1.4 + b.ox * .03) * 7;
+      if (bx > -40 && bx < canvas.width + 40) allGone = false;
+      b.flap += .13 + b.speed * .04; // irregular, out-of-phase wing beats
+      const w = Math.sin(b.flap) * 4.5;
+      ctx.strokeStyle = "rgba(40,50,40,.75)";
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      ctx.moveTo(bx - 4 * f.dir, by - w);
+      ctx.quadraticCurveTo(bx, by - 1.5, bx + 4 * f.dir, by - w);
+      ctx.stroke();
+    }
+    if (allGone) { flock = null; nextFlockAt = now + 180000 * (.7 + Math.random() * .6); }
   }
   requestAnimationFrame(tick);
 })();
@@ -4423,6 +4468,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.237.0", "bird flock — every ~2-4 min a small loose flock of silhouetted birds flutters across the page at a random height, each bird flapping on its own out-of-phase beat while the group wobbles along together, then they clear off over the far edge like the sky was never theirs"],
   ["v0.236.0", "tumbleweed — every ~2-4 min a scraggly tumbleweed rolls across the bottom of the page, bouncing over invisible ruts and spinning as it goes, sheds a couple of twigs that drop behind it, then tumbles off the far edge like the prairie was never there"],
   ["v0.235.0", "slinky — every ~2-4 min a metal slinky flops over the top edge of the page and walks its way down step by stretchy step, top coils stretching out while the bunched bottom coils catch up, then it pools into a squat pile on the floor and fades away like nobody ever had stairs"],
   ["v0.234.0", "yo-yo — every ~2-4 min a tiny yo-yo on a string drops from the top of the page near a random spot, idles spinning and bobbing for a moment like someone got bored of the trick, then reels back up and vanishes like the trick was never shown"],
