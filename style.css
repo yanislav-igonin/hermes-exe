@@ -1363,6 +1363,37 @@ body.vaporwave .firefly {
 body.vaporwave .eclipse-corona { background: radial-gradient(circle, transparent 58%, rgba(201, 166, 232, .2) 66%, rgba(255, 220, 250, .3) 70%, transparent 77%); }
 body.synthwave .eclipse-corona { background: radial-gradient(circle, transparent 58%, rgba(255, 140, 46, .2) 66%, rgba(255, 220, 170, .3) 70%, transparent 77%); }
 
+/* meteor shower: brief diagonal streaks of shooting stars with fading trails */
+.meteor-shower {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9992;
+  overflow: hidden;
+}
+.meteor-shower .meteor {
+  position: absolute;
+  left: var(--m-x, 50vw);
+  top: var(--m-y, 20vh);
+  width: var(--m-len, 140px);
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.9));
+  box-shadow: 0 0 6px 1px rgba(200, 220, 255, .6);
+  opacity: 0;
+  transform: rotate(38deg) translateX(120vw);
+  will-change: transform, opacity;
+}
+.meteor-shower.m-on .meteor {
+  animation: m-streak var(--m-dur, 1200ms) linear var(--m-delay, 0ms) forwards;
+}
+@keyframes m-streak {
+  0%   { opacity: 0; transform: rotate(38deg) translateX(30vw); }
+  12%  { opacity: 1; }
+  70%  { opacity: .9; }
+  100% { opacity: 0; transform: rotate(38deg) translateX(120vw); }
+}
+
 /* frost bloom: crystalline frost creeps in from a screen corner, grows inward,
    then melts away */
 .frost-bloom {

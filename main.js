@@ -1923,6 +1923,33 @@ addEventListener("mousemove", e => {
   setTimeout(convene, 18000 + Math.random() * 20000);
 })();
 
+// meteor shower — every ~2-4 min a brief shower of shooting stars streaks
+// diagonally across the page, each with a fading trail, then the sky clears
+// like the comet was never there
+(function meteorShower() {
+  const layer = document.createElement("div");
+  layer.className = "meteor-shower";
+  document.body.appendChild(layer);
+  function rain() {
+    const count = 5 + Math.floor(Math.random() * 6);
+    layer.innerHTML = "";
+    for (let i = 0; i < count; i++) {
+      const m = document.createElement("span");
+      m.className = "meteor";
+      m.style.setProperty("--m-x", (30 + Math.random() * 90).toFixed(1) + "vw");
+      m.style.setProperty("--m-y", (10 + Math.random() * 50).toFixed(1) + "vh");
+      m.style.setProperty("--m-len", (90 + Math.random() * 110).toFixed(0) + "px");
+      m.style.setProperty("--m-dur", (900 + Math.random() * 700).toFixed(0) + "ms");
+      m.style.setProperty("--m-delay", (Math.random() * 3500).toFixed(0) + "ms");
+      layer.appendChild(m);
+    }
+    layer.classList.add("m-on");
+    setTimeout(() => layer.classList.remove("m-on"), 7500);
+    setTimeout(rain, 120000 + Math.random() * 120000);
+  }
+  setTimeout(rain, 25000 + Math.random() * 20000);
+})();
+
 // frost bloom — every ~2-3 min a patch of crystalline frost creeps in from a
 // random screen corner, grows inward over a few seconds, then slowly melts
 // away and the page dries like winter was never there
@@ -3359,6 +3386,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.195.0", "meteor shower — every ~2-4 min a brief shower of shooting stars streaks diagonally across the page, each with a fading glowing trail, then the sky clears like the comet was never there"],
   ["v0.194.0", "tea steam — every ~2-4 min a small steaming teacup settles near the bottom of the page, curling wisps of steam rise off it and dissolve, then the cup lifts away like the tea was never poured"],
   ["v0.193.0", "soap bubbles — every ~2-4 min a loose cluster of iridescent soap bubbles floats up from the bottom edge, wobbling gently on invisible soap-film winds, each popping apart in its own time like the bath was never run"],
   ["v0.192.0", "firefly swarm — every few minutes a loose swarm of tiny glowing fireflies drifts across the page, blinking softly as they wander, then fades away into the dark"],
