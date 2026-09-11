@@ -2514,3 +2514,16 @@ body.synthwave .firefly { background: rgba(255,196,140,.95); box-shadow: 0 0 8px
   50% { opacity: .95; }
   70% { opacity: .6; }
 }
+
+/* pixel dust — tiny colored squares bursting from clicks */
+.pixel-dust {
+  position: fixed;
+  z-index: 4;
+  pointer-events: none;
+  animation: pixel-dust-drift var(--pd-dur, 1000ms) cubic-bezier(.2, .6, .4, 1) forwards;
+}
+@keyframes pixel-dust-drift {
+  from { opacity: 1; transform: translate(0, 0); }
+  70% { opacity: .8; }
+  to { opacity: 0; transform: translate(var(--pd-dx, 30px), var(--pd-dy, -10px)); }
+}

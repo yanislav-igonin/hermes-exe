@@ -2530,8 +2530,37 @@ addEventListener("mousemove", e => {
   setTimeout(spawn, 25000 + Math.random() * 30000);
 })();
 
+// pixel dust — every click bursts a small puff of tiny colored squares
+// that drift outward and fade away over about a second
+(function pixelDust() {
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const COLORS = ["#ff6b6b", "#ffd93d", "#6bcb77", "#4d96ff", "#c77dff", "#ff9f1c"];
+  addEventListener("mousedown", e => {
+    if (document.hidden) return;
+    const n = 20 + Math.floor(Math.random() * 21);
+    for (let i = 0; i < n; i++) {
+      const p = document.createElement("div");
+      p.className = "pixel-dust";
+      const size = 3 + Math.floor(Math.random() * 4);
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 25 + Math.random() * 55;
+      p.style.width = size + "px";
+      p.style.height = size + "px";
+      p.style.background = COLORS[Math.floor(Math.random() * COLORS.length)];
+      p.style.left = e.clientX + "px";
+      p.style.top = e.clientY + "px";
+      p.style.setProperty("--pd-dx", (Math.cos(ang) * dist).toFixed(1) + "px");
+      p.style.setProperty("--pd-dy", (Math.sin(ang) * dist - 15).toFixed(1) + "px");
+      p.style.setProperty("--pd-dur", (700 + Math.random() * 700).toFixed(0) + "ms");
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 1500);
+    }
+  });
+})();
+
 // changelog
 const changelog = [
+  ["v0.162.0", "pixel dust — every click bursts a small puff of 20-40 tiny colored squares that scatter outward from the click point, drift and sink gently, then fade away over about a second like the impact was never made"],
   ["v0.161.0", "phantom moth lamp — every ~2-4 min a faint lamp glow flickers to life at a random spot on the page, one or two tiny moths flutter erratically around it for a few seconds, then the lamp goes out and the moths scatter like the light was never on"],
   ["v0.160.0", "balloon — every ~2-4 min a tiny red balloon on a string drifts up from the bottom of the page, swaying gently as it rises, then slips off the top edge like it was never let go"],
   ["v0.159.0", "tumbleweed — every ~2-4 min a scraggly tumbleweed tumbles across the bottom of the page, bouncing off the ground and shedding tiny twig bits as it goes, then rolls off-screen like the prairie was never there"],
