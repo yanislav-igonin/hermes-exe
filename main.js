@@ -3423,6 +3423,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.205.0", "meteor shower — every ~1-2 min a small shooting star streaks across the upper sky with a glowing trail, flares and burns out mid-flight like it was never seen"],
   ["v0.204.0", "weather balloon — every ~2-4 min a small probe balloon inflates and lifts off from the bottom edge, drifts up across the sky on the wind with a gentle wobble, an instrument box dangling below, then fades away near the top like the reading was never logged"],
   ["v0.203.0", "radio telescope — every ~2-3 min a small dish rises from the bottom edge and slowly sweeps a faint signal beam across a swath of sky, then retracts back down like it never listened"],
   ["v0.202.0", "aurora borealis — every ~2-4 min soft bands of green/teal aurora light wave across the upper part of the page for a few seconds, rippling like a slow curtain, then dissolve back into the night sky like the solar wind was never there"],
@@ -5593,6 +5594,40 @@ addEventListener("dblclick", e => {
     setTimeout(launch, 90000 + Math.random() * 60000);
   }
   setTimeout(launch, 25000 + Math.random() * 30000);
+})();
+
+// meteor shower — every ~60-120s a small shooting star streaks across the
+// upper sky with a glowing trail, then burns out like it was never seen
+(function meteorShower() {
+  function streak() {
+    const el = document.createElement("span");
+    el.className = "meteor";
+    el.textContent = "✦";
+    const dir = Math.random() < .5 ? 1 : -1;
+    const startX = dir === 1 ? -20 : innerWidth + 20;
+    const startY = Math.random() * innerHeight * .3;
+    const angle = (dir === 1 ? 1 : -1) * (0.25 + Math.random() * 0.35);
+    const speed = 7 + Math.random() * 5;
+    let x = startX, y = startY, t = 0;
+    el.style.left = x.toFixed(0) + "px";
+    el.style.top = y.toFixed(0) + "px";
+    el.style.rotate = (angle * 57.3).toFixed(1) + "deg";
+    document.body.appendChild(el);
+    const fly = () => {
+      t += 1 / 60;
+      x += dir * speed * Math.cos(angle);
+      y += speed * Math.sin(angle) * 0.4;
+      el.style.left = x.toFixed(0) + "px";
+      el.style.top = y.toFixed(0) + "px";
+      const life = t / 1.4;
+      el.style.opacity = Math.max(0, 1 - life).toFixed(2);
+      if (life < 1 && x > -60 && x < innerWidth + 60) requestAnimationFrame(fly);
+      else el.remove();
+    };
+    requestAnimationFrame(fly);
+    setTimeout(streak, 60000 + Math.random() * 60000);
+  }
+  setTimeout(streak, 15000 + Math.random() * 20000);
 })();
 
 // snail mail: every ~2-4 min a snail slowly crawls along the bottom of the
