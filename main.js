@@ -3315,6 +3315,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.189.0", "school of minnows — every ~2-4 min a small school of tiny translucent fish swims across the lower part of the page, each minnow wobbling and darting within the shoal, then the school slips off-screen like the pond was never there"],
   ["v0.188.0", "fireflies at dusk — every minute or so a small brood of tiny glowing fireflies blinks awake near the bottom of the page, each wandering and flickering on its own rhythm before fading away like the meadow was never there"],
   ["v0.187.0", "jellyfish — every ~2-4 min a small translucent jellyfish rises from the bottom of the page, its bell pulsing as it bobs gently upward with long tentacles swaying behind it, then it fades out near the top like the deep was never visited"],
   ["v0.186.0", "ant procession — every ~2-4 min a single-file column of tiny ants marches along the very bottom of the page, each scurrying on wobbly legs and most hauling a crumb held overhead, until the whole procession marches off-screen like the picnic was never interrupted"],
@@ -7197,4 +7198,39 @@ const AURORA_NOTES = [
     setTimeout(brood, 60000 + Math.random() * 90000);
   }
   setTimeout(brood, 15000 + Math.random() * 20000);
+})();
+
+// school of minnows — every ~2-4 min a small school of tiny translucent fish
+// swims across the lower part of the page, each minnow wobbling within the
+// shoal, then the whole school slips off-screen like the pond was never there
+(function minnows() {
+  function swim() {
+    if (!document.hidden) {
+      const school = document.createElement("div");
+      school.className = "minnow-school";
+      const life = 22000 + Math.random() * 10000;
+      const n = 5 + Math.floor(Math.random() * 5); // 5-9 minnows
+      const y = 8 + Math.random() * 14;
+      school.style.setProperty("--mn-y", y.toFixed(1) + "vh");
+      school.style.setProperty("--mn-life", life.toFixed(0) + "ms");
+      school.style.setProperty("--mn-dx", (110 + Math.random() * 15).toFixed(1) + "vw");
+      school.style.setProperty("--mn-my1", (-3 + Math.random() * 6).toFixed(1) + "vh");
+      school.style.setProperty("--mn-my2", (-3 + Math.random() * 6).toFixed(1) + "vh");
+      for (let i = 0; i < n; i++) {
+        const el = document.createElement("div");
+        el.className = "minnow";
+        const w = 7 + Math.random() * 6;
+        el.style.setProperty("--mn-w", w.toFixed(1) + "px");
+        el.style.setProperty("--mn-ox", (Math.random() * 60 - 20).toFixed(1) + "px");
+        el.style.setProperty("--mn-oy", (Math.random() * 36 - 18).toFixed(1) + "px");
+        el.style.setProperty("--mn-wb", (0.9 + Math.random() * 0.9).toFixed(2) + "s");
+        el.style.animationDelay = (Math.random() * 800).toFixed(0) + "ms";
+        school.appendChild(el);
+      }
+      document.body.appendChild(school);
+      setTimeout(() => school.remove(), life + 1500);
+    }
+    setTimeout(swim, 120000 + Math.random() * 120000);
+  }
+  setTimeout(swim, 30000 + Math.random() * 40000);
 })();

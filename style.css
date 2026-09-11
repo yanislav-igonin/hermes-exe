@@ -2990,3 +2990,54 @@ body.synthwave .firefly { background: rgba(255,196,140,.95); box-shadow: 0 0 8px
   55% { transform: translate(var(--ff-dx2, -2vw), calc(var(--ff-dy2, -4vh))); }
   100% { transform: translate(var(--ff-dx3, 1vw), calc(var(--ff-dy3, -6vh))); opacity: 0; }
 }
+
+// school of minnows — every few minutes a small school of tiny translucent
+// fish swims across the lower part of the page, wobbling within the shoal,
+// then slips off-screen like the pond was never there
+.minnow-school {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 0; height: 0;
+  margin-bottom: var(--mn-y, 12vh);
+  margin-left: var(--mn-x0, -8vw);
+  pointer-events: none;
+  z-index: 9994;
+  opacity: 0;
+  animation: mn-swim var(--mn-life, 26000ms) linear forwards;
+  will-change: transform, opacity;
+}
+.minnow {
+  position: absolute;
+  width: var(--mn-w, 10px); height: 4px;
+  margin-left: var(--mn-ox, 0px);
+  margin-top: var(--mn-oy, 0px);
+  background: rgba(200,225,250,.6);
+  border-radius: 50% 40% 40% 50%;
+  animation: mn-wobble var(--mn-wb, 1.4s) ease-in-out infinite alternate;
+  will-change: transform;
+}
+.minnow::after {
+  content: "";
+  position: absolute;
+  left: -3px; top: 50%;
+  width: 4px; height: 3px;
+  transform: translateY(-50%);
+  background: rgba(200,225,250,.45);
+  clip-path: polygon(100% 0, 0 50%, 100% 100%);
+}
+body.vaporwave .minnow { background: rgba(236,214,255,.6); }
+body.vaporwave .minnow::after { background: rgba(236,214,255,.45); }
+body.synthwave .minnow { background: rgba(255,196,140,.6); }
+body.synthwave .minnow::after { background: rgba(255,196,140,.45); }
+@keyframes mn-swim {
+  0%   { opacity: 0; transform: translate(0, 0); }
+  6%   { opacity: .9; }
+  50%  { transform: translate(calc(var(--mn-dx, 120vw) * .5), var(--mn-my1, 0vh)); }
+  94%  { opacity: .9; }
+  100% { opacity: 0; transform: translate(var(--mn-dx, 120vw), var(--mn-my2, 0vh)); }
+}
+@keyframes mn-wobble {
+  0%   { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(2px) rotate(4deg); }
+}
