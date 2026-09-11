@@ -2590,6 +2590,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.166.0", "paper boat — every ~2-4 min a tiny folded paper boat sails along the bottom of the page, bobbing on an invisible tide and occasionally listing in the waves, then drifts off-screen like the ocean was never there"],
   ["v0.165.0", "origami crane — every ~2-4 min a folded paper square unfolds wing by wing into a tiny crane at a random spot, flutters up in a lazy circle while a fold note prints in the console, then dissolves like the paper was never creased"],
   ["v0.164.0", "sonar ping — every ~90s a faint sonar pulse expands from a random point on the background canvas, shoving particles as the wavefront passes, then an echo whispers in the console and the ocean goes quiet again"],
   ["v0.163.0", "shooting star — every ~2-4 min a meteor streaks diagonally across the sky with a fading ember trail, then a wish is whispered in the console a beat later like the sky was never there"],
@@ -6027,4 +6028,55 @@ addEventListener("dblclick", e => {
     requestAnimationFrame(craneTick);
   }
   requestAnimationFrame(craneTick);
+})();
+
+// paper boat — a tiny folded boat sails the bottom of the page
+const BOAT_NOTES = [
+  "the paper boat sets out, trusting the tide",
+  "somewhere, a paper boat is still sailing",
+  "folded from a page of the changelog, probably",
+  "the boat does not ask where the water comes from",
+];
+(function boatTick() {
+  let boat = null, nextBoatAt = performance.now() + 20000 * (0.7 + Math.random() * 1.3);
+  function drawBoat(now) {
+    if (!boat && now >= nextBoatAt) {
+      const dir = Math.random() < 0.5 ? 1 : -1;
+      boat = { x: dir > 0 ? -60 : innerWidth + 60, y: innerHeight - 34 - Math.random() * 26, dir, t: 0, listed: 0 };
+    }
+    if (boat) {
+      boat.t += 1 / 60;
+      boat.x += boat.dir * 0.55;
+      const bob = Math.sin(boat.t * 2.2) * 3.5;
+      const rock = Math.sin(boat.t * 1.3) * 0.14 + (boat.listed > 0 ? boat.listed : 0);
+      if (boat.listed === 0 && Math.random() < 0.002) boat.listed = (Math.random() < 0.5 ? -1 : 1) * 0.35;
+      if (boat.listed !== 0) boat.listed *= 0.999;
+      const fade = boat.x < -80 || boat.x > innerWidth + 80;
+      if (fade) {
+        boat = null;
+        nextBoatAt = now + 120000 * (0.7 + Math.random() * 0.6);
+        console.log(`paper boat: ${BOAT_NOTES[Math.random() * BOAT_NOTES.length | 0]}`);
+      } else {
+        ctx.save();
+        ctx.translate(boat.x, boat.y + bob);
+        ctx.rotate(rock * boat.dir);
+        ctx.strokeStyle = `rgba(225,232,245,0.8)`;
+        ctx.lineWidth = 1.1;
+        // hull
+        ctx.beginPath();
+        ctx.moveTo(-10, 0); ctx.lineTo(10, 0); ctx.lineTo(6, 5); ctx.lineTo(-6, 5);
+        ctx.closePath(); ctx.stroke();
+        // fold line
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -9); ctx.stroke();
+        // sail
+        ctx.beginPath();
+        ctx.moveTo(0, -9); ctx.lineTo(7, 0); ctx.lineTo(0, 0);
+        ctx.moveTo(0, -9); ctx.lineTo(-6, 0);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+    requestAnimationFrame(drawBoat);
+  }
+  requestAnimationFrame(drawBoat);
 })();
