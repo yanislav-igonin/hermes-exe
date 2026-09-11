@@ -3818,6 +3818,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.219.0", "kite — every ~2-4 min a small kite swoops in from a screen edge and glides across the upper sky on a bobbing path, banked into the wind with its tail trailing and fluttering behind it, then drifts off the far edge like the wind was never flying it"],
   ["v0.218.0", "boomerang — every ~2-4 min a boomerang launches from a random spot on the page, flies out along a sweeping arc while spinning, curves back through the sky and returns to the exact point it was thrown from, then fades away like the thrower was never there"],
   ["v0.217.0", "balloon — every ~2-4 min a small balloon drifts up from the bottom of the page, sways gently on an invisible breeze with its string trailing below, and pops into a tiny confetti burst if you click it; otherwise it floats away off the top like a fairground you were never at"],
   ["v0.216.0", "fireflies — a loose swarm of tiny amber lights drifts across the page, each blinking on its own wavering rhythm with a soft glow, shying away from the cursor until it wanders off into the dark again"],
@@ -8837,4 +8838,37 @@ const AURORA_NOTES = [
     })(start);
   }
   setTimeout(launch, 30000 + Math.random() * 40000);
+})();
+
+// kite — every ~2-4 min a small kite swoops in from a screen edge and glides
+// across the upper sky on a bobbing path, banked into the wind with its tail
+// trailing and fluttering behind it, then drifts off the far edge like the
+// wind was never flying it
+(function kite() {
+  function fly() {
+    const el = document.createElement("div");
+    el.className = "kite";
+    el.textContent = "🪁";
+    const fromLeft = Math.random() < .5;
+    el.style.top = (innerHeight * (.05 + Math.random() * .3)) + "px";
+    el.style.left = (fromLeft ? -60 : innerWidth + 60) + "px";
+    el.style.filter = `hue-rotate(${Math.random() * 360 | 0}deg)`;
+    document.body.appendChild(el);
+    const dur = 16000 + Math.random() * 8000;
+    const dist = innerWidth + 140;
+    const dir = fromLeft ? 1 : -1;
+    const bob = 20 + Math.random() * 22;
+    const swoop = 30 + Math.random() * 40;
+    const start = performance.now();
+    (function tick(now) {
+      const t = (now - start) / dur;
+      if (t >= 1) { el.remove(); setTimeout(fly, 120000 + Math.random() * 120000); return; }
+      const x = dir * (dist * t - 70);
+      const y = Math.sin(t * Math.PI * 3) * bob + Math.sin(t * Math.PI) * -swoop;
+      const bank = dir * (8 + Math.sin(t * Math.PI * 3) * 6);
+      el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${bank.toFixed(1)}deg) scaleX(${dir})`;
+      requestAnimationFrame(tick);
+    })(start);
+  }
+  setTimeout(fly, 30000 + Math.random() * 40000);
 })();
