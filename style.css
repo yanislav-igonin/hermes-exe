@@ -3794,3 +3794,32 @@ body.vaporwave .yy-dropper .yy-hub { stroke: rgba(201,166,232,.9); }
 body.synthwave .yy-dropper .yy-string { background: rgba(255,140,46,.4); }
 body.synthwave .yy-dropper .yy-rim { fill: rgba(255,140,46,.8); stroke: rgba(255,140,46,.9); }
 body.synthwave .yy-dropper .yy-hub { stroke: rgba(255,140,46,.9); }
+
+/* slinky */
+.sl-layer {
+  position: fixed; inset: 0; z-index: 9994; pointer-events: none; overflow: hidden;
+}
+.sl-slinky {
+  position: absolute; left: var(--sl-x, 40vw); top: 0;
+  width: 34px; height: 0; margin-left: -17px;
+  opacity: 0; animation: sl-in 600ms ease-out forwards;
+}
+.sl-slinky .sl-ring {
+  position: absolute; left: 0; top: 0;
+  width: 34px; height: 7px;
+  border: 1.4px solid rgba(124,252,156,.8);
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(124,252,156,.18);
+}
+@keyframes sl-in {
+  0%   { opacity: 0; }
+  100% { opacity: .9; }
+}
+body.vaporwave .sl-slinky .sl-ring {
+  border-color: rgba(201,166,232,.85);
+  box-shadow: 0 0 4px rgba(201,166,232,.2);
+}
+body.synthwave .sl-slinky .sl-ring {
+  border-color: rgba(255,140,46,.85);
+  box-shadow: 0 0 4px rgba(255,140,46,.2);
+}

@@ -4352,8 +4352,78 @@ addEventListener("mousemove", e => {
   setTimeout(visit, 25000 + Math.random() * 55000);
 })();
 
+// slinky — every ~2-4 min a metal slinky flops over the top edge of the page
+// and walks its way down step by stretchy step, the top coils stretching out
+// while the bottom coils bunch up and catch up, then it pools into a squat
+// pile on the floor and fades away like nobody ever had stairs
+(function slinkyWalk() {
+  const layer = document.createElement("div");
+  layer.className = "sl-layer";
+  document.body.appendChild(layer);
+  const RINGS = 9;
+  function visit() {
+    const sl = document.createElement("div");
+    sl.className = "sl-slinky";
+    sl.style.setProperty("--sl-x", (8 + Math.random() * 84).toFixed(1) + "vw");
+    for (let i = 0; i < RINGS; i++) {
+      const r = document.createElement("span");
+      r.className = "sl-ring";
+      sl.appendChild(r);
+    }
+    layer.appendChild(sl);
+    const rings = sl.children;
+    const floor = window.innerHeight - 14;
+    const step = 52 + Math.random() * 34;
+    let topY = -34, botY = -6; // flopped over the top edge
+    let phaseStart = performance.now();
+    let mode = "stretch"; // stretch -> catch -> ... -> pool -> fade
+    function tick(now) {
+      const t = (now - phaseStart);
+      if (mode === "stretch") {
+        const p = Math.min(1, t / 420);
+        botY = stretchFrom + (stretchTo - stretchFrom) * (1 - Math.pow(1 - p, 2));
+        if (p >= 1) { mode = "catch"; phaseStart = now; }
+      } else if (mode === "catch") {
+        const p = Math.min(1, t / 260);
+        topY = catchFrom + (catchTo - catchFrom) * (1 - Math.pow(1 - p, 3));
+        if (p >= 1) {
+          if (botY >= floor - 2) { mode = "pool"; phaseStart = now; }
+          else {
+            stretchFrom = botY;
+            stretchTo = Math.min(floor, botY + step);
+            mode = "stretch"; phaseStart = now;
+          }
+        }
+      } else if (mode === "pool") {
+        const p = Math.min(1, t / 700);
+        topY = catchTo + (botY - 8 - catchTo) * p;
+        if (p >= 1) { mode = "fade"; phaseStart = now; }
+      } else if (mode === "fade") {
+        const p = Math.min(1, t / 1200);
+        sl.style.opacity = String(0.9 * (1 - p));
+        if (p >= 1) {
+          sl.remove();
+          setTimeout(visit, 120000 + Math.random() * 120000);
+          return;
+        }
+      }
+      const span = Math.max(6, botY - topY);
+      for (let i = 0; i < RINGS; i++) {
+        const f = Math.pow(i / (RINGS - 1), 1.6); // coils bunch toward the top
+        rings[i].style.transform = "translateY(" + (topY + span * f).toFixed(1) + "px)";
+      }
+      requestAnimationFrame(tick);
+    }
+    let stretchFrom = botY, stretchTo = Math.min(floor, botY + step);
+    let catchFrom = topY, catchTo = botY;
+    requestAnimationFrame(tick);
+  }
+  setTimeout(visit, 20000 + Math.random() * 60000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.235.0", "slinky — every ~2-4 min a metal slinky flops over the top edge of the page and walks its way down step by stretchy step, top coils stretching out while the bunched bottom coils catch up, then it pools into a squat pile on the floor and fades away like nobody ever had stairs"],
   ["v0.234.0", "yo-yo — every ~2-4 min a tiny yo-yo on a string drops from the top of the page near a random spot, idles spinning and bobbing for a moment like someone got bored of the trick, then reels back up and vanishes like the trick was never shown"],
   ["v0.233.0", "ice cream truck — every ~3-5 min a tiny ice cream truck rolls along the bottom of the page jingling a little tune note by note, drops a single scoop of ice cream onto the pavement mid-route, then trundles off the far edge like the tune was never for sale"],
   ["v0.232.0", "ink blot — every ~2-5 min a drop of ink falls from above the page, splats against it and blooms into a lopsided blot with torn edges, which slowly spreads, darkens at the rim and fades away like it was never signed"],
