@@ -2877,3 +2877,31 @@ body.synthwave .firefly { background: rgba(255,196,140,.95); box-shadow: 0 0 8px
   0%, 100% { opacity: .25; }
   50%      { opacity: 1; }
 }
+
+/* prowling shadow: every ~2-4 min a soft blurred dark shape slinks across
+   the page on a slight diagonal, low to the ground, then melts away */
+.shadow-prowl {
+  position: fixed;
+  left: -30vw;
+  bottom: 0;
+  width: 26vw;
+  height: 9vh;
+  z-index: 5;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 65%, rgba(8,10,14,.5), rgba(8,10,14,.22) 55%, transparent 75%);
+  border-radius: 50%;
+  filter: blur(6px);
+  transform: translate(0, 0) skewX(-14deg);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.shadow-prowl.is-running {
+  animation: shadowProwl var(--sh-dur) ease-in-out forwards;
+}
+@keyframes shadowProwl {
+  0%   { transform: translate(0, 0) skewX(-14deg); opacity: 0; }
+  15%  { opacity: .9; }
+  50%  { transform: translate(calc(50vw + var(--sh-x)), calc(-1 * var(--sh-lift))) skewX(6deg); opacity: .8; }
+  85%  { opacity: .7; }
+  100% { transform: translate(calc(130vw + var(--sh-x)), calc(-1.6 * var(--sh-lift))) skewX(20deg); opacity: 0; }
+}
