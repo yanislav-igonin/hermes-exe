@@ -52,6 +52,9 @@ const sctx = staticCanvas.getContext("2d");
 function resizeStatic() { staticCanvas.width = Math.ceil(canvas.width / 3); staticCanvas.height = Math.ceil(canvas.height / 3); }
 resizeStatic(); addEventListener("resize", resizeStatic);
 
+// sonar ping state — lives above the tick loop so it survives frames
+let sonar = null, nextSonarAt = performance.now() + 90000 * (.7 + Math.random() * .6);
+
 (function tick(now) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawNoise(now);
@@ -359,6 +362,32 @@ const kite = { active: false, x: 0, y: 0, t: 0, sway: 0, phase: Math.random() * 
     if (kite.x > canvas.width + 60) {
       kite.active = false;
       nextKiteAt = now + 120000 * (.7 + Math.random() * .6);
+    }
+  }
+  // sonar ping — every ~90s a faint ring expands from a random point on the
+  // background canvas like a sonar pulse; particles it sweeps get a small shove,
+  // then the echo dies away like the ocean was never there (state above the loop)
+  if (!sonar && now > nextSonarAt) {
+    sonar = { x: Math.random() * canvas.width, y: Math.random() * canvas.height, r: 0, life: 1 };
+    setTimeout(() => console.log("sonar echo: something is out there"), 2600);
+  }
+  if (sonar) {
+    sonar.r += 4; sonar.life -= .008;
+    for (const p of pts) {
+      const d = Math.hypot(p.x - sonar.x, p.y - sonar.y);
+      if (Math.abs(d - sonar.r) < 14) { // wavefront just swept this particle
+        const f = .7 * sonar.life;
+        p.vx += (p.x - sonar.x) / (d || 1) * f;
+        p.vy += (p.y - sonar.y) / (d || 1) * f;
+      }
+    }
+    if (sonar.life <= 0) { sonar = null; nextSonarAt = now + 90000 * (.7 + Math.random() * .6); }
+    else {
+      ctx.beginPath();
+      ctx.arc(sonar.x, sonar.y, sonar.r, 0, 7);
+      ctx.strokeStyle = `rgba(124,252,156,${.35 * sonar.life})`;
+      ctx.lineWidth = 1.5 * sonar.life;
+      ctx.stroke();
     }
   }
   requestAnimationFrame(tick);
@@ -2558,8 +2587,10 @@ addEventListener("mousemove", e => {
   });
 })();
 
+
 // changelog
 const changelog = [
+  ["v0.164.0", "sonar ping — every ~90s a faint sonar pulse expands from a random point on the background canvas, shoving particles as the wavefront passes, then an echo whispers in the console and the ocean goes quiet again"],
   ["v0.163.0", "shooting star — every ~2-4 min a meteor streaks diagonally across the sky with a fading ember trail, then a wish is whispered in the console a beat later like the sky was never there"],
   ["v0.162.0", "pixel dust — every click bursts a small puff of 20-40 tiny colored squares that scatter outward from the click point, drift and sink gently, then fade away over about a second like the impact was never made"],
   ["v0.161.0", "phantom moth lamp — every ~2-4 min a faint lamp glow flickers to life at a random spot on the page, one or two tiny moths flutter erratically around it for a few seconds, then the lamp goes out and the moths scatter like the light was never on"],
