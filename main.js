@@ -76,6 +76,11 @@ let bottle = null, nextBottleAt = performance.now() + 180000 * (.7 + Math.random
 // was never fenced
 let tumbleweed = null, nextTumbleweedAt = performance.now() + 180000 * (.7 + Math.random() * .6);
 
+// butterfly state — a butterfly flutters in across the page every few minutes,
+// wings opening and closing on a lazy bobbing path, then drifts off the far
+// edge like the meadow was never there
+let butterfly = null, nextButterflyAt = performance.now() + 180000 * (.7 + Math.random() * .6);
+
 (function tick(now) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawNoise(now);
@@ -782,6 +787,47 @@ const geese = [];
         ctx.moveTo(Math.cos(ang) * 3, Math.sin(ang) * 2.5);
         ctx.lineTo(Math.cos(ang + 2.5) * 7, Math.sin(ang + 2.5) * 6);
         ctx.stroke();
+      }
+      ctx.restore();
+    }
+  }
+  // butterfly — every ~2-4 min a butterfly flutters in from a screen edge on a
+  // lazy bobbing path, wings opening and closing as it goes, then drifts off
+  // the far edge like the meadow was never there (state above the loop)
+  if (!butterfly && now > nextButterflyAt) {
+    const dir = Math.random() < .5 ? 1 : -1;
+    butterfly = { dir, x: dir > 0 ? -30 : canvas.width + 30, y: canvas.height * (.3 + Math.random() * .4), t: Math.random() * 6, flap: Math.random() * 6, hue: Math.random() < .5 ? 30 : 285 };
+  }
+  if (butterfly) {
+    const b = butterfly;
+    b.t += .016; b.flap += .16; b.x += 1.1 * b.dir;
+    b.y += Math.sin(b.t * 2.2) * .8;
+    if (b.x < -40 || b.x > canvas.width + 40) { butterfly = null; nextButterflyAt = now + 180000 * (.7 + Math.random() * .6); }
+    else {
+      const flap = Math.abs(Math.sin(b.flap)) * .8 + .2; // wing openness 0.2..1
+      const wing = `rgba(${b.hue === 30 ? "232,168,84" : "190,140,225"},.8)`;
+      const edge = `rgba(${b.hue === 30 ? "180,120,50" : "140,95,175"},.9)`;
+      ctx.save();
+      ctx.translate(b.x, b.y);
+      const s = .8 + Math.sin(b.t) * .06;
+      // body — small dark sliver along the flight axis
+      ctx.strokeStyle = "rgba(60,45,35,.85)";
+      ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(0, -4 * s); ctx.lineTo(0, 4 * s); ctx.stroke();
+      // antennae
+      ctx.lineWidth = .7;
+      ctx.beginPath(); ctx.moveTo(0, -4 * s); ctx.quadraticCurveTo(-2 * s, -7 * s, -3.5 * s, -8 * s); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, -4 * s); ctx.quadraticCurveTo(2 * s, -7 * s, 3.5 * s, -8 * s); ctx.stroke();
+      // four wings, scaling with the flap so they visibly open and close
+      ctx.fillStyle = wing;
+      ctx.strokeStyle = edge;
+      ctx.lineWidth = .8;
+      for (const [wx, wy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(wx * 7 * s * flap, wy * 9 * s * flap - 1, wx * 3 * s * flap, wy * 8.5 * s * flap);
+        ctx.quadraticCurveTo(wx * 1.2 * s * flap, wy * 5 * s * flap, 0, 0);
+        ctx.fill(); ctx.stroke();
       }
       ctx.restore();
     }
@@ -4032,6 +4078,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.225.0", "butterfly — every ~2-4 min a butterfly flutters in from a screen edge on a lazy bobbing path, wings opening and closing as it goes, then drifts off the far edge like the meadow was never there"],
   ["v0.224.0", "tumbleweed — every ~2-4 min a dry tangled tumbleweed rolls in from a screen edge and bounces along the bottom of the page, shedding stray twigs on its hardest landings, then tumbles off the far edge like the prairie was never fenced"],
   ["v0.223.0", "message in a bottle — every ~2-4 min a corked glass bottle washes in along the bottom of the page, bobbing on invisible waves with a rolled note sealed inside, then the tide carries it back out like the message was never read"],
   ["v0.222.0", "shooting star — every ~2-4 min a meteor streaks diagonally across the sky, glowing head flickering with a tapering trail that burns out behind it, then the night is quiet again like nothing was wished on"],
