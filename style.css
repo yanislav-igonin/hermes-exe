@@ -3511,3 +3511,51 @@ canvas.fireflies {
   pointer-events: none;
   will-change: transform, opacity;
 }
+
+/* paper lantern — a glowing lantern drifts up from the bottom and gutters out */
+.paper-lantern {
+  position: fixed;
+  bottom: -70px;
+  left: 0;
+  z-index: 5;
+  width: 26px;
+  height: 34px;
+  pointer-events: none;
+  will-change: transform, opacity;
+  filter: var(--lantern-filter, none);
+}
+.paper-lantern .lantern-body {
+  position: absolute;
+  inset: 0;
+  border-radius: 45% 45% 40% 40% / 55% 55% 38% 38%;
+  background: radial-gradient(circle at 50% 65%, #ffe9a8 0%, #ffc46b 45%, rgba(255, 150, 60, .35) 75%, rgba(255, 120, 40, 0) 100%);
+  box-shadow: 0 0 18px 6px rgba(255, 190, 100, .35), 0 0 44px 14px rgba(255, 160, 60, .12);
+}
+.paper-lantern .lantern-body::after {
+  /* little flame glowing through the paper */
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 58%;
+  width: 7px;
+  height: 10px;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 40% 40%;
+  background: radial-gradient(circle at 50% 70%, #fff6d8, #ffb84d 60%, rgba(255, 130, 40, 0) 100%);
+}
+.paper-lantern .lantern-flame {
+  /* warm glow halo that breathes with the flicker */
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  width: 60px;
+  height: 60px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 200, 110, .22) 0%, rgba(255, 160, 60, .08) 45%, transparent 70%);
+  pointer-events: none;
+}
+body.vaporwave .paper-lantern .lantern-body {
+  background: radial-gradient(circle at 50% 65%, #ffd7f5 0%, #e08bff 45%, rgba(201, 120, 232, .35) 75%, rgba(160, 80, 200, 0) 100%);
+  box-shadow: 0 0 18px 6px rgba(230, 150, 255, .35), 0 0 44px 14px rgba(201, 120, 232, .12);
+}

@@ -3818,6 +3818,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.220.0", "paper lantern — every ~2-4 min a glowing paper lantern lifts off from the bottom of the page and drifts upward on the warm air, swaying and flickering as it rises, then gutters out mid-sky like the wish was never made"],
   ["v0.219.0", "kite — every ~2-4 min a small kite swoops in from a screen edge and glides across the upper sky on a bobbing path, banked into the wind with its tail trailing and fluttering behind it, then drifts off the far edge like the wind was never flying it"],
   ["v0.218.0", "boomerang — every ~2-4 min a boomerang launches from a random spot on the page, flies out along a sweeping arc while spinning, curves back through the sky and returns to the exact point it was thrown from, then fades away like the thrower was never there"],
   ["v0.217.0", "balloon — every ~2-4 min a small balloon drifts up from the bottom of the page, sways gently on an invisible breeze with its string trailing below, and pops into a tiny confetti burst if you click it; otherwise it floats away off the top like a fairground you were never at"],
@@ -7645,6 +7646,37 @@ const AURORA_NOTES = [
 // kite — every ~2-4 min a small diamond kite with a fluttering ribbon tail
 // glides across the upper sky, bobbing and tilting on the breeze, then
 // drifts off-screen like the wind was never there
+// paper lantern — every ~2-4 min a glowing paper lantern lifts off from the
+// bottom of the page and drifts upward on the warm air, swaying as it rises,
+// flickering, then guttering out mid-sky like the wish was never made
+(function paperLantern() {
+  function launch() {
+    const el = document.createElement("div");
+    el.className = "paper-lantern";
+    el.innerHTML = `<div class="lantern-body"></div><div class="lantern-flame"></div>`;
+    el.style.left = (8 + Math.random() * 84) + "vw";
+    const hue = (Math.random() * 40 - 15).toFixed(0) + "deg";
+    document.body.appendChild(el);
+    const dur = 22000 + Math.random() * 12000;
+    const drift = (Math.random() - .5) * 24;  // sideways wander, vw
+    const sway = 3 + Math.random() * 4;       // bob amplitude, vw
+    const start = performance.now();
+    (function tick(now) {
+      const t = (now - start) / dur;
+      if (t >= 1) { el.remove(); return; }
+      const x = drift * t + Math.sin(t * Math.PI * 5) * sway * (1 - t * .6);
+      const y = -(110 * Math.pow(t, 1.15));     // slows slightly as air cools
+      const flicker = .75 + Math.sin(now * .012 + t * 9) * .2 + Math.random() * .05;
+      el.style.opacity = (t > .82 ? (1 - (t - .82) / .18) : 1).toFixed(2);
+      el.style.transform = `translate(${x.toFixed(2)}vw, ${y.toFixed(1)}vh) rotate(${(x * .6).toFixed(1)}deg)`;
+      el.style.filter = `hue-rotate(${hue}) brightness(${flicker.toFixed(2)})`;
+      requestAnimationFrame(tick);
+    })(start);
+    setTimeout(launch, 120000 + Math.random() * 120000);
+  }
+  setTimeout(launch, 20000 + Math.random() * 30000);
+})();
+
 (function kite() {
   const sky = document.createElement("div");
   sky.className = "kite";
