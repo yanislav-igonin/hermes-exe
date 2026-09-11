@@ -91,6 +91,11 @@ let satellite = null, nextSatelliteAt = performance.now() + 200000 * (.7 + Math.
 // off over the far edge like the sky was never theirs
 let flock = null, nextFlockAt = performance.now() + 180000 * (.7 + Math.random() * .6);
 
+// rubber duck state — a yellow rubber duck bobs in along the bottom of the
+// page every few minutes, tilts on invisible waves, squeaks once to the
+// console, then drifts off like bath time was never scheduled
+let duck = null, nextDuckAt = performance.now() + 180000 * (.7 + Math.random() * .6);
+
 (function tick(now) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawNoise(now);
@@ -936,6 +941,71 @@ const geese = [];
       ctx.stroke();
     }
     if (allGone) { flock = null; nextFlockAt = now + 180000 * (.7 + Math.random() * .6); }
+  }
+  // rubber duck — every ~2-4 min a yellow rubber duck bobs in along the
+  // bottom of the page, tilting on invisible waves with a faint wake behind
+  // it, then drifts off the far edge like bath time was never scheduled
+  if (!duck && now > nextDuckAt) {
+    const dir = Math.random() < .5 ? 1 : -1;
+    duck = { dir, x: dir > 0 ? -40 : canvas.width + 40, y: canvas.height - 20 - Math.random() * 16, phase: Math.random() * 6 };
+    setTimeout(() => console.log("duck log: bathwater temperature nominal"), 4000);
+  }
+  if (duck) {
+    const d = duck;
+    d.x += .8 * d.dir;
+    d.phase += .045;
+    const bob = Math.sin(d.phase) * 2.5, tilt = Math.sin(d.phase * .8) * .12;
+    if (d.x < -50 || d.x > canvas.width + 50) { duck = null; nextDuckAt = now + 180000 * (.7 + Math.random() * .6); }
+    else {
+      // faint wake ripples trailing behind
+      ctx.strokeStyle = "rgba(124,252,156,.18)";
+      ctx.lineWidth = 1;
+      for (let r = 1; r <= 3; r++) {
+        ctx.beginPath();
+        ctx.arc(d.x - d.dir * (8 + r * 7), d.y + bob + 3, r * 2.2, Math.PI * .85, Math.PI * 1.15);
+        ctx.stroke();
+      }
+      ctx.save();
+      ctx.translate(d.x, d.y + bob);
+      ctx.rotate(tilt * d.dir);
+      ctx.scale(d.dir, 1);
+      // body — squat yellow hull
+      ctx.fillStyle = "rgba(250,215,80,.92)";
+      ctx.beginPath();
+      ctx.ellipse(0, 2, 8, 5.5, 0, 0, 7);
+      ctx.fill();
+      // tail kick at the back
+      ctx.beginPath();
+      ctx.moveTo(-7, 0);
+      ctx.quadraticCurveTo(-11, -3 - Math.sin(d.phase) * 2, -8, -4);
+      ctx.fillStyle = "rgba(250,215,80,.92)";
+      ctx.fill();
+      // head
+      ctx.beginPath();
+      ctx.arc(5, -4, 4, 0, 7);
+      ctx.fill();
+      // orange bill
+      ctx.fillStyle = "rgba(235,130,50,.95)";
+      ctx.beginPath();
+      ctx.moveTo(8, -4);
+      ctx.lineTo(13, -3);
+      ctx.lineTo(8, -2);
+      ctx.closePath();
+      ctx.fill();
+      // eye
+      ctx.fillStyle = "#1a1a10";
+      ctx.beginPath();
+      ctx.arc(6, -5.4, .9, 0, 7);
+      ctx.fill();
+      // waterline shading on the hull
+      ctx.strokeStyle = "rgba(124,252,156,.35)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(-8, 5);
+      ctx.lineTo(8, 5);
+      ctx.stroke();
+      ctx.restore();
+    }
   }
   requestAnimationFrame(tick);
 })();
@@ -4468,6 +4538,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.239.0", "rubber duck — every ~2-4 min a yellow rubber duck bobs in along the bottom of the page, tilting on invisible waves with a faint wake trailing behind, squeaks once to the console, then drifts off the far edge like bath time was never scheduled"],
   ["v0.238.0", "bubble wrap — every ~2-4 min a sheet of bubble wrap drifts slowly up from the bottom of the page, its bubbles popping one by one on staggered little bursts as it rises, then the last empty bubbles fade away like nobody ever needed the packing"],
   ["v0.237.0", "bird flock — every ~2-4 min a small loose flock of silhouetted birds flutters across the page at a random height, each bird flapping on its own out-of-phase beat while the group wobbles along together, then they clear off over the far edge like the sky was never theirs"],
   ["v0.236.0", "tumbleweed — every ~2-4 min a scraggly tumbleweed rolls across the bottom of the page, bouncing over invisible ruts and spinning as it goes, sheds a couple of twigs that drop behind it, then tumbles off the far edge like the prairie was never there"],
