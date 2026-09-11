@@ -2550,6 +2550,50 @@ addEventListener("mousemove", e => {
   setTimeout(ride, 40000 + Math.random() * 40000);
 })();
 
+// dandelion — every ~2-4 min a dandelion puff appears near an edge, sways
+// for a moment, then bursts: a dozen parachute seeds drift off on the
+// breeze with a lazy wobble until they fade away like the wind was never there
+(function dandelion() {
+  const layer = document.createElement("div");
+  layer.className = "dandelion";
+  document.body.appendChild(layer);
+  function bloom() {
+    if (!document.hidden) {
+      const fromLeft = Math.random() < 0.5;
+      const head = document.createElement("span");
+      head.className = "puff-head";
+      const hx = fromLeft ? -30 : innerWidth + 30;
+      const hy = innerHeight * (0.25 + Math.random() * 0.45);
+      head.style.left = hx + "px";
+      head.style.top = hy + "px";
+      head.style.setProperty("--dp-dur", "5200ms");
+      head.style.setProperty("--dp-x", (fromLeft ? 90 : -90) + "px");
+      layer.appendChild(head);
+      setTimeout(() => {
+        head.remove();
+        if (document.hidden) return;
+        const seeds = [];
+        const n = 10 + Math.floor(Math.random() * 5);
+        for (let i = 0; i < n; i++) {
+          const s = document.createElement("span");
+          s.className = "puff-seed";
+          s.style.left = hx + "px";
+          s.style.top = hy + "px";
+          s.style.setProperty("--ds-x", ((fromLeft ? 1 : -1) * (180 + Math.random() * 260)).toFixed(0) + "px");
+          s.style.setProperty("--ds-y", (-40 + Math.random() * 160).toFixed(0) + "px");
+          s.style.setProperty("--ds-dur", (7000 + Math.random() * 6000).toFixed(0) + "ms");
+          s.style.animationDelay = (Math.random() * 0.6).toFixed(2) + "s";
+          layer.appendChild(s);
+          seeds.push(s);
+        }
+        setTimeout(() => seeds.forEach(s => s.remove()), 14500);
+      }, 5000);
+    }
+    setTimeout(bloom, 120000 + Math.random() * 120000);
+  }
+  setTimeout(bloom, 30000 + Math.random() * 40000);
+})();
+
 // shooting star — every ~2-4 min a brief meteor streaks diagonally across
 // the viewport: a thin bright line with a fading trail, then it burns out
 (function shootingStar() {
@@ -3315,6 +3359,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.190.0", "dandelion — every ~2-4 min a dandelion puff sways in near an edge, then bursts: a dozen parachute seeds drift off across the page on a lazy breeze, wobbling until they fade away like the wind was never there"],
   ["v0.189.0", "school of minnows — every ~2-4 min a small school of tiny translucent fish swims across the lower part of the page, each minnow wobbling and darting within the shoal, then the school slips off-screen like the pond was never there"],
   ["v0.188.0", "fireflies at dusk — every minute or so a small brood of tiny glowing fireflies blinks awake near the bottom of the page, each wandering and flickering on its own rhythm before fading away like the meadow was never there"],
   ["v0.187.0", "jellyfish — every ~2-4 min a small translucent jellyfish rises from the bottom of the page, its bell pulsing as it bobs gently upward with long tentacles swaying behind it, then it fades out near the top like the deep was never visited"],

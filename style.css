@@ -1736,6 +1736,69 @@ body.synthwave #ghost-typewriter { color: #ff8c2e; text-shadow: 0 0 8px rgba(255
   50%      { filter: brightness(1.6); }
 }
 
+/* dandelion — a puff sways in, then bursts into drifting parachute seeds */
+.dandelion {
+  position: fixed; inset: 0; z-index: 9996;
+  pointer-events: none; overflow: hidden;
+}
+.dandelion .puff-head {
+  position: absolute;
+  width: 22px; height: 26px;
+  opacity: 0;
+  animation: puff-sway var(--dp-dur, 5200ms) ease-in-out forwards;
+}
+.dandelion .puff-head::before {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 50% 22%, rgba(255,255,255,.9) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 38% 34%, rgba(255,255,255,.75) 0 1.3px, transparent 1.8px),
+    radial-gradient(circle at 62% 34%, rgba(255,255,255,.75) 0 1.3px, transparent 1.8px),
+    radial-gradient(circle at 30% 52%, rgba(255,255,255,.6) 0 1.1px, transparent 1.6px),
+    radial-gradient(circle at 70% 52%, rgba(255,255,255,.6) 0 1.1px, transparent 1.6px),
+    radial-gradient(circle at 50% 62%, rgba(235,240,255,.7) 0 2.2px, rgba(220,228,250,.25) 5px, transparent 8px);
+  filter: drop-shadow(0 0 4px rgba(255,255,255,.25));
+}
+.dandelion .puff-head::after {
+  content: "";
+  position: absolute; left: 50%; top: 60%;
+  width: 1px; height: 10px;
+  background: rgba(200,210,235,.4);
+  transform: translateX(-50%);
+}
+@keyframes puff-sway {
+  0%   { opacity: 0; transform: translate(0, 0) rotate(-6deg); }
+  20%  { opacity: .95; }
+  60%  { opacity: .9; transform: translate(calc(var(--dp-x, 0) * .4), 6px) rotate(7deg); }
+  100% { opacity: 0; transform: translate(var(--dp-x, 0), 14px) rotate(-4deg); }
+}
+.dandelion .puff-seed {
+  position: absolute;
+  width: 8px; height: 8px;
+  opacity: 0;
+  animation: seed-drift var(--ds-dur, 9000ms) ease-out forwards;
+}
+.dandelion .puff-seed::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 30%, rgba(255,255,255,.95) 0 .8px, transparent 1.4px);
+  filter: drop-shadow(0 0 3px rgba(255,255,255,.3));
+}
+.dandelion .puff-seed::after {
+  content: "";
+  position: absolute; left: 50%; top: 40%;
+  width: 6px; height: 1px;
+  background: rgba(210,220,245,.5);
+  transform: translateX(-50%) rotate(24deg);
+}
+@keyframes seed-drift {
+  0%   { opacity: 0; transform: translate(0, 0) rotate(0deg); }
+  8%   { opacity: .9; }
+  30%  { transform: translate(calc(var(--ds-x, 0) * .3), calc(var(--ds-y, 0) * .4)) rotate(40deg); }
+  60%  { opacity: .7; transform: translate(calc(var(--ds-x, 0) * .6), calc(var(--ds-y, 0) * .8)) rotate(-30deg); }
+  100% { opacity: 0; transform: translate(var(--ds-x, 0), var(--ds-y, 0)) rotate(20deg); }
+}
+
 /* star chart — an antique astronomical chart surfaces at a random spot:
    field stars fade in, the figure's stars pop in one by one and the chart
    line draws itself between them, a plate label fades in beneath, then the
