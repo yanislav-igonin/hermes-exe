@@ -3765,6 +3765,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.213.0", "dandelion seed — every ~2-4 min a fluffy seed head drifts in from a screen edge on the breeze, and the moment it settles it bursts into a scatter of tiny parachutes that flutter away on their own little journeys"],
   ["v0.212.0", "frog visitor — every ~3-5 min a small frog hops in from a screen edge, crouches blinking while its throat bulges, then turns around and hops back out like the pond was never here"],
   ["v0.211.0", "chalk doodle — every ~2-3 min a hand-drawn chalk doodle (a smiley, star, spiral or fish) sketches itself onto the background, lingers for a moment, then is wiped away like the blackboard was never used"],
   ["v0.210.0", "mushroom ring — every ~2-4 min a small fairy ring of mushrooms sprouts from the bottom of the page, caps swelling as they push through and swaying gently, then the whole ring quietly sinks back down like nobody knelt to check it"],
@@ -8467,4 +8468,81 @@ const AURORA_NOTES = [
     })(performance.now());
   }
   setTimeout(sprout, 45000 + Math.random() * 60000);
+})();
+// dandelion seed — every ~2-4 min a dandelion seed head drifts in from a
+// screen edge, wobbling on the breeze, and the moment it touches the page it
+// bursts: a handful of tiny parachutes scatter and flutter away on their own
+// little journeys
+(function dandelionSeed() {
+  function puff(cx, cy, n) {
+    const seeds = [];
+    for (let i = 0; i < n; i++) {
+      const el = document.createElement("div");
+      const size = 10 + Math.random() * 8;
+      el.style.cssText = "position:fixed;z-index:4;pointer-events:none;will-change:transform,opacity;opacity:0;transition:opacity 1.2s ease-out;";
+      el.innerHTML =
+        '<svg width="' + size + '" height="' + (size + 8) + '" viewBox="0 0 ' + size + ' ' + (size + 8) + '" style="display:block">' +
+          '<path d="M' + (size / 2) + ' 0 L' + (size / 2 - 3) + ' ' + size / 2 + ' M' + (size / 2) + ' 0 L' + (size / 2 + 3) + ' ' + size / 2 + ' M' + (size / 2) + ' 0 L' + (size / 2) + ' ' + (size / 2 + 1) + '" stroke="rgba(240,240,230,.7)" stroke-width=".8" fill="none"/>' +
+          '<line x1="' + size / 2 + '" y1="' + (size / 2 + 1) + '" x2="' + size / 2 + '" y2="' + (size + 6) + '" stroke="rgba(200,200,190,.55)" stroke-width=".9"/>' +
+        "</svg>";
+      document.body.appendChild(el);
+      seeds.push({
+        el, x: cx, y: cy,
+        vx: (Math.random() - .5) * 40, vy: 8 + Math.random() * 14,
+        sway: Math.random() * 6.28, swaySpeed: 1 + Math.random() * 1.2,
+        fade: 9 + Math.random() * 5, born: performance.now()
+      });
+    }
+    requestAnimationFrame(seeds[0] && function drift(now) {
+      let alive = false;
+      for (const s of seeds) {
+        const t = (now - s.born) / 1000;
+        if (t > s.fade) { s.el.remove(); continue; }
+        alive = true;
+        s.x += (s.vx + Math.sin(t * s.swaySpeed + s.sway) * 22) / 60;
+        s.y += s.vy / 60;
+        s.el.style.opacity = String(Math.min(1, t * 2) * (1 - Math.max(0, (t - s.fade + 1.5) / 1.5)));
+        s.el.style.transform = "translate(" + s.x.toFixed(1) + "px," + s.y.toFixed(1) + "px) rotate(" + (Math.sin(t * 2 + s.sway) * 14).toFixed(1) + "deg)";
+      }
+      if (alive) requestAnimationFrame(drift);
+    });
+  }
+  function seedHead() {
+    const fromLeft = Math.random() < .5;
+    const head = document.createElement("div");
+    const size = 26 + Math.random() * 10;
+    head.style.cssText = "position:fixed;z-index:4;pointer-events:none;will-change:transform;";
+    head.innerHTML =
+      '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" style="display:block;filter:drop-shadow(0 0 6px rgba(255,255,240,.35))">' +
+        '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + (size * .32) + '" fill="rgba(245,245,235,.25)"/>' +
+        '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + (size * .16) + '" fill="rgba(230,225,205,.5)"/>' +
+        Array.from({ length: 10 }, (_, i) => {
+          const a = (i / 10) * Math.PI * 2;
+          return '<line x1="' + size / 2 + '" y1="' + size / 2 + '" x2="' + (size / 2 + Math.cos(a) * size * .45) + '" y2="' + (size / 2 + Math.sin(a) * size * .45) + '" stroke="rgba(245,245,235,.55)" stroke-width=".9"/>' +
+                 '<circle cx="' + (size / 2 + Math.cos(a) * size * .45) + '" cy="' + (size / 2 + Math.sin(a) * size * .45) + '" r="1.2" fill="rgba(255,255,245,.7)"/>';
+        }).join("") +
+      "</svg>";
+    document.body.appendChild(head);
+    const startX = fromLeft ? -40 : innerWidth + 40;
+    const startY = innerHeight * (.15 + Math.random() * .35);
+    const tx = innerWidth * (.3 + Math.random() * .4);
+    const ty = innerHeight * (.3 + Math.random() * .35);
+    const dur = 22000 + Math.random() * 12000;
+    const born = performance.now();
+    console.log("a dandelion seed rides the draft");
+    (function floatHead(now) {
+      const t = Math.min(1, (now - born) / dur);
+      const x = startX + (tx - startX) * t + Math.sin(t * 9) * 26 * (1 - t * .4);
+      const y = startY + (ty - startY) * (t * t * (3 - 2 * t)) + Math.cos(t * 7) * 18;
+      head.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) rotate(" + (Math.sin(t * 5) * 10).toFixed(1) + "deg)";
+      if (t < 1) requestAnimationFrame(floatHead);
+      else {
+        head.remove();
+        puff(x, y, 7 + Math.floor(Math.random() * 5));
+        console.log("the seed head bursts — make a wish");
+        setTimeout(seedHead, 120000 + Math.random() * 120000);
+      }
+    })(born);
+  }
+  setTimeout(seedHead, 60000 + Math.random() * 60000);
 })();
