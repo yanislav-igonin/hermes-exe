@@ -3560,6 +3560,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.210.0", "mushroom ring — every ~2-4 min a small fairy ring of mushrooms sprouts from the bottom of the page, caps swelling as they push through and swaying gently, then the whole ring quietly sinks back down like nobody knelt to check it"],
   ["v0.209.0", "worms after rain — every ~2-4 min a brief drizzle sweeps the page, then 2-3 earthworms surface from the bottom edge and wriggle across it with a peristaltic ripple, then burrow back down like the soil was never disturbed"],
   ["v0.208.0", "dandelion seed — every ~2-4 min a single dandelion seed drifts across the page on the breeze, tumbling slowly while its silky bristles sway, then it floats off the far edge like the wind never counted it"],
   ["v0.207.0", "paper airplane — every ~2-3 min a folded paper airplane glides across the page on a swaying path, launched from a screen edge, wobbling on the breeze with a gentle bank, then vanishes off the far edge like the flight was never logged"],
@@ -8212,4 +8213,51 @@ const AURORA_NOTES = [
     requestAnimationFrame(planeTick);
   }
   setTimeout(launch, 40000 + Math.random() * 50000);
+})();
+
+// mushroom ring — every ~2-4 min a small ring of mushrooms sprouts up from the
+// bottom of the page overnight-style, caps gently swelling as they push
+// through, then the whole fairy ring quietly sinks back down like nobody
+// knelt to check it
+(function mushroomRing() {
+  const CAP = "rgba(198,152,120,.85)", STEM = "rgba(220,208,188,.75)";
+  function sprout() {
+    const n = 3 + Math.floor(Math.random() * 3);
+    const cx = innerWidth * (.15 + Math.random() * .7);
+    const spread = 40 + Math.random() * 50;
+    const baseY = innerHeight - 6;
+    const shrooms = [];
+    for (let i = 0; i < n; i++) {
+      const el = document.createElement("div");
+      const w = 16 + Math.random() * 14;
+      el.style.cssText = "position:fixed;z-index:3;pointer-events:none;will-change:transform,opacity;opacity:0;transition:opacity 2s ease-in-out;";
+      el.innerHTML =
+        '<svg width="' + (w + 4) + '" height="' + (w + 16) + '" viewBox="0 0 ' + (w + 4) + ' ' + (w + 16) + '" style="display:block">' +
+          '<path d="M' + ((w + 4) / 2) + ' ' + (w + 4) + ' L' + ((w + 4) / 2 - 2.5) + ' ' + (w + 16) + ' L' + ((w + 4) / 2 + 2.5) + ' ' + (w + 16) + ' Z" fill="' + STEM + '"/>' +
+          '<path d="M2 ' + (w + 6) + ' Q' + ((w + 4) / 2) + ' ' + (-w * .45) + ' ' + (w + 2) + ' ' + (w + 6) + ' Q' + ((w + 4) / 2) + ' ' + (w + 1) + ' 2 ' + (w + 6) + ' Z" fill="' + CAP + '"/>' +
+          '<circle cx="' + ((w + 4) * .38) + '" cy="' + (w * .32 + 2) + '" r="1.4" fill="rgba(255,245,220,.5)"/>' +
+          '<circle cx="' + ((w + 4) * .62) + '" cy="' + (w * .42 + 2) + '" r="1" fill="rgba(255,245,220,.4)"/>' +
+        "</svg>";
+      const x = cx + (i - (n - 1) / 2) * spread + (Math.random() - .5) * 18;
+      document.body.appendChild(el);
+      shrooms.push({ el, x: x - (w + 4) / 2, y: baseY, h: w + 16, sway: Math.random() * 7, delay: i * (600 + Math.random() * 700) });
+    }
+    setTimeout(() => console.log("fairy ring: do not step inside"), 2500);
+    let start = null;
+    (function step(now) {
+      if (!start) start = now;
+      const t = (now - start) / 1000;
+      for (const s of shrooms) {
+        const rise = Math.max(0, Math.min(1, (t * 1000 - s.delay) / 2500));
+        const sink = Math.max(0, (t * 1000 - 11000) / 2500);
+        const k = Math.min(1, rise) * (1 - Math.min(1, sink));
+        const bob = Math.sin(t * 1.6 + s.sway) * 1.5 * k;
+        s.el.style.opacity = String(k);
+        s.el.style.transform = "translate(" + s.x.toFixed(1) + "px, " + (s.y - s.h * k + bob).toFixed(1) + "px)";
+      }
+      if (t * 1000 < 15000) requestAnimationFrame(step);
+      else { for (const s of shrooms) s.el.remove(); setTimeout(sprout, 120000 + Math.random() * 120000); }
+    })(performance.now());
+  }
+  setTimeout(sprout, 45000 + Math.random() * 60000);
 })();
