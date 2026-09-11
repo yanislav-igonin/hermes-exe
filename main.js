@@ -67,6 +67,10 @@ let jelly = null, nextJellyAt = performance.now() + 180000 * (.7 + Math.random()
 // pauses, blinks, then hops away in the direction it came from
 let frog = null, nextFrogAt = performance.now() + 200000 * (.7 + Math.random() * .6);
 
+// bottle state — a corked glass bottle washes in along the bottom of the page
+// every few minutes, a rolled note sealed inside, then the tide takes it away
+let bottle = null, nextBottleAt = performance.now() + 180000 * (.7 + Math.random() * .6);
+
 (function tick(now) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawNoise(now);
@@ -664,6 +668,59 @@ const geese = [];
       ctx.strokeStyle = "rgba(90,180,110,.8)";
       ctx.lineWidth = 1.6;
       ctx.beginPath(); ctx.moveTo(5, 6); ctx.lineTo(9, 7); ctx.stroke();
+      ctx.restore();
+    }
+  }
+  // message in a bottle — every ~2-4 min a corked glass bottle washes in
+  // along the bottom of the page, bobbing on invisible waves with a rolled
+  // note sealed inside, then the tide carries it back out like the message
+  // was never read (state above the loop)
+  if (!bottle && now > nextBottleAt) {
+    const dir = Math.random() < .5 ? 1 : -1;
+    bottle = { dir, x: dir > 0 ? -40 : canvas.width + 40, y: canvas.height - 14 - Math.random() * 20, phase: Math.random() * 6 };
+    setTimeout(() => console.log("bottle log: the note inside is just \"ok\""), 5000);
+  }
+  if (bottle) {
+    const b = bottle;
+    b.x += 1.1 * b.dir;
+    b.phase += .05;
+    const bob = Math.sin(b.phase) * 3, tilt = Math.sin(b.phase * .7) * .16;
+    if (b.x < -50 || b.x > canvas.width + 50) { bottle = null; nextBottleAt = now + 180000 * (.7 + Math.random() * .6); }
+    else {
+      ctx.save();
+      ctx.translate(b.x, b.y + bob);
+      ctx.rotate(tilt * b.dir);
+      // bottle body — tilted glass with a faint highlight
+      ctx.fillStyle = "rgba(150,220,255,.16)";
+      ctx.strokeStyle = "rgba(170,235,255,.45)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(-11, -5);
+      ctx.quadraticCurveTo(-13, 0, -11, 5);
+      ctx.lineTo(11, 5);
+      ctx.lineTo(11, -5);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      // neck and cork
+      ctx.strokeRect(11, -2.5, 7, 5);
+      ctx.fillStyle = "rgba(190,150,100,.85)";
+      ctx.fillRect(17.5, -3, 4, 6);
+      // rolled note sealed inside
+      ctx.fillStyle = "rgba(235,230,200,.75)";
+      ctx.fillRect(-7, -2.5, 12, 5);
+      ctx.strokeStyle = "rgba(180,175,150,.6)";
+      ctx.lineWidth = .5;
+      ctx.beginPath();
+      ctx.moveTo(-3, -2.5); ctx.lineTo(-3, 2.5);
+      ctx.moveTo(1, -2.5); ctx.lineTo(1, 2.5);
+      ctx.stroke();
+      // glass glint
+      ctx.strokeStyle = "rgba(235,250,255,.35)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(-9, -3.5); ctx.lineTo(-6, -3.8);
+      ctx.stroke();
       ctx.restore();
     }
   }
@@ -3913,6 +3970,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.223.0", "message in a bottle — every ~2-4 min a corked glass bottle washes in along the bottom of the page, bobbing on invisible waves with a rolled note sealed inside, then the tide carries it back out like the message was never read"],
   ["v0.222.0", "shooting star — every ~2-4 min a meteor streaks diagonally across the sky, glowing head flickering with a tapering trail that burns out behind it, then the night is quiet again like nothing was wished on"],
   ["v0.221.0", "paper airplane — every ~2-4 min a folded paper airplane glides in from a screen edge, bobbing on the air with banking wobbles, does one loop mid-flight and veers off the far edge like the note was never thrown"],
   ["v0.220.0", "paper lantern — every ~2-4 min a glowing paper lantern lifts off from the bottom of the page and drifts upward on the warm air, swaying and flickering as it rises, then gutters out mid-sky like the wish was never made"],
