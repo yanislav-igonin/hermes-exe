@@ -4138,6 +4138,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.228.0", "shooting star — every ~2-4 min a brief streak slashes diagonally across the upper sky, its spark head flaring and a thin trail fading behind it, then it burns out mid-air like the wish was never made"],
   ["v0.227.0", "satellite pass — every ~3-5 min a tiny satellite drifts across the upper sky, solar panels glinting and a small light blinking steadily, then it passes over the horizon like the orbit was never noticed"],
   ["v0.226.0", "zeppelin — every ~3-5 min a small airship glides slowly across the upper sky, its envelope swaying on the breeze with the gondola dangling beneath, then it sails off the far edge like the crossing was never booked"],
   ["v0.225.0", "butterfly — every ~2-4 min a butterfly flutters in from a screen edge on a lazy bobbing path, wings opening and closing as it goes, then drifts off the far edge like the meadow was never there"],
@@ -9260,4 +9261,33 @@ const AURORA_NOTES = [
     })(start);
   }
   setTimeout(fly, 30000 + Math.random() * 40000);
+})();
+
+// shooting star — every ~2-4 min a brief streak slashes diagonally across the
+// upper sky, its spark head flaring and a thin trail fading behind it, then it
+// burns out mid-air like the wish was never made
+(function shootingStar() {
+  function fly() {
+    const el = document.createElement("div");
+    el.className = "shooting-star";
+    const fromLeft = Math.random() < .5;
+    el.style.top = (innerHeight * (.02 + Math.random() * .12)) + "px";
+    el.style.left = (fromLeft ? -80 : innerWidth + 80) + "px";
+    document.body.appendChild(el);
+    const dur = 1400 + Math.random() * 800; // wishes don't dawdle
+    const dist = innerWidth + 180;
+    const dir = fromLeft ? 1 : -1;
+    const slope = (Math.random() * .3 + .12) * (Math.random() < .5 ? 1 : -1);
+    const start = performance.now();
+    (function tick(now) {
+      const t = (now - start) / dur;
+      if (t >= 1) { el.remove(); setTimeout(fly, 120000 + Math.random() * 120000); return; }
+      const x = dir * dist * t;
+      const y = x * slope;
+      el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scaleX(${dir})`;
+      el.style.opacity = (t < .15 ? t / .15 : 1 - (t - .15) / .85).toFixed(2);
+      requestAnimationFrame(tick);
+    })(start);
+  }
+  setTimeout(fly, 120000 + Math.random() * 120000);
 })();
