@@ -3765,6 +3765,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.215.0", "lighthouse — every ~2-4 min a tiny lighthouse rises near the top of the page, its beam sweeping slow rotating arcs of light across the sky, then it dims and sinks away like the coast was never charted"],
   ["v0.214.0", "ekg pulse — a tiny heart monitor in the corner scrolls a steady green EKG line, occasionally flatlines in red for a breath, then finds its pulse again"],
   ["v0.213.0", "dandelion seed — every ~2-4 min a fluffy seed head drifts in from a screen edge on the breeze, and the moment it settles it bursts into a scatter of tiny parachutes that flutter away on their own little journeys"],
   ["v0.212.0", "frog visitor — every ~3-5 min a small frog hops in from a screen edge, crouches blinking while its throat bulges, then turns around and hops back out like the pond was never here"],
@@ -8604,4 +8605,44 @@ const AURORA_NOTES = [
     requestAnimationFrame(ekgTick);
   }
   requestAnimationFrame(ekgTick);
+})();
+
+// lighthouse — every ~2-4 min a tiny lighthouse rises from a random spot near
+// an upper edge, its beam sweeping a slow rotating arc of light across the
+// page in dark-green sweeps, then it folds back down like the coast was never
+// charted
+(function lighthouse() {
+  let tower = null;
+  function sweep() {
+    const x = innerWidth * (.15 + Math.random() * .7);
+    const y = 40 + Math.random() * (innerHeight * .3);
+    tower = document.createElement("div");
+    tower.className = "lighthouse";
+    tower.style.left = x + "px";
+    tower.style.top = y + "px";
+    const beam = document.createElement("div");
+    beam.className = "lighthouse-beam";
+    tower.appendChild(beam);
+    document.body.appendChild(tower);
+    const dur = 5000 + Math.random() * 3000;
+    const spins = 2 + Math.random() * 2 | 0;
+    const dir = Math.random() < .5 ? 1 : -1;
+    const start = performance.now();
+    (function tick(now) {
+      const t = (now - start) / dur;
+      if (t >= 1) {
+        tower.classList.add("fading");
+        setTimeout(() => tower.remove(), 900);
+        setTimeout(sweep, 120000 + Math.random() * 120000);
+        return;
+      }
+      const rise = Math.min(1, t * 8) * (t > .88 ? (1 - (t - .88) / .12) : 1);
+      tower.style.opacity = rise.toFixed(2);
+      tower.style.transform = `translate(-50%, ${(1 - rise) * 24}px)`;
+      const ang = dir * t * spins * 360;
+      beam.style.transform = `rotate(${ang}deg)`;
+      requestAnimationFrame(tick);
+    })(start);
+  }
+  setTimeout(sweep, 30000 + Math.random() * 40000);
 })();

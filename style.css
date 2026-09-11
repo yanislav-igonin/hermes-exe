@@ -3423,3 +3423,37 @@ body.synthwave .tumbleweed { color: rgba(255, 170, 100, .8); text-shadow: 0 0 6p
 }
 .shooting-star.fading { opacity: 0; transition: opacity 1.2s ease-out; }
 .shooting-star-glow.fading { opacity: 0; transition: opacity 1.2s ease-out; }
+
+/* lighthouse: every ~2-4 min a tiny lighthouse rises near the top of the page,
+   its beam sweeping slow rotating arcs of light across the sky, then it dims
+   and sinks away like the coast was never charted */
+.lighthouse {
+  position: fixed;
+  z-index: 6;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.lighthouse::before {
+  content: "△";
+  display: block;
+  font-size: 22px;
+  line-height: 1;
+  color: rgba(124, 252, 156, .75);
+  text-shadow: 0 0 8px rgba(124, 252, 156, .5);
+}
+.lighthouse-beam {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  width: 240px;
+  height: 2px;
+  margin-left: 0;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, rgba(230, 255, 240, .55), rgba(230, 255, 240, 0));
+  box-shadow: 0 0 10px rgba(180, 255, 210, .35);
+  pointer-events: none;
+}
+.lighthouse.fading { opacity: 0 !important; transition: opacity .9s ease-out; }
+body.vaporwave .lighthouse::before { color: rgba(201, 166, 232, .75); text-shadow: 0 0 8px rgba(201, 166, 232, .4); }
+body.synthwave .lighthouse::before { color: rgba(255, 170, 100, .8); text-shadow: 0 0 8px rgba(255, 140, 70, .4); }
