@@ -3893,3 +3893,50 @@ body.synthwave .sl-slinky .sl-ring {
   border-color: rgba(255,140,46,.85);
   box-shadow: 0 0 4px rgba(255,140,46,.2);
 }
+
+/* bubble wrap: a sheet of bubble wrap drifts up from the bottom every ~2-4 min,
+   popping bubble by bubble on staggered timers as it rises, then fades out */
+.bubblewrap-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 3s ease;
+}
+.bubblewrap-layer.bw-on { opacity: 1; }
+.bubblewrap {
+  position: absolute;
+  bottom: -30vh;
+  left: var(--bw-x, 30vw);
+  display: grid;
+  grid-template-columns: repeat(9, 16px);
+  gap: 5px;
+  padding: 8px;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 6px;
+  will-change: transform;
+}
+.bubblewrap-layer.bw-on .bubblewrap { animation: bw-rise var(--bw-dur, 26s) ease-in forwards; }
+@keyframes bw-rise {
+  0% { transform: translateY(0); }
+  85% { transform: translateY(-128vh); }
+  100% { transform: translateY(-128vh); opacity: 0; }
+}
+.bw-bubble {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.75), rgba(255,255,255,.18) 55%, rgba(255,255,255,.05));
+  box-shadow: inset -1px -2px 3px rgba(0,0,0,.15), inset 1px 1px 2px rgba(255,255,255,.5);
+  animation: bw-pop .35s ease-out forwards;
+  animation-delay: var(--pop-delay, 2s);
+}
+@keyframes bw-pop {
+  0% { transform: scale(1); opacity: 1; }
+  60% { transform: scale(1.5); opacity: .8; }
+  100% { transform: scale(.2); opacity: 0; }
+}
+body.vaporwave .bubblewrap { background: rgba(201,166,232,.1); border-color: rgba(201,166,232,.25); }
+body.synthwave .bubblewrap { background: rgba(255,140,46,.1); border-color: rgba(255,140,46,.25); }

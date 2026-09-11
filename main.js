@@ -4468,6 +4468,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.238.0", "bubble wrap — every ~2-4 min a sheet of bubble wrap drifts slowly up from the bottom of the page, its bubbles popping one by one on staggered little bursts as it rises, then the last empty bubbles fade away like nobody ever needed the packing"],
   ["v0.237.0", "bird flock — every ~2-4 min a small loose flock of silhouetted birds flutters across the page at a random height, each bird flapping on its own out-of-phase beat while the group wobbles along together, then they clear off over the far edge like the sky was never theirs"],
   ["v0.236.0", "tumbleweed — every ~2-4 min a scraggly tumbleweed rolls across the bottom of the page, bouncing over invisible ruts and spinning as it goes, sheds a couple of twigs that drop behind it, then tumbles off the far edge like the prairie was never there"],
   ["v0.235.0", "slinky — every ~2-4 min a metal slinky flops over the top edge of the page and walks its way down step by stretchy step, top coils stretching out while the bunched bottom coils catch up, then it pools into a squat pile on the floor and fades away like nobody ever had stairs"],
@@ -9785,4 +9786,34 @@ const AURORA_NOTES = [
     setTimeout(roll, 120000 + Math.random() * 120000);
   }
   setTimeout(roll, 20000 + Math.random() * 30000);
+})();
+// bubble wrap — a sheet of bubble wrap drifts up from the bottom of the page
+// every ~2-4 min, pops with tiny staggered bursts as it rises, then the last
+// empty bubbles fade away like nobody ever needed the packing
+(function bubbleWrap() {
+  const layer = document.createElement("div");
+  layer.className = "bubblewrap-layer";
+  document.body.appendChild(layer);
+  function release() {
+    layer.innerHTML = "";
+    const sheet = document.createElement("div");
+    sheet.className = "bubblewrap";
+    const rows = 4, cols = 9;
+    for (let i = 0; i < rows * cols; i++) {
+      const bubble = document.createElement("span");
+      bubble.className = "bw-bubble";
+      sheet.appendChild(bubble);
+    }
+    sheet.style.setProperty("--bw-x", (6 + Math.random() * 62).toFixed(1) + "vw");
+    sheet.style.setProperty("--bw-dur", (22000 + Math.random() * 12000).toFixed(0) + "ms");
+    const bubbles = sheet.querySelectorAll(".bw-bubble");
+    bubbles.forEach(function (b) {
+      b.style.setProperty("--pop-delay", (1 + Math.random() * 18).toFixed(1) + "s");
+    });
+    layer.appendChild(sheet);
+    layer.classList.add("bw-on");
+    setTimeout(function () { layer.classList.remove("bw-on"); }, 40000);
+    setTimeout(release, 120000 + Math.random() * 120000);
+  }
+  setTimeout(release, 15000 + Math.random() * 30000);
 })();
