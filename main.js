@@ -59,6 +59,10 @@ let sonar = null, nextSonarAt = performance.now() + 90000 * (.7 + Math.random() 
 // very bottom edge of the page, enters from one side and marches out the other
 let ants = null, nextAntsAt = performance.now() + 180000 * (.7 + Math.random() * .6);
 
+// jellyfish state — small translucent jellyfish rise from the bottom and drift
+// up the page, pulsing, then fade out near the top
+let jelly = null, nextJellyAt = performance.now() + 180000 * (.7 + Math.random() * .6);
+
 (function tick(now) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawNoise(now);
@@ -480,6 +484,59 @@ const geese = [];
       }
     }
     if (allGone) { ants = null; nextAntsAt = now + 180000 * (.7 + Math.random() * .6); }
+  }
+  // jellyfish — every ~2-4 min a small translucent jellyfish rises from the
+  // bottom of the page, its bell pulsing as it bobs upward with tentacles
+  // trailing behind, then it fades out near the top like the deep was never
+  // visited (state above the loop)
+  if (!jelly && now > nextJellyAt) {
+    jelly = {
+      x: 60 + Math.random() * (canvas.width - 120),
+      y: canvas.height + 40,
+      r: 10 + Math.random() * 7,
+      phase: Math.random() * 6,
+      speed: .45 + Math.random() * .3,
+      drift: (Math.random() - .5) * .3
+    };
+    setTimeout(() => console.log("jellyfish log: gentle tides today"), 3000);
+  }
+  if (jelly) {
+    const j = jelly;
+    j.y -= j.speed;
+    j.x += j.drift + Math.sin(j.phase * .7) * .2;
+    j.phase += .035;
+    const pulse = Math.sin(j.phase); // bell squeeze rhythm
+    const life = Math.min(1, (j.y + 40) / 120, (canvas.height - j.y) / (canvas.height * .25)); // fade in at bottom, out near top
+    if (j.y < -40 || life <= 0) { jelly = null; nextJellyAt = now + 180000 * (.7 + Math.random() * .6); }
+    else if (j.y > -40 && j.y < canvas.height + 40) {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, Math.min(1, life));
+      ctx.translate(j.x, j.y);
+      const rw = j.r * (1 + pulse * .18), rh = j.r * (1 - pulse * .14);
+      // translucent bell
+      ctx.beginPath();
+      ctx.ellipse(0, 0, rw, rh, 0, Math.PI, 0);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(150,220,255,.22)";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(170,235,255,.5)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      // trailing tentacles, swaying with the pulse
+      ctx.strokeStyle = "rgba(150,220,255,.35)";
+      ctx.lineWidth = .8;
+      for (let t = -2; t <= 2; t++) {
+        const bx = t * rw * .38;
+        ctx.beginPath();
+        ctx.moveTo(bx, rh * .2);
+        ctx.quadraticCurveTo(
+          bx + Math.sin(j.phase + t) * 5, j.r * 1.4,
+          bx + Math.sin(j.phase * .8 + t) * 8, j.r * 2.6
+        );
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
   }
   requestAnimationFrame(tick);
 })();
@@ -3258,6 +3315,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.187.0", "jellyfish — every ~2-4 min a small translucent jellyfish rises from the bottom of the page, its bell pulsing as it bobs gently upward with long tentacles swaying behind it, then it fades out near the top like the deep was never visited"],
   ["v0.186.0", "ant procession — every ~2-4 min a single-file column of tiny ants marches along the very bottom of the page, each scurrying on wobbly legs and most hauling a crumb held overhead, until the whole procession marches off-screen like the picnic was never interrupted"],
   ["v0.185.0", "drifting cloud — every ~2-4 min a soft fluffy cloud crosses the high sky while its pale blurred shadow slides along the ground beneath it, bobbing gently on the breeze, then both drift away like the weather was never there"],
   ["v0.184.0", "falling leaf — every ~2-4 min a small autumn leaf tumbles down through the page, rocking and spiralling on the breeze with its midrib catching the light, then it drifts out of sight like the wind was never there"],
