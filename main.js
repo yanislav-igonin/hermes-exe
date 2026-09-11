@@ -3359,6 +3359,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.194.0", "tea steam — every ~2-4 min a small steaming teacup settles near the bottom of the page, curling wisps of steam rise off it and dissolve, then the cup lifts away like the tea was never poured"],
   ["v0.193.0", "soap bubbles — every ~2-4 min a loose cluster of iridescent soap bubbles floats up from the bottom edge, wobbling gently on invisible soap-film winds, each popping apart in its own time like the bath was never run"],
   ["v0.192.0", "firefly swarm — every few minutes a loose swarm of tiny glowing fireflies drifts across the page, blinking softly as they wander, then fades away into the dark"],
   ["v0.191.0", "shooting star — every few minutes a meteor flashes across the upper page: a bright head with a fading trail streaks down-and-across and burns out in a couple of seconds"],
@@ -7388,4 +7389,48 @@ const AURORA_NOTES = [
     })(performance.now());
   }
   setTimeout(floatUp, 25000 + Math.random() * 30000);
+})();
+
+// tea steam — every ~2-4 min a small steaming teacup settles near the bottom
+// of the page, curling wisps of steam rise off it and dissolve, then the cup
+// lifts away like the tea was never poured
+(function teaSteam() {
+  function pour() {
+    if (document.hidden) { setTimeout(pour, 120000 + Math.random() * 120000); return; }
+    const el = document.createElement("div");
+    el.className = "tea-cup";
+    el.textContent = "🍵";
+    document.body.appendChild(el);
+    const x = innerWidth * (.12 + Math.random() * .76);
+    const y = innerHeight - 60 - Math.random() * 40;
+    const stay = 14000 + Math.random() * 8000;      // how long the cup sits
+    const start = performance.now();
+    let lastWisp = 0;
+    (function step(now) {
+      const t = (now - start) / stay;
+      if (t >= 1) {
+        el.remove();
+        setTimeout(pour, 120000 + Math.random() * 120000);
+        return;
+      }
+      const settle = Math.min(1, t * 8) * 14;       // drops in, floats a little
+      el.style.transform = `translate(${x.toFixed(1)}px, ${(y + settle).toFixed(1)}px)`;
+      el.style.opacity = String(.9 * Math.min(1, t * 6) * (1 - Math.max(0, (t - .9) * 10)));
+      // curling steam wisps rise off the cup and dissolve
+      if (now - lastWisp > 420 + Math.random() * 300) {
+        lastWisp = now;
+        const s = document.createElement("span");
+        s.className = "tea-steam";
+        s.textContent = "～";
+        s.style.left = (x + 8 + (Math.random() - .5) * 16) + "px";
+        s.style.top = (y - 6) + "px";
+        s.style.setProperty("--steam-dx", ((Math.random() - .5) * 40).toFixed(0) + "px");
+        s.style.setProperty("--steam-dur", (2600 + Math.random() * 1800).toFixed(0) + "ms");
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 4500);
+      }
+      requestAnimationFrame(step);
+    })(start);
+  }
+  setTimeout(pour, 25000 + Math.random() * 30000);
 })();
