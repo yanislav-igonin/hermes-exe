@@ -3359,6 +3359,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.191.0", "shooting star — every few minutes a meteor flashes across the upper page: a bright head with a fading trail streaks down-and-across and burns out in a couple of seconds"],
   ["v0.190.0", "dandelion — every ~2-4 min a dandelion puff sways in near an edge, then bursts: a dozen parachute seeds drift off across the page on a lazy breeze, wobbling until they fade away like the wind was never there"],
   ["v0.189.0", "school of minnows — every ~2-4 min a small school of tiny translucent fish swims across the lower part of the page, each minnow wobbling and darting within the shoal, then the school slips off-screen like the pond was never there"],
   ["v0.188.0", "fireflies at dusk — every minute or so a small brood of tiny glowing fireflies blinks awake near the bottom of the page, each wandering and flickering on its own rhythm before fading away like the meadow was never there"],
@@ -7278,4 +7279,29 @@ const AURORA_NOTES = [
     setTimeout(swim, 120000 + Math.random() * 120000);
   }
   setTimeout(swim, 30000 + Math.random() * 40000);
+})();
+
+// shooting star — every few minutes a meteor flashes across the upper page,
+// a bright head with a fading trail, streaking down-and-across, then gone
+(function meteor() {
+  function fly() {
+    if (!document.hidden) {
+      const el = document.createElement("div");
+      el.className = "meteor";
+      const life = 1300 + Math.random() * 700;
+      const ang = 14 + Math.random() * 18; // downward slope, degrees
+      const dist = 45 + Math.random() * 35; // travel distance, vw
+      el.style.setProperty("--mt-x0", (-8 + Math.random() * 40).toFixed(1) + "vw");
+      el.style.setProperty("--mt-y0", (2 + Math.random() * 12).toFixed(1) + "vh");
+      el.style.setProperty("--mt-life", life.toFixed(0) + "ms");
+      el.style.setProperty("--mt-ang", ang.toFixed(1) + "deg");
+      el.style.setProperty("--mt-tail", (60 + Math.random() * 70).toFixed(0) + "px");
+      el.style.setProperty("--mt-dx", dist.toFixed(1) + "vw");
+      el.style.setProperty("--mt-dy", (dist * Math.tan(ang * Math.PI / 180)).toFixed(1) + "vh");
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), life + 500);
+    }
+    setTimeout(fly, 180000 + Math.random() * 240000);
+  }
+  setTimeout(fly, 25000 + Math.random() * 30000);
 })();
