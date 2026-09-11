@@ -2826,8 +2826,54 @@ addEventListener("mousemove", e => {
   setTimeout(shine, 40000 + Math.random() * 30000);
 })();
 
+// meteor shower — every ~2-4 min a brief shower of meteors streaks out of one
+// corner of the upper sky over a few seconds, each burning with a fading trail,
+// then the sky dries up like the shower was never there
+(function meteorShower() {
+  const meteors = [];
+  let showerUntil = 0, nextShowerAt = performance.now() + 120000 * (.7 + Math.random() * .6);
+  function spawn(fromLeft) {
+    const speed = 9 + Math.random() * 6;
+    meteors.push({
+      x: fromLeft ? -20 : canvas.width + 20,
+      y: Math.random() * canvas.height * .35,
+      vx: speed * (fromLeft ? 1 : -1), vy: speed * (.35 + Math.random() * .25),
+      life: 1, len: 40 + Math.random() * 50
+    });
+  }
+  function showerTick(now) {
+    if (!showerUntil && now > nextShowerAt) {
+      showerUntil = now + 4200;
+      setTimeout(() => console.log("a meteor shower burns across the sky, then is gone"), 4600);
+    }
+    if (showerUntil) {
+      if (now < showerUntil) { if (Math.random() < .35) spawn(showerUntil % 8400 < 4200); }
+      else { showerUntil = 0; nextShowerAt = now + 120000 * (.7 + Math.random() * .6); }
+    }
+    for (let i = meteors.length - 1; i >= 0; i--) {
+      const m = meteors[i];
+      m.x += m.vx; m.y += m.vy; m.life -= .008;
+      if (m.life <= 0 || m.y > canvas.height) { meteors.splice(i, 1); continue; }
+      // tapering trail behind the head
+      ctx.strokeStyle = `rgba(220,255,235,${.85 * m.life})`;
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(m.x, m.y);
+      ctx.lineTo(m.x - m.vx / Math.hypot(m.vx, m.vy) * m.len, m.y - m.vy / Math.hypot(m.vx, m.vy) * m.len);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(m.x, m.y, 1.4, 0, 7);
+      ctx.fillStyle = `rgba(230,255,240,${.9 * m.life})`;
+      ctx.fill();
+    }
+    requestAnimationFrame(showerTick);
+  }
+  requestAnimationFrame(showerTick);
+})();
+
 // changelog
 const changelog = [
+  ["v0.177.0", "meteor shower — every ~2-4 min a brief shower of meteors streaks out of one corner of the upper sky with tapering glowing trails, then the sky dries up like the shower was never there"],
   ["v0.176.0", "lighthouse — every ~2-4 min a small lighthouse rises from the bottom of the page, its rotating beam sweeps once across the sky, briefly illuminating what it passes over, then it sinks back below the edge like the coast was never watched"],
   ["v0.175.0", "periscope — every ~2-4 min a submarine periscope rises from the bottom of the page, sweeps slowly across the room with a lens glint while a sonar blip prints in the console, then sinks back below the edge like the coast was never watched"],
   ["v0.174.0", "jellyfish — every ~2-4 min a translucent jellyfish with a glowing bell and five trailing tentacles drifts slowly up from the bottom of the page, pulsing gently as it rises and swaying with the current, then fades out near the top like the tide was never there"],
