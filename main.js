@@ -4206,6 +4206,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.230.0", "firefly swarm — every ~2-5 min a loose cluster of tiny glowing fireflies rises from the lower half of the page, drifting and blinking dimly on their own, then flashing bright together in two brief sync waves before dispersing like the summer was imagined"],
   ["v0.229.0", "wind-up robot — every ~2-4 min a tiny boxy robot with a winding key on its back marches in from a screen edge along the bottom of the page on stiff little legs, ticking and wobbling, gradually slowing as its spring runs down, then it topples over mid-stride and fades away like it was never wound"],
   ["v0.228.0", "shooting star — every ~2-4 min a brief streak slashes diagonally across the upper sky, its spark head flaring and a thin trail fading behind it, then it burns out mid-air like the wish was never made"],
   ["v0.227.0", "satellite pass — every ~3-5 min a tiny satellite drifts across the upper sky, solar panels glinting and a small light blinking steadily, then it passes over the horizon like the orbit was never noticed"],
@@ -9359,4 +9360,56 @@ const AURORA_NOTES = [
     })(start);
   }
   setTimeout(fly, 120000 + Math.random() * 120000);
+})();
+
+// firefly swarm — every ~2-5 min a loose cluster of tiny glowing fireflies
+// rises from near the bottom of the page, drifting on slow random wander,
+// blinking dimly on their own until — for a heartbeat — they all flash
+// bright together, then they scatter and fade like the summer was imagined
+(function fireflySwarm() {
+  function swarm() {
+    const COUNT = 9 + (Math.random() * 5 | 0);
+    const dur = 26000 + Math.random() * 10000;
+    const baseX = innerWidth * (.15 + Math.random() * .7);
+    const startY = innerHeight * (.62 + Math.random() * .25);
+    const rise = 60 + Math.random() * 80;
+    const flies = [];
+    for (let i = 0; i < COUNT; i++) {
+      const el = document.createElement("div");
+      el.className = "firefly";
+      el.style.setProperty("--ff-hue", (48 + Math.random() * 18 | 0) + "deg");
+      document.body.appendChild(el);
+      flies.push({
+        el,
+        ox: (Math.random() - .5) * 240,
+        oy: (Math.random() - .5) * 60,
+        phase: Math.random() * Math.PI * 2,
+        wanderSpeed: .4 + Math.random() * .5,
+        blinkPeriod: 1800 + Math.random() * 1600,
+        blinkOffset: Math.random() * 3400,
+      });
+    }
+    const start = performance.now();
+    (function tick(now) {
+      const t = (now - start) / dur;
+      if (t >= 1) {
+        flies.forEach(f => f.el.remove());
+        setTimeout(swarm, 120000 + Math.random() * 180000);
+        return;
+      }
+      const fade = Math.min(1, t * 8) * Math.min(1, (1 - t) * 4);
+      // sync-flash: everything pulses bright in two brief waves
+      const sync = Math.pow(Math.max(0, Math.sin(t * Math.PI * 2)), 24) + Math.pow(Math.max(0, Math.sin(t * Math.PI * 4 + .6)), 24);
+      for (const f of flies) {
+        const x = baseX + f.ox + Math.sin(t * Math.PI * 2 * f.wanderSpeed + f.phase) * 46;
+        const y = startY - rise * t + f.oy + Math.cos(t * Math.PI * 2 * f.wanderSpeed * 1.3 + f.phase) * 22;
+        const own = Math.pow(Math.max(0, Math.sin((now + f.blinkOffset) / f.blinkPeriod * Math.PI * 2)), 6) * .5;
+        const glow = Math.min(1, own + sync);
+        f.el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${(.7 + glow * .8).toFixed(2)})`;
+        f.el.style.opacity = (fade * (.35 + glow * .65)).toFixed(2);
+      }
+      requestAnimationFrame(tick);
+    })(start);
+  }
+  setTimeout(swarm, 30000 + Math.random() * 40000);
 })();
