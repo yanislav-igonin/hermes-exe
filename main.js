@@ -3765,6 +3765,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.214.0", "ekg pulse — a tiny heart monitor in the corner scrolls a steady green EKG line, occasionally flatlines in red for a breath, then finds its pulse again"],
   ["v0.213.0", "dandelion seed — every ~2-4 min a fluffy seed head drifts in from a screen edge on the breeze, and the moment it settles it bursts into a scatter of tiny parachutes that flutter away on their own little journeys"],
   ["v0.212.0", "frog visitor — every ~3-5 min a small frog hops in from a screen edge, crouches blinking while its throat bulges, then turns around and hops back out like the pond was never here"],
   ["v0.211.0", "chalk doodle — every ~2-3 min a hand-drawn chalk doodle (a smiley, star, spiral or fish) sketches itself onto the background, lingers for a moment, then is wiped away like the blackboard was never used"],
@@ -8545,4 +8546,62 @@ const AURORA_NOTES = [
     })(born);
   }
   setTimeout(seedHead, 60000 + Math.random() * 60000);
+})();
+
+// ekg pulse — a tiny heartbeat monitor lives in the bottom-left corner: a
+// scrolling EKG line that beats steadily, occasionally flatlines for a breath
+// with a despairing beep note in the console, then remembers it is alive
+// and resumes like the site's pulse was never in question
+(function ekgPulse() {
+  const W = 140, H = 46;
+  const el = document.createElement("canvas");
+  el.id = "ekg";
+  el.width = W; el.height = H;
+  el.style.cssText = "position:fixed;left:12px;bottom:12px;z-index:2;pointer-events:none;opacity:.85;";
+  document.body.appendChild(el);
+  const ectx = el.getContext("2d");
+  const trace = Array.from({ length: W }, () => H / 2);
+  let x = 0, flatUntil = 0, nextFlatAt = performance.now() + 70000 + Math.random() * 60000;
+  function spikeAt(px) {
+    // classic PQRST-ish blip: small bump, tall spike, dip, recover
+    const ph = px % 46;
+    if (ph < 4) return -3 * Math.sin(ph / 4 * Math.PI);
+    if (ph < 8) return 3 * Math.sin((ph - 4) / 4 * Math.PI);
+    if (ph < 12) return -26 * Math.sin((ph - 8) / 4 * Math.PI);
+    if (ph < 16) return 18 * Math.sin((ph - 12) / 4 * Math.PI);
+    if (ph < 20) return -8 * Math.sin((ph - 16) / 4 * Math.PI);
+    return 0;
+  }
+  function ekgTick() {
+    const now = performance.now();
+    // schedule a flatline crisis
+    if (!flatUntil && now > nextFlatAt) {
+      flatUntil = now + 1600 + Math.random() * 1400;
+      nextFlatAt = now + 90000 + Math.random() * 90000;
+      console.log("ekg: flatline detected — searching for a pulse...");
+    }
+    const flat = now < flatUntil;
+    if (flat && now > flatUntil - 900) {
+      // heartbeat returns mid-crisis
+      flatUntil = 0;
+      console.log("ekg: pulse restored — it was just resting");
+    }
+    for (let i = 0; i < 3; i++) {
+      trace.shift();
+      const v = flat ? H / 2 + (Math.random() - .5) * 1.4 : H / 2 + spikeAt(x += 2.2);
+      trace.push(v);
+    }
+    ectx.clearRect(0, 0, W, H);
+    ectx.strokeStyle = flat ? "rgba(255,120,120,.8)" : "rgba(124,252,156,.8)";
+    ectx.lineWidth = 1.4;
+    ectx.beginPath();
+    trace.forEach((v, i) => i ? ectx.lineTo(i, v) : ectx.moveTo(i, v));
+    ectx.stroke();
+    // label: bpm readout goes quiet while flatlined
+    ectx.fillStyle = flat ? "rgba(255,120,120,.9)" : "rgba(124,252,156,.65)";
+    ectx.font = "9px monospace";
+    ectx.fillText(flat ? "flatline" : "bpm 61", 4, 11);
+    requestAnimationFrame(ekgTick);
+  }
+  requestAnimationFrame(ekgTick);
 })();
