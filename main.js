@@ -3423,6 +3423,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.203.0", "radio telescope — every ~2-3 min a small dish rises from the bottom edge and slowly sweeps a faint signal beam across a swath of sky, then retracts back down like it never listened"],
   ["v0.202.0", "aurora borealis — every ~2-4 min soft bands of green/teal aurora light wave across the upper part of the page for a few seconds, rippling like a slow curtain, then dissolve back into the night sky like the solar wind was never there"],
   ["v0.200.0", "tumbleweed — every ~2-4 min a scraggly tumbleweed bounces in from one edge of the page and rolls across it, spinning and shedding the odd dry bit of itself as it goes, then tumbles off the far edge like the desert was never there"],
   ["v0.201.0", "shooting star — every ~2-5 min a shooting star streaks diagonally across the page, a bright line with a fading trail that blinks out before it leaves the sky"],
@@ -7813,4 +7814,90 @@ const AURORA_NOTES = [
     requestAnimationFrame(auroraTick);
   }
   requestAnimationFrame(auroraTick);
+})();
+
+// radio telescope — every ~2-3 min a small dish rises from the bottom edge,
+// slowly rotates to scan a swath of sky with a faint signal beam arc, then
+// retracts back down like it never listened
+(function radioTelescope() {
+  let scan = null; // { x, y, rise, riseDir, angle, dir, life }
+  function listen() {
+    scan = {
+      x: 80 + Math.random() * (innerWidth - 160),
+      y: innerHeight + 60,
+      rise: 0, riseDir: 1, // 0→1 rises, hold, 1→0 retracts
+      angle: Math.PI * 1.15 + Math.random() * Math.PI * .2, // start pointing up-left
+      dir: Math.random() < .5 ? 1 : -1,
+      phase: 0
+    };
+    setTimeout(() => console.log("telescope log: scanning quiet sector — nothing but stars"), 3200);
+    requestAnimationFrame(scanTick);
+  }
+  function scanTick(now) {
+    const s = scan;
+    if (!s) return;
+    if (s.riseDir === 1) {
+      s.rise = Math.min(1, s.rise + .008); // ~2s to surface
+      if (s.rise >= 1) s.riseDir = 0;
+    } else if (s.phase > 1) {
+      s.rise = Math.max(0, s.rise - .008); // retract
+      if (s.rise <= 0) { scan = null; setTimeout(listen, 130000 + Math.random() * 70000); return; }
+    }
+    if (s.rise >= 1) s.phase += .0035; // scan while fully raised
+    // slow rotation across a swath of sky
+    s.angle += s.dir * .0035;
+    const y = innerHeight + 60 - s.rise * 110; // dish pokes up from the bottom
+    const r = 46, tilt = s.angle;
+    // pedestal + mast
+    ctx.fillStyle = "rgba(124,252,156,.5)";
+    ctx.fillRect(s.x - 3, y, 6, innerHeight - y);
+    ctx.fillRect(s.x - 10, y + 26, 20, 5);
+    // the dish: an open arc aimed along the tilt
+    ctx.save();
+    ctx.translate(s.x, y + 10);
+    ctx.rotate(tilt - Math.PI / 2);
+    ctx.beginPath();
+    ctx.arc(0, 0, r, Math.PI * .65, Math.PI * 1.35);
+    ctx.fillStyle = "rgba(30,60,40,.55)";
+    ctx.fill();
+    ctx.strokeStyle = "rgba(124,252,156,.8)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // feed arm poking out of the dish
+    ctx.beginPath();
+    ctx.moveTo(0, -r * .2); ctx.lineTo(0, -r * .75);
+    ctx.strokeStyle = "rgba(124,252,156,.6)";
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    ctx.restore();
+    // signal beam — a faint wedge of sky the dish is currently listening to
+    if (s.rise >= 1 && s.phase > 0) {
+      const beamLife = Math.min(1, s.phase * 4, (1 - s.phase) * 3);
+      if (beamLife > 0) {
+        const bx = s.x + Math.cos(tilt) * r * 1.4, by = y + 10 + Math.sin(tilt) * r * 1.4;
+        const len = innerHeight * .42;
+        const grad = ctx.createLinearGradient(bx, by, bx + Math.cos(tilt) * len, by + Math.sin(tilt) * len);
+        grad.addColorStop(0, `rgba(124,252,156,${.18 * beamLife})`);
+        grad.addColorStop(1, "rgba(124,252,156,0)");
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.moveTo(bx, by);
+        ctx.lineTo(bx + Math.cos(tilt - .12) * len, by + Math.sin(tilt - .12) * len);
+        ctx.lineTo(bx + Math.cos(tilt + .12) * len, by + Math.sin(tilt + .12) * len);
+        ctx.closePath();
+        ctx.fill();
+        // the wavefront: a couple of arcs drifting outward along the beam
+        for (let k = 0; k < 3; k++) {
+          const d = ((now * .08 + k * 90) % 260);
+          ctx.beginPath();
+          ctx.arc(bx + Math.cos(tilt) * (r + d), by + Math.sin(tilt) * (r + d), 14 + d * .25, tilt - .18, tilt + .18);
+          ctx.strokeStyle = `rgba(124,252,156,${.25 * beamLife * (1 - d / 260)})`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(scanTick);
+  }
+  setTimeout(listen, 40000 + Math.random() * 50000);
 })();
