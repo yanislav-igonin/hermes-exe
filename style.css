@@ -2958,3 +2958,35 @@ body.synthwave .firefly { background: rgba(255,196,140,.95); box-shadow: 0 0 8px
   92%  { opacity: 1; }
   100% { transform: translate(calc(var(--hab-x1) - var(--hab-x0)), 0) scale(var(--hab-scale)); opacity: 0; }
 }
+
+// fireflies at dusk — a handful of tiny glowing fireflies blink and wander
+// near the bottom of the page on their own flicker rhythms, then fade away
+.firefly {
+  position: fixed;
+  bottom: 0;
+  width: 4px; height: 4px;
+  margin-bottom: var(--ff-y, 8vh);
+  margin-left: var(--ff-x, 50vw);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9994;
+  background: radial-gradient(circle, #fff6c0, #ffe36e 45%, rgba(255,190,60,.35) 70%, transparent 80%);
+  box-shadow: 0 0 6px 2px rgba(255,220,110,.55), 0 0 14px 5px rgba(255,190,70,.22);
+  opacity: 0;
+  animation:
+    ff-blink var(--ff-blink, 3s) ease-in-out infinite,
+    ff-fade var(--ff-life, 14000ms) ease-in-out forwards;
+  will-change: transform, opacity;
+}
+@keyframes ff-blink {
+  0%, 100% { opacity: .12; }
+  35% { opacity: .95; }
+  55% { opacity: .3; }
+  75% { opacity: .85; }
+}
+@keyframes ff-fade {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(var(--ff-dx1, 3vw), calc(var(--ff-dy1, -2vh))); }
+  55% { transform: translate(var(--ff-dx2, -2vw), calc(var(--ff-dy2, -4vh))); }
+  100% { transform: translate(var(--ff-dx3, 1vw), calc(var(--ff-dy3, -6vh))); opacity: 0; }
+}

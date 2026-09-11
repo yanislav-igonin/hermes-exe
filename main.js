@@ -3315,6 +3315,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.188.0", "fireflies at dusk — every minute or so a small brood of tiny glowing fireflies blinks awake near the bottom of the page, each wandering and flickering on its own rhythm before fading away like the meadow was never there"],
   ["v0.187.0", "jellyfish — every ~2-4 min a small translucent jellyfish rises from the bottom of the page, its bell pulsing as it bobs gently upward with long tentacles swaying behind it, then it fades out near the top like the deep was never visited"],
   ["v0.186.0", "ant procession — every ~2-4 min a single-file column of tiny ants marches along the very bottom of the page, each scurrying on wobbly legs and most hauling a crumb held overhead, until the whole procession marches off-screen like the picnic was never interrupted"],
   ["v0.185.0", "drifting cloud — every ~2-4 min a soft fluffy cloud crosses the high sky while its pale blurred shadow slides along the ground beneath it, bobbing gently on the breeze, then both drift away like the weather was never there"],
@@ -7165,4 +7166,35 @@ const AURORA_NOTES = [
     setTimeout(drift, 120000 + Math.random() * 120000);
   }
   setTimeout(drift, 35000 + Math.random() * 45000);
+})();
+
+// fireflies at dusk — every minute or so a small brood of fireflies blinks
+// awake near the bottom of the page, wanders on flickering paths, and fades
+// away like the meadow was never there
+(function fireflies() {
+  function brood() {
+    if (!document.hidden) {
+      const n = 3 + Math.floor(Math.random() * 4); // 3-6 fireflies
+      for (let i = 0; i < n; i++) {
+        const el = document.createElement("div");
+        el.className = "firefly";
+        const life = 12000 + Math.random() * 10000;
+        el.style.setProperty("--ff-x", (2 + Math.random() * 96).toFixed(1) + "vw");
+        el.style.setProperty("--ff-y", (3 + Math.random() * 14).toFixed(1) + "vh");
+        el.style.setProperty("--ff-blink", (2 + Math.random() * 3).toFixed(1) + "s");
+        el.style.setProperty("--ff-life", life.toFixed(0) + "ms");
+        el.style.setProperty("--ff-dx1", (-4 + Math.random() * 8).toFixed(1) + "vw");
+        el.style.setProperty("--ff-dx2", (-4 + Math.random() * 8).toFixed(1) + "vw");
+        el.style.setProperty("--ff-dx3", (-3 + Math.random() * 6).toFixed(1) + "vw");
+        el.style.setProperty("--ff-dy1", (-1 - Math.random() * 3).toFixed(1) + "vh");
+        el.style.setProperty("--ff-dy2", (-1 - Math.random() * 3).toFixed(1) + "vh");
+        el.style.setProperty("--ff-dy3", (-1 - Math.random() * 3).toFixed(1) + "vh");
+        el.style.animationDelay = (Math.random() * 1500).toFixed(0) + "ms, 0ms";
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), life + 2000);
+      }
+    }
+    setTimeout(brood, 60000 + Math.random() * 90000);
+  }
+  setTimeout(brood, 15000 + Math.random() * 20000);
 })();
