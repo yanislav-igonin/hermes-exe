@@ -1443,6 +1443,35 @@ body.vaporwave .dandelion-seed { color: rgba(201,166,232,.9); }
 body.synthwave .dandelion { filter: drop-shadow(0 0 8px rgba(255,140,46,.5)); }
 body.synthwave .dandelion-seed { color: rgba(255,140,46,.9); }
 
+/* firefly swarm — tiny glowing motes drift across the page, blinking softly.
+   spawn positions and wander are driven by --ff-* custom properties from main.js */
+.firefly {
+  position: fixed;
+  z-index: 7;
+  pointer-events: none;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #d9ff9e;
+  box-shadow: 0 0 6px 2px rgba(190, 255, 130, .7), 0 0 14px 6px rgba(160, 255, 100, .3);
+  opacity: 0;
+  animation:
+    firefly-drift var(--ff-life, 12000ms) linear forwards,
+    firefly-blink var(--ff-blink, 1800ms) ease-in-out infinite;
+}
+@keyframes firefly-drift {
+  0%   { opacity: 0; transform: translate(var(--ff-x0), var(--ff-y0)); }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--ff-x1), var(--ff-y1)); }
+}
+@keyframes firefly-blink {
+  0%, 100% { filter: brightness(.35); }
+  50%      { filter: brightness(1.6); }
+}
+body.vaporwave .firefly { background: #e6c8ff; box-shadow: 0 0 6px 2px rgba(201, 166, 232, .7), 0 0 14px 6px rgba(201, 166, 232, .3); }
+body.synthwave .firefly { background: #ffcf8a; box-shadow: 0 0 6px 2px rgba(255, 150, 60, .7), 0 0 14px 6px rgba(255, 140, 46, .3); }
+
 /* meteor streak: every ~40-80s a meteor burns diagonally across the page,
    leaving a fading glowing trail of sparks that vanish like it was never there */
 .meteor {

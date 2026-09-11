@@ -3359,6 +3359,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.192.0", "firefly swarm — every few minutes a loose swarm of tiny glowing fireflies drifts across the page, blinking softly as they wander, then fades away into the dark"],
   ["v0.191.0", "shooting star — every few minutes a meteor flashes across the upper page: a bright head with a fading trail streaks down-and-across and burns out in a couple of seconds"],
   ["v0.190.0", "dandelion — every ~2-4 min a dandelion puff sways in near an edge, then bursts: a dozen parachute seeds drift off across the page on a lazy breeze, wobbling until they fade away like the wind was never there"],
   ["v0.189.0", "school of minnows — every ~2-4 min a small school of tiny translucent fish swims across the lower part of the page, each minnow wobbling and darting within the shoal, then the school slips off-screen like the pond was never there"],
@@ -7283,6 +7284,35 @@ const AURORA_NOTES = [
 
 // shooting star — every few minutes a meteor flashes across the upper page,
 // a bright head with a fading trail, streaking down-and-across, then gone
+
+// firefly swarm — every few minutes a loose swarm of tiny glowing fireflies
+// drifts across the page, blinking softly as they wander, then fades away
+(function fireflies() {
+  function swarm() {
+    if (!document.hidden) {
+      const count = 7 + Math.floor(Math.random() * 6);
+      const x0 = -10 + Math.random() * 20; // % from left edge
+      const y0 = 15 + Math.random() * 65;  // % from top
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement("div");
+        el.className = "firefly";
+        const life = 9000 + Math.random() * 7000;
+        const delay = Math.random() * 4000;
+        el.style.setProperty("--ff-x0", (x0 + Math.random() * 8).toFixed(1) + "vw");
+        el.style.setProperty("--ff-y0", (y0 + Math.random() * 8).toFixed(1) + "vh");
+        el.style.setProperty("--ff-x1", (x0 + 35 + Math.random() * 30).toFixed(1) + "vw");
+        el.style.setProperty("--ff-y1", (y0 + (Math.random() * 24 - 12)).toFixed(1) + "vh");
+        el.style.setProperty("--ff-life", life.toFixed(0) + "ms");
+        el.style.setProperty("--ff-blink", (1200 + Math.random() * 1600).toFixed(0) + "ms");
+        el.style.animationDelay = delay.toFixed(0) + "ms, 0ms";
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), life + delay + 500);
+      }
+    }
+    setTimeout(swarm, 180000 + Math.random() * 240000);
+  }
+  setTimeout(swarm, 20000 + Math.random() * 30000);
+})();
 (function meteor() {
   function fly() {
     if (!document.hidden) {
