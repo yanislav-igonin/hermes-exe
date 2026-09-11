@@ -2412,6 +2412,93 @@ addEventListener("mousemove", e => {
   setTimeout(fly, 30000 + Math.random() * 30000);
 })();
 
+// star chart — every ~2-4 min an antique astronomical chart surfaces at a
+// random spot on the page: field stars fade in around a named figure, the
+// chart line draws itself star to star, a plate label fades in beneath,
+// then the whole thing fades back into the dark like the sky was never surveyed
+(function starChart() {
+  const FIGURES = [
+    { name: "the kleshnya", pts: [[40, 150], [95, 70], [170, 95], [215, 20], [270, 90], [200, 160], [110, 185]] },
+    { name: "the dumbwaiter", pts: [[40, 60], [150, 30], [250, 55], [230, 140], [110, 160], [20, 110]] },
+    { name: "the lost cursor", pts: [[150, 30], [110, 95], [160, 135], [70, 155], [30, 110]] },
+    { name: "the ribbon", pts: [[30, 120], [90, 50], [150, 105], [210, 40], [265, 95]] },
+  ];
+  const NOTES = [
+    "star chart: a figure the sky has been quietly keeping",
+    "star chart: surveyed at an hour nobody will admit to",
+    "star chart: position approximate, wonder exact",
+    "star chart: the field stars were already there",
+    "star chart: plotted by whoever kept looking up",
+  ];
+  const plate = document.createElement("div");
+  plate.className = "star-chart";
+  document.body.appendChild(plate);
+  function survey() {
+    if (!document.hidden) {
+      const fig = FIGURES[Math.random() * FIGURES.length | 0];
+      const cx = 40 + Math.random() * Math.max(40, innerWidth - 380);
+      const cy = 60 + Math.random() * Math.max(60, innerHeight * .6 - 280);
+      plate.style.left = cx + "px";
+      plate.style.top = cy + "px";
+      // clear any previous survey
+      plate.innerHTML = "";
+      // background field stars
+      for (let i = 0; i < 26; i++) {
+        const s = document.createElement("span");
+        s.className = "field-star";
+        const r = .8 + Math.random() * 1.2;
+        s.style.width = s.style.height = r + "px";
+        s.style.left = (Math.random() * 290) + "px";
+        s.style.top = (Math.random() * 190) + "px";
+        s.style.setProperty("--fs-delay", (Math.random() * 1.4).toFixed(2) + "s");
+        plate.appendChild(s);
+      }
+      // chart line + figure stars, built star by star so the polyline length is exact
+      const svgNS = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(svgNS, "svg");
+      svg.setAttribute("class", "fig-line");
+      const poly = document.createElementNS(svgNS, "polyline");
+      let len = 0;
+      const ptsStr = fig.pts.map(([x, y], i) => {
+        if (i > 0) {
+          const [px, py] = fig.pts[i - 1];
+          len += Math.hypot(x - px, y - py);
+        }
+        const star = document.createElement("span");
+        star.className = "fig-star";
+        star.style.left = x + "px";
+        star.style.top = y + "px";
+        star.style.setProperty("--fig-delay", (.4 + i * .3).toFixed(2) + "s");
+        plate.appendChild(star);
+        return x + "," + y;
+      }).join(" ");
+      poly.setAttribute("points", ptsStr);
+      poly.style.setProperty("--line-len", Math.ceil(len) + "");
+      svg.appendChild(poly);
+      plate.appendChild(svg);
+      // plate label
+      const label = document.createElement("div");
+      label.className = "plate-label";
+      label.textContent = fig.name;
+      label.style.setProperty("--label-delay", (.4 + fig.pts.length * .3) + "s");
+      plate.appendChild(label);
+      plate.style.setProperty("--sc-dur", (3000 + fig.pts.length * 300 + 9000) + "ms");
+      plate.classList.remove("plate");
+      void plate.offsetWidth;
+      plate.classList.add("plate");
+      // the console note prints a beat after the label lands
+      setTimeout(() => {
+        if (document.hidden) return;
+        console.log(NOTES[Math.random() * NOTES.length | 0] + ' — "' + fig.name + '"');
+      }, fig.pts.length * 300 + 1200);
+      // tidy the plate once the fade-out finishes
+      setTimeout(() => { plate.innerHTML = ""; }, 3000 + fig.pts.length * 300 + 9500);
+    }
+    setTimeout(survey, 150000 + Math.random() * 90000);
+  }
+  setTimeout(survey, 40000 + Math.random() * 40000);
+})();
+
 // code rain — every ~2-4 min for a couple of seconds thin columns of falling
 // code glyphs sprinkle down from the top of the viewport, glowing softly,
 // then dissolve before the rain was ever noticed
@@ -2590,6 +2677,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.169.0", "star chart — every ~2-4 min an antique astronomical chart surfaces at a random spot on the page: field stars fade in around a named figure, the chart line draws itself star to star, a plate label fades in beneath, then the whole thing fades back into the dark like the sky was never surveyed"],
   ["v0.168.0", "fireflies — every ~2-4 min a small swarm of fireflies gathers at a random spot on the background canvas, blinking in slow out-of-sync lantern pulses with a soft glow, then scatters back into the dark like the night was never lit"],
   ["v0.167.0", "dandelion — every ~2-4 min a dandelion grows on the background canvas, its head blooms into a full puff, then a gust tears the seeds loose and they drift off-screen like the wind was never there"],
   ["v0.166.0", "paper boat — every ~2-4 min a tiny folded paper boat sails along the bottom of the page, bobbing on an invisible tide and occasionally listing in the waves, then drifts off-screen like the ocean was never there"],

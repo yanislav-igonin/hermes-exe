@@ -1736,6 +1736,65 @@ body.synthwave #ghost-typewriter { color: #ff8c2e; text-shadow: 0 0 8px rgba(255
   50%      { filter: brightness(1.6); }
 }
 
+/* star chart — an antique astronomical chart surfaces at a random spot:
+   field stars fade in, the figure's stars pop in one by one and the chart
+   line draws itself between them, a plate label fades in beneath, then the
+   whole thing fades back into the dark like the sky was never surveyed */
+.star-chart {
+  position: fixed; z-index: 9996; pointer-events: none;
+  width: 300px; height: 220px;
+  opacity: 0;
+}
+.star-chart.plate { animation: chart-plate var(--sc-dur, 13000ms) ease-in-out forwards; }
+@keyframes chart-plate {
+  0%   { opacity: 0; }
+  10%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+.star-chart .field-star {
+  position: absolute; border-radius: 50%;
+  background: #cfe8ff;
+  box-shadow: 0 0 3px rgba(160, 200, 255, .5);
+  opacity: 0;
+  animation: chart-star-in .8s ease-out forwards,
+             chart-twinkle 3.2s ease-in-out infinite;
+  animation-delay: var(--fs-delay, 0s), calc(var(--fs-delay, 0s) + .8s);
+}
+@keyframes chart-star-in { to { opacity: .55; } }
+@keyframes chart-twinkle { 0%, 100% { filter: brightness(.7); } 50% { filter: brightness(1.5); } }
+.star-chart .fig-star {
+  position: absolute; width: 5px; height: 5px; margin: -2px 0 0 -2px;
+  border-radius: 50%; background: #eaf6ff;
+  box-shadow: 0 0 7px 2px rgba(180, 220, 255, .55);
+  opacity: 0; transform: scale(.2);
+  animation: chart-fig-star .7s cubic-bezier(.2, .8, .3, 1.2) forwards;
+  animation-delay: var(--fig-delay, 0s);
+}
+@keyframes chart-fig-star { to { opacity: .95; transform: scale(1); } }
+.star-chart svg.fig-line {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  overflow: visible;
+}
+.star-chart svg.fig-line polyline {
+  fill: none; stroke: rgba(124, 252, 156, .5); stroke-width: 1;
+  stroke-dasharray: var(--line-len, 400);
+  stroke-dashoffset: var(--line-len, 400);
+  animation: chart-line var(--line-dur, 2400ms) ease-in-out forwards;
+  animation-delay: .4s;
+}
+@keyframes chart-line { to { stroke-dashoffset: 0; } }
+.star-chart .plate-label {
+  position: absolute; left: 0; bottom: -6px; width: 100%;
+  text-align: left; font-family: monospace; font-size: 10px;
+  letter-spacing: 1px; color: #d8ffe0;
+  text-shadow: 0 0 4px rgba(120, 255, 170, .5);
+  opacity: 0;
+  animation: chart-label .9s ease-out forwards;
+  animation-delay: var(--label-delay, 2s);
+}
+@keyframes chart-label { to { opacity: .9; } }
+
 /* elevator — a tiny elevator car gliding along the right edge of the viewport */
 .elevator {
   position: fixed; right: 3px; top: 0; z-index: 9996;
