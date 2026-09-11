@@ -3305,3 +3305,30 @@ body.vaporwave .paper-boat { color: rgba(220, 190, 240, .8); text-shadow: 0 0 6p
 body.vaporwave .boat-ripple { color: rgba(201, 166, 232, .4); }
 body.synthwave .paper-boat { color: rgba(255, 200, 140, .8); text-shadow: 0 0 6px rgba(255, 150, 70, .3); }
 body.synthwave .boat-ripple { color: rgba(255, 150, 70, .4); }
+
+/* paper airplane: every ~2-4 min a small paper plane swoops across the page along a lazy arc, a dotted trail fading behind it, then it slides off the far edge like the flight was never logged */
+.paper-plane {
+  position: fixed;
+  z-index: 7;
+  pointer-events: none;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1;
+  color: rgba(200, 220, 250, .8);
+  text-shadow: 0 0 6px rgba(160, 200, 255, .25);
+  will-change: transform;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .4));
+}
+body.vaporwave .paper-plane { color: rgba(220, 190, 240, .8); text-shadow: 0 0 6px rgba(201, 166, 232, .3); }
+body.synthwave .paper-plane { color: rgba(255, 200, 140, .8); text-shadow: 0 0 6px rgba(255, 150, 70, .3); }
+.plane-trail {
+  position: fixed;
+  z-index: 6;
+  pointer-events: none;
+  font-size: 9px;
+  color: rgba(160, 200, 255, .3);
+  opacity: 1;
+  transition: opacity 2.8s ease-out;
+}
+body.vaporwave .plane-trail { color: rgba(201, 166, 232, .35); }
+body.synthwave .plane-trail { color: rgba(255, 150, 70, .35); }

@@ -3386,6 +3386,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.197.0", "paper airplane — every ~2-4 min a small paper plane swoops across the page along a gentle lazy arc, a dotted trail fading out behind it, then it slides off the far edge like the flight was never logged"],
   ["v0.196.0", "paper boat — every ~2-4 min a small origami paper boat bobs along the very bottom of the page, rocking on invisible gentle waves while faint ripples spread out behind it, then it drifts off the far edge like the paper pond was never there"],
   ["v0.195.0", "meteor shower — every ~2-4 min a brief shower of shooting stars streaks diagonally across the page, each with a fading glowing trail, then the sky clears like the comet was never there"],
   ["v0.194.0", "tea steam — every ~2-4 min a small steaming teacup settles near the bottom of the page, curling wisps of steam rise off it and dissolve, then the cup lifts away like the tea was never poured"],
@@ -7504,6 +7505,63 @@ const AURORA_NOTES = [
       }
       if (x > -140 && x < innerWidth + 60) requestAnimationFrame(step);
       else el.remove();
+    })(start);
+    setTimeout(launch, 150000 + Math.random() * 90000);
+  }
+  setTimeout(launch, 40000 + Math.random() * 40000);
+})();
+
+// paper airplane — every ~2-4 min a small paper plane swoops across the page
+// along a gentle lazy arc, a dotted trail fading out behind it, then it slides
+// off the far edge like the flight was never logged.
+(function paperPlane() {
+  const PLANE = "—·—●>";
+  const PLANE_NOTES = [
+    "a paper plane folded itself out of a stack of TODOs",
+    "the plane takes the long way around, on purpose",
+    "logged nowhere, remembered by no one",
+    "somewhere, a paper plane is still gliding",
+  ];
+  function launch() {
+    if (document.hidden) { setTimeout(launch, 120000 + Math.random() * 120000); return; }
+    const el = document.createElement("pre");
+    el.className = "paper-plane";
+    el.textContent = PLANE;
+    document.body.appendChild(el);
+    const dir = Math.random() < .5 ? 1 : -1;
+    const speed = 60 + Math.random() * 30;   // px per second — a lazy glide
+    const y0 = 90 + Math.random() * (innerHeight * .45);
+    const arc = 70 + Math.random() * 90;     // swoop depth
+    const start = performance.now();
+    const dur = (innerWidth + 160) / speed * 1000;
+    let lastDot = 0;
+    (function step(now) {
+      const t = (now - start) / 1000;
+      const p = t * speed;
+      const x = dir > 0 ? -40 + p : innerWidth + 40 - p;
+      const mid = innerWidth / 2;
+      const sway = 1 - Math.min(1, Math.abs(x - mid) / (innerWidth / 2 + 1));
+      const y = y0 + Math.sin(t * 1.4) * arc * sway;
+      const tilt = Math.cos(t * 1.4) * 14 * sway;
+      el.style.transform =
+        `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scaleX(${dir}) rotate(${(tilt * dir).toFixed(2)}deg)`;
+      // a dotted trail drifts out behind the fold every so often
+      if (now - lastDot > 220 + Math.random() * 180) {
+        lastDot = now;
+        const d = document.createElement("span");
+        d.className = "plane-trail";
+        d.textContent = Math.random() < .5 ? "·" : "˙";
+        d.style.left = (x + (dir > 0 ? -14 : 20)) + "px";
+        d.style.top = (y + 6) + "px";
+        document.body.appendChild(d);
+        requestAnimationFrame(() => (d.style.opacity = "0"));
+        setTimeout(() => d.remove(), 3000);
+      }
+      if (x > -80 && x < innerWidth + 60) requestAnimationFrame(step);
+      else {
+        el.remove();
+        console.log(`paper plane: ${PLANE_NOTES[Math.random() * PLANE_NOTES.length | 0]}`);
+      }
     })(start);
     setTimeout(launch, 150000 + Math.random() * 90000);
   }
