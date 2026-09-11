@@ -3384,8 +3384,46 @@ addEventListener("mousemove", e => {
   requestAnimationFrame(tick);
 })();
 
+// fireflies — every few minutes a couple of tiny glowing fireflies drifts
+// lazily around the page, flickering softly, then fades away into the dark
+// like the summer night was never there
+(function fireflies() {
+  const layer = document.createElement("div");
+  layer.className = "fireflies";
+  document.body.appendChild(layer);
+  function release() {
+    const count = 2 + (Math.random() * 3 | 0);
+    const cx = 80 + Math.random() * (innerWidth - 160);
+    const cy = 80 + Math.random() * (innerHeight - 160);
+    layer.innerHTML = "";
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement("span");
+      el.className = "firefly-dot";
+      layer.appendChild(el);
+      const seed = Math.random() * Math.PI * 2;
+      const wander = 50 + Math.random() * 90;
+      const ox = cx + (Math.random() - .5) * 60, oy = cy + (Math.random() - .5) * 60;
+      const blinkSpeed = 1.2 + Math.random() * 1.6;
+      const dur = 9000 + Math.random() * 6000;
+      const start = performance.now();
+      (function drift(now) {
+        const t = (now - start) / dur;
+        if (t >= 1) { el.remove(); return; }
+        const a = seed + t * 4 + Math.sin(now * .0006 + seed) * 2;
+        const fade = Math.min(1, t * 6, (1 - t) * 6);
+        el.style.transform = `translate(${ox + Math.cos(a) * wander * t + Math.sin(now * .001 + seed) * 10}px, ${oy + Math.sin(a * 1.3) * wander * t}px)`;
+        el.style.opacity = (Math.max(0, (.3 + .7 * Math.max(0, Math.sin(now * .001 * blinkSpeed + seed)))) * fade).toFixed(2);
+        requestAnimationFrame(drift);
+      })(start);
+    }
+    setTimeout(release, 150000 + Math.random() * 90000);
+  }
+  setTimeout(release, 40000 + Math.random() * 40000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.199.0", "fireflies — every few minutes a couple of tiny glowing fireflies drifts lazily around the page, flickering softly, then fades away into the dark like the summer night was never there"],
   ["v0.198.0", "dragonfly — every ~2-4 min an ASCII dragonfly darts across the page in quick zigzags, hovers in place for a moment as if considering the cursor, then zips off the far edge like the pond was never there"],
   ["v0.197.0", "paper airplane — every ~2-4 min a small paper plane swoops across the page along a gentle lazy arc, a dotted trail fading out behind it, then it slides off the far edge like the flight was never logged"],
   ["v0.196.0", "paper boat — every ~2-4 min a small origami paper boat bobs along the very bottom of the page, rocking on invisible gentle waves while faint ripples spread out behind it, then it drifts off the far edge like the paper pond was never there"],
