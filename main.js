@@ -3061,8 +3061,82 @@ addEventListener("mousemove", e => {
   requestAnimationFrame(tick);
 })();
 
+// falling leaf — every ~2-4 min a small autumn leaf tumbles down through the
+// page, rocking and spiralling on the breeze, then settles out of sight like
+// the wind was never there
+(function fallingLeaf() {
+  let leaf = null;
+  let nextAt = performance.now() + 120000 * (.7 + Math.random() * .6);
+  let t = 0;
+  function spawn() {
+    leaf = {
+      x: canvas.width * (.1 + Math.random() * .8),
+      y: -30,
+      vx: (Math.random() - .5) * .5,
+      vy: .55 + Math.random() * .35,
+      sway: Math.random() * 6.28,
+      swaySpeed: .02 + Math.random() * .015,
+      spin: Math.random() * 6.28,
+      spinSpeed: .05 + Math.random() * .04,
+      hue: 20 + Math.random() * 30,
+      life: 1
+    };
+  }
+  function drawLeaf(l) {
+    ctx.save();
+    ctx.translate(l.x, l.y);
+    ctx.rotate(l.spin + Math.sin(l.sway) * .8);
+    const w = 11, h = 15;
+    // leaf blade — pointed oval, slightly asymmetric
+    ctx.beginPath();
+    ctx.moveTo(0, -h / 2);
+    ctx.quadraticCurveTo(w, -h * .15, 0, h / 2);
+    ctx.quadraticCurveTo(-w, -h * .15, 0, -h / 2);
+    ctx.fillStyle = `hsla(${l.hue}, 72%, 52%, ${.9 * l.life})`;
+    ctx.fill();
+    // stem
+    ctx.beginPath();
+    ctx.moveTo(0, h / 2);
+    ctx.lineTo(-1.5, h / 2 + 4);
+    ctx.strokeStyle = `hsla(${l.hue}, 55%, 34%, ${.8 * l.life})`;
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    // midrib vein
+    ctx.beginPath();
+    ctx.moveTo(0, -h / 2 + 2);
+    ctx.lineTo(0, h / 2 - 2);
+    ctx.strokeStyle = `hsla(${l.hue}, 60%, 30%, ${.6 * l.life})`;
+    ctx.stroke();
+    ctx.restore();
+  }
+  function tick(now) {
+    if (!leaf && now > nextAt) {
+      spawn();
+      t = 0;
+      setTimeout(() => console.log("a leaf lets go of the branch"), 6400);
+    }
+    if (leaf) {
+      t++;
+      const l = leaf;
+      l.sway += l.swaySpeed;
+      l.spin += l.spinSpeed + Math.sin(l.sway) * .02;
+      l.x += l.vx + Math.sin(l.sway) * .9;
+      l.y += l.vy + Math.cos(l.sway * .5) * .25;
+      l.vx *= .999;
+      if (l.y > canvas.height + 50 || l.x < -60 || l.x > canvas.width + 60) {
+        leaf = null; nextAt = now + 120000 * (.7 + Math.random() * .6);
+      } else {
+        drawLeaf(l);
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
 // changelog
 const changelog = [
+  ["v0.184.0", "falling leaf — every ~2-4 min a small autumn leaf tumbles down through the page, rocking and spiralling on the breeze with its midrib catching the light, then it drifts out of sight like the wind was never there"],
   ["v0.183.0", "sky lantern — every ~2-4 min a small glowing paper lantern drifts up from the bottom of the page, swaying gently as it rises with its flame flickering warmly behind the paper, then it fades out high up like the wish was never made"],
   ["v0.182.0", "comet streak — every ~2-4 min a comet with a long tapering glowing tail crosses the sky on a shallow diagonal, its ice-blue head haloed and its tail streaming and fading behind it, then it burns out past the far edge like the comet was never sighted"],
   ["v0.181.0", "hot air balloon — every ~2-4 min a small striped hot air balloon with a softly glowing basket drifts slowly across the upper sky, bobbing gently on the breeze, then sails off-screen like the flight was never there"],
