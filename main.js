@@ -3423,6 +3423,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.202.0", "aurora borealis — every ~2-4 min soft bands of green/teal aurora light wave across the upper part of the page for a few seconds, rippling like a slow curtain, then dissolve back into the night sky like the solar wind was never there"],
   ["v0.200.0", "tumbleweed — every ~2-4 min a scraggly tumbleweed bounces in from one edge of the page and rolls across it, spinning and shedding the odd dry bit of itself as it goes, then tumbles off the far edge like the desert was never there"],
   ["v0.201.0", "shooting star — every ~2-5 min a shooting star streaks diagonally across the page, a bright line with a fading trail that blinks out before it leaves the sky"],
   ["v0.199.0", "fireflies — every few minutes a couple of tiny glowing fireflies drifts lazily around the page, flickering softly, then fades away into the dark like the summer night was never there"],
@@ -7752,4 +7753,64 @@ const AURORA_NOTES = [
     })(start);
   }
   setTimeout(streak, 40000 + Math.random() * 50000);
+})();
+
+// aurora — every ~2-4 min soft bands of green/teal aurora light wave across
+// the upper part of the page for a few seconds, then dissolve back into the
+// night sky
+(function aurora() {
+  let show = null, nextAt = performance.now() + 90000 * (0.7 + Math.random() * 0.6);
+  const BANDS = 3;
+  function auroraTick(now) {
+    if (!show && now >= nextAt) {
+      show = { start: now, dur: 6000 + Math.random() * 4000, hues: [120 + Math.random() * 60, 160 + Math.random() * 40, 90 + Math.random() * 50] };
+    }
+    if (show) {
+      const t = (now - show.start) / show.dur;
+      if (t >= 1) {
+        show = null;
+        nextAt = now + 150000 * (0.7 + Math.random() * 0.6);
+        console.log("aurora: the sky exhales");
+      } else {
+        // envelope: ease in, ease out
+        const env = Math.sin(t * Math.PI) ** 1.5;
+        ctx.save();
+        ctx.globalCompositeOperation = "lighter";
+        for (let b = 0; b < BANDS; b++) {
+          const hue = show.hues[b];
+          const yBase = innerHeight * (0.08 + b * 0.09);
+          const amp = 14 + b * 8;
+          const speed = 0.00035 + b * 0.00015;
+          const thick = 46 + b * 18;
+          ctx.beginPath();
+          for (let x = 0; x <= innerWidth; x += 24) {
+            const y = yBase + Math.sin(x * 0.004 + now * speed + b * 2) * amp
+              + Math.sin(x * 0.011 - now * speed * 1.7 + b) * amp * 0.4;
+            if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          }
+          const grad = ctx.createLinearGradient(0, yBase - thick, 0, yBase + thick * 1.6);
+          grad.addColorStop(0, `hsla(${hue},80%,60%,0)`);
+          grad.addColorStop(0.5, `hsla(${hue},80%,60%,${0.10 * env})`);
+          grad.addColorStop(1, `hsla(${hue},80%,60%,0)`);
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = thick * 2;
+          ctx.lineCap = "round";
+          ctx.stroke();
+          // brighter curtain edge along the band
+          ctx.beginPath();
+          for (let x = 0; x <= innerWidth; x += 12) {
+            const y = yBase + Math.sin(x * 0.004 + now * speed + b * 2) * amp
+              + Math.sin(x * 0.011 - now * speed * 1.7 + b) * amp * 0.4;
+            if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          }
+          ctx.strokeStyle = `hsla(${hue},90%,75%,${0.22 * env})`;
+          ctx.lineWidth = 1.4;
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+    }
+    requestAnimationFrame(auroraTick);
+  }
+  requestAnimationFrame(auroraTick);
 })();
