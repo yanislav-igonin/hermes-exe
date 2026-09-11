@@ -3559,3 +3559,15 @@ body.vaporwave .paper-lantern .lantern-body {
   background: radial-gradient(circle at 50% 65%, #ffd7f5 0%, #e08bff 45%, rgba(201, 120, 232, .35) 75%, rgba(160, 80, 200, 0) 100%);
   box-shadow: 0 0 18px 6px rgba(230, 150, 255, .35), 0 0 44px 14px rgba(201, 120, 232, .12);
 }
+
+/* zeppelin: a small airship glides slowly across the upper sky */
+.zeppelin {
+  position: fixed; left: 0; top: 0;
+  z-index: 9992; pointer-events: none;
+  margin: 0;
+  font-size: 44px; line-height: 1;
+  filter: drop-shadow(0 3px 4px rgba(0,0,0,.3));
+  will-change: transform;
+}
+body.vaporwave .zeppelin { filter: drop-shadow(0 0 6px rgba(201,166,232,.4)) hue-rotate(40deg); }
+body.synthwave .zeppelin { filter: drop-shadow(0 0 6px rgba(255,140,46,.4)) hue-rotate(-60deg) saturate(1.3); }

@@ -4078,6 +4078,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.226.0", "zeppelin — every ~3-5 min a small airship glides slowly across the upper sky, its envelope swaying on the breeze with the gondola dangling beneath, then it sails off the far edge like the crossing was never booked"],
   ["v0.225.0", "butterfly — every ~2-4 min a butterfly flutters in from a screen edge on a lazy bobbing path, wings opening and closing as it goes, then drifts off the far edge like the meadow was never there"],
   ["v0.224.0", "tumbleweed — every ~2-4 min a dry tangled tumbleweed rolls in from a screen edge and bounces along the bottom of the page, shedding stray twigs on its hardest landings, then tumbles off the far edge like the prairie was never fenced"],
   ["v0.223.0", "message in a bottle — every ~2-4 min a corked glass bottle washes in along the bottom of the page, bobbing on invisible waves with a rolled note sealed inside, then the tide carries it back out like the message was never read"],
@@ -9164,6 +9165,36 @@ const AURORA_NOTES = [
       const y = Math.sin(t * Math.PI * 3) * bob + Math.sin(t * Math.PI) * -swoop;
       const bank = dir * (8 + Math.sin(t * Math.PI * 3) * 6);
       el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${bank.toFixed(1)}deg) scaleX(${dir})`;
+      requestAnimationFrame(tick);
+    })(start);
+  }
+  setTimeout(fly, 30000 + Math.random() * 40000);
+})();
+
+// zeppelin — every ~3-6 min a small airship glides slowly across the upper sky,
+// its envelope swaying on the breeze with the gondola dangling beneath and a
+// slow-spinning propeller at the tail, then it sails off the far edge like the
+// crossing was never booked
+(function zeppelin() {
+  function fly() {
+    const el = document.createElement("div");
+    el.className = "zeppelin";
+    el.textContent = "🛩";
+    const fromLeft = Math.random() < .5;
+    el.style.top = (innerHeight * (.04 + Math.random() * .12)) + "px";
+    el.style.left = (fromLeft ? -120 : innerWidth + 120) + "px";
+    document.body.appendChild(el);
+    const dur = 40000 + Math.random() * 20000; // airships are in no hurry
+    const dist = innerWidth + 260;
+    const dir = fromLeft ? 1 : -1;
+    const drift = 14 + Math.random() * 12;
+    const start = performance.now();
+    (function tick(now) {
+      const t = (now - start) / dur;
+      if (t >= 1) { el.remove(); setTimeout(fly, 150000 + Math.random() * 150000); return; }
+      const x = dir * (dist * t - 130);
+      const y = Math.sin(t * Math.PI * 2) * drift + Math.sin(t * Math.PI) * -16;
+      el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scaleX(${dir})`;
       requestAnimationFrame(tick);
     })(start);
   }
