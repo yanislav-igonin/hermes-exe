@@ -3597,3 +3597,50 @@ body.synthwave .shooting-star { background: linear-gradient(90deg, rgba(255,140,
 }
 body.vaporwave .firefly { background: radial-gradient(circle, #f6e2ff 0%, #dfa0ff 45%, rgba(201, 120, 232, 0) 100%); filter: drop-shadow(0 0 6px rgba(210, 150, 255, .6)); }
 body.synthwave .firefly { background: radial-gradient(circle, #ffe9cf 0%, #ffb45e 45%, rgba(255, 140, 46, 0) 100%); filter: drop-shadow(0 0 6px rgba(255, 160, 70, .6)); }
+
+/* balloon release: a handful of balloons rising slowly from the bottom, swaying */
+.balloon-release {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9992;
+  overflow: hidden;
+}
+.balloon-release .balloon {
+  position: absolute;
+  bottom: -80px;
+  left: var(--b-x, 50vw);
+  width: 22px;
+  height: 28px;
+  border-radius: 50% 50% 50% 50% / 46% 46% 54% 54%;
+  background: hsl(var(--b-hue, 0deg), 70%, 58%);
+  opacity: .8;
+  transform: scale(var(--b-scale, 1));
+  will-change: transform, opacity;
+}
+.balloon-release .balloon::after {
+  /* the string, dangling and slightly curved */
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 1px;
+  height: 46px;
+  background: rgba(255, 255, 255, .35);
+  transform-origin: top center;
+  transform: translateX(-.5px) rotate(6deg);
+}
+.balloon-release.b-on .balloon {
+  animation:
+    b-rise var(--b-dur, 18000ms) linear var(--b-delay, 0ms) forwards,
+    b-sway calc(var(--b-dur, 18000ms) / 6) ease-in-out var(--b-delay, 0ms) infinite alternate;
+}
+@keyframes b-rise {
+  0%   { opacity: 0; transform: translate(0, 0) scale(var(--b-scale, 1)) rotate(0deg); }
+  6%   { opacity: .8; }
+  100% { opacity: .8; transform: translate(4vw, -112vh) scale(var(--b-scale, 1)) rotate(var(--b-spin, 4deg)); }
+}
+@keyframes b-sway {
+  0%   { margin-left: 0; }
+  100% { margin-left: var(--b-sway, 40px); }
+}

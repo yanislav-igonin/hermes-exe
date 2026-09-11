@@ -4206,6 +4206,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.231.0", "balloon release — every ~2-4 min a handful of small balloons rises slowly from the bottom of the page, each wobbling side to side on its own string in its own colour, then they drift up out of view like the carnival packed up and left"],
   ["v0.230.0", "firefly swarm — every ~2-5 min a loose cluster of tiny glowing fireflies rises from the lower half of the page, drifting and blinking dimly on their own, then flashing bright together in two brief sync waves before dispersing like the summer was imagined"],
   ["v0.229.0", "wind-up robot — every ~2-4 min a tiny boxy robot with a winding key on its back marches in from a screen edge along the bottom of the page on stiff little legs, ticking and wobbling, gradually slowing as its spring runs down, then it topples over mid-stride and fades away like it was never wound"],
   ["v0.228.0", "shooting star — every ~2-4 min a brief streak slashes diagonally across the upper sky, its spark head flaring and a thin trail fading behind it, then it burns out mid-air like the wish was never made"],
@@ -9412,4 +9413,33 @@ const AURORA_NOTES = [
     })(start);
   }
   setTimeout(swarm, 30000 + Math.random() * 40000);
+})();
+
+// balloon release — every ~2-4 min a handful of small balloons rises slowly
+// from the bottom of the page, wobbling side to side on their own strings,
+// then drifts up out of view like the carnival packed up and left
+(function balloonRelease() {
+  const layer = document.createElement("div");
+  layer.className = "balloon-release";
+  document.body.appendChild(layer);
+  function release() {
+    const count = 4 + (Math.random() * 3 | 0);
+    layer.innerHTML = "";
+    for (let i = 0; i < count; i++) {
+      const b = document.createElement("span");
+      b.className = "balloon";
+      b.style.setProperty("--b-x", (8 + Math.random() * 84).toFixed(1) + "vw");
+      b.style.setProperty("--b-hue", (Math.random() * 360 | 0) + "deg");
+      b.style.setProperty("--b-dur", (15000 + Math.random() * 9000).toFixed(0) + "ms");
+      b.style.setProperty("--b-delay", (Math.random() * 5000).toFixed(0) + "ms");
+      b.style.setProperty("--b-sway", (28 + Math.random() * 42 | 0) + "px");
+      b.style.setProperty("--b-spin", ((Math.random() - .5) * 9).toFixed(1) + "deg");
+      b.style.setProperty("--b-scale", (.7 + Math.random() * .6).toFixed(2));
+      layer.appendChild(b);
+    }
+    layer.classList.add("b-on");
+    setTimeout(() => layer.classList.remove("b-on"), 30000);
+    setTimeout(release, 120000 + Math.random() * 120000);
+  }
+  setTimeout(release, 20000 + Math.random() * 30000);
 })();
