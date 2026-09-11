@@ -4136,8 +4136,77 @@ addEventListener("mousemove", e => {
   requestAnimationFrame(step);
 })();
 
+// wind-up robot — every ~2-4 min a tiny robot with a winding key on its back
+// marches in from a screen edge along the bottom of the page on stiff little
+// legs, ticking and wobbling, gradually slowing as its spring runs down, then
+// it topples over mid-stride and fades away like it was never wound
+(function windUpRobot() {
+  let t = null, nextAt = performance.now() + 90000 * (.7 + Math.random() * .6);
+  function step(now) {
+    if (!t && now > nextAt) {
+      const dir = Math.random() < .5 ? 1 : -1;
+      t = {
+        dir,
+        x: dir > 0 ? -30 : canvas.width + 30,
+        y: canvas.height - 24,
+        start: now,
+        dur: 11000 + Math.random() * 4000
+      };
+      setTimeout(() => console.log("robot log: the spring was never wound"), t.dur * .82);
+    }
+    if (t) {
+      const p = (now - t.start) / t.dur;
+      if (p >= 1) { t = null; nextAt = now + 170000 * (.7 + Math.random() * .6); }
+      else {
+        // ease-out speed: the spring winds down as it crosses the page
+        const speed = (1 - p) * (1 - p);
+        t.x += t.dir * 2.6 * speed * (1 + Math.sin(now / 90) * .18);
+        const x = t.x, y = t.y + Math.sin(now / 70) * 1.2;
+        const wobble = Math.sin(now / 110) * .07;
+        const fell = p > .92;
+        const fallA = fell ? Math.min(1, (p - .92) / .06) : 0;
+        const alpha = p > .96 ? 1 - (p - .96) / .04 : 1;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(wobble + fallA * 1.35);
+        ctx.globalAlpha = alpha;
+        ctx.strokeStyle = "rgba(124,252,156,.8)";
+        ctx.lineWidth = 1.6;
+        ctx.lineCap = "round";
+        // stiff little legs mid-stride
+        const stride = Math.sin(now / 60) * 4 * (fell ? 0 : speed);
+        ctx.beginPath();
+        ctx.moveTo(-4, 8); ctx.lineTo(-4 + stride, 15);
+        ctx.moveTo(4, 8); ctx.lineTo(4 - stride, 15);
+        ctx.stroke();
+        // boxy body with a riveted seam
+        ctx.strokeRect(-8, -6, 16, 14);
+        ctx.beginPath(); ctx.moveTo(0, -6); ctx.lineTo(0, 8); ctx.stroke();
+        ctx.fillStyle = "rgba(124,252,156,.85)";
+        ctx.fillRect(-4, -3, 3, 3); // eye
+        ctx.fillRect(2, -3, 3, 3);
+        ctx.strokeStyle = "rgba(124,252,156,.55)";
+        ctx.strokeRect(-3, 4, 6, 2); // little mouth grille
+        // winding key on its back, still turning while the spring lasts
+        ctx.save();
+        ctx.translate(-t.dir * 10, 0);
+        ctx.rotate(now / 300 * (fell ? 0 : speed));
+        ctx.beginPath();
+        ctx.moveTo(0, 0); ctx.lineTo(0, -6);
+        ctx.moveTo(-3, -8); ctx.lineTo(3, -8);
+        ctx.stroke();
+        ctx.restore();
+        ctx.restore();
+      }
+    }
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+})();
+
 // changelog
 const changelog = [
+  ["v0.229.0", "wind-up robot — every ~2-4 min a tiny boxy robot with a winding key on its back marches in from a screen edge along the bottom of the page on stiff little legs, ticking and wobbling, gradually slowing as its spring runs down, then it topples over mid-stride and fades away like it was never wound"],
   ["v0.228.0", "shooting star — every ~2-4 min a brief streak slashes diagonally across the upper sky, its spark head flaring and a thin trail fading behind it, then it burns out mid-air like the wish was never made"],
   ["v0.227.0", "satellite pass — every ~3-5 min a tiny satellite drifts across the upper sky, solar panels glinting and a small light blinking steadily, then it passes over the horizon like the orbit was never noticed"],
   ["v0.226.0", "zeppelin — every ~3-5 min a small airship glides slowly across the upper sky, its envelope swaying on the breeze with the gondola dangling beneath, then it sails off the far edge like the crossing was never booked"],
