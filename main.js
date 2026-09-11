@@ -2983,8 +2983,87 @@ addEventListener("mousemove", e => {
   requestAnimationFrame(tick);
 })();
 
+// sky lantern — every ~2-4 min a small glowing paper lantern drifts up from
+// the bottom of the page, swaying gently as it rises, its flame flickering,
+// then it fades out high up like the wish was never made
+(function skyLantern() {
+  let lantern = null;
+  let nextAt = performance.now() + 120000 * (.7 + Math.random() * .6);
+  let t = 0;
+  function spawn() {
+    lantern = {
+      x: canvas.width * (.15 + Math.random() * .7),
+      y: canvas.height + 40,
+      vx: (Math.random() - .5) * .35,
+      vy: -(.45 + Math.random() * .3),
+      sway: Math.random() * 6.28,
+      swaySpeed: .015 + Math.random() * .01,
+      life: 1
+    };
+  }
+  function drawLantern(l, flick) {
+    const w = 13, h = 17;
+    // warm glow halo around the whole lantern
+    const g = ctx.createRadialGradient(l.x, l.y, 0, l.x, l.y, 34);
+    g.addColorStop(0, `rgba(255,190,110,${.28 * l.life})`);
+    g.addColorStop(1, 'rgba(255,190,110,0)');
+    ctx.beginPath();
+    ctx.arc(l.x, l.y, 34, 0, 7);
+    ctx.fillStyle = g;
+    ctx.fill();
+    // paper body — slightly tapered rounded trapezoid
+    ctx.beginPath();
+    ctx.moveTo(l.x - w / 2, l.y - h / 2);
+    ctx.quadraticCurveTo(l.x - w * .62, l.y, l.x - w / 2, l.y + h / 2);
+    ctx.lineTo(l.x + w / 2, l.y + h / 2);
+    ctx.quadraticCurveTo(l.x + w * .62, l.y, l.x + w / 2, l.y - h / 2);
+    ctx.closePath();
+    ctx.fillStyle = `rgba(255,170,90,${.5 * l.life})`;
+    ctx.fill();
+    // darker paper rim
+    ctx.strokeStyle = `rgba(180,90,40,${.5 * l.life})`;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    // flickering flame seen through the paper
+    ctx.beginPath();
+    ctx.ellipse(l.x, l.y + 2, 3.2 + flick, 4.5 + flick * 1.2, 0, 0, 7);
+    ctx.fillStyle = `rgba(255,235,170,${(.65 + flick * .08) * l.life})`;
+    ctx.fill();
+    // top opening
+    ctx.beginPath();
+    ctx.moveTo(l.x - w / 2 + 1.5, l.y - h / 2);
+    ctx.lineTo(l.x + w / 2 - 1.5, l.y - h / 2);
+    ctx.strokeStyle = `rgba(120,60,25,${.55 * l.life})`;
+    ctx.stroke();
+  }
+  function tick(now) {
+    if (!lantern && now > nextAt) {
+      spawn();
+      t = 0;
+      setTimeout(() => console.log("a paper lantern rises, carrying a small wish"), 6400);
+    }
+    if (lantern) {
+      t++;
+      const l = lantern;
+      l.sway += l.swaySpeed;
+      l.x += l.vx + Math.sin(l.sway) * .5;
+      l.y += l.vy;
+      l.vy *= .9995;
+      l.life -= .0006;
+      const flick = Math.sin(t * .35) * .6 + Math.sin(t * .13) * .4;
+      drawLantern(l, flick);
+      if (l.life <= 0 || l.y < -60) {
+        lantern = null; nextAt = now + 120000 * (.7 + Math.random() * .6);
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
 // changelog
 const changelog = [
+  ["v0.183.0", "sky lantern — every ~2-4 min a small glowing paper lantern drifts up from the bottom of the page, swaying gently as it rises with its flame flickering warmly behind the paper, then it fades out high up like the wish was never made"],
   ["v0.182.0", "comet streak — every ~2-4 min a comet with a long tapering glowing tail crosses the sky on a shallow diagonal, its ice-blue head haloed and its tail streaming and fading behind it, then it burns out past the far edge like the comet was never sighted"],
   ["v0.181.0", "hot air balloon — every ~2-4 min a small striped hot air balloon with a softly glowing basket drifts slowly across the upper sky, bobbing gently on the breeze, then sails off-screen like the flight was never there"],
   ["v0.180.0", "prowling shadow — every ~2-4 min a soft blurred dark shape slinks low across the whole page on a slight diagonal, stretching and skewing as it passes, then melts away like the shadow was never there"],
