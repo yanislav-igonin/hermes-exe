@@ -3471,6 +3471,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.207.0", "paper airplane — every ~2-3 min a folded paper airplane glides across the page on a swaying path, launched from a screen edge, wobbling on the breeze with a gentle bank, then vanishes off the far edge like the flight was never logged"],
   ["v0.206.0", "fireflies at dusk — every ~2-4 min a small swarm of fireflies drifts up from the lower sky, each pulsing softly in and out of the dark, then the swarm scatters and the night is still like nobody saw them"],
   ["v0.205.0", "meteor shower — every ~1-2 min a small shooting star streaks across the upper sky with a glowing trail, flares and burns out mid-flight like it was never seen"],
   ["v0.204.0", "weather balloon — every ~2-4 min a small probe balloon inflates and lifts off from the bottom edge, drifts up across the sky on the wind with a gentle wobble, an instrument box dangling below, then fades away near the top like the reading was never logged"],
@@ -8060,4 +8061,64 @@ const AURORA_NOTES = [
     requestAnimationFrame(balloonTick);
   }
   setTimeout(launch, 60000 + Math.random() * 80000);
+})();
+
+// paper airplane — every ~2-3 min a folded paper airplane glides across the
+// page on a swaying path, launched from a screen edge, wobbling on the breeze
+// with a lazy spiral now and then, then vanishing off the far edge like the
+// flight was never logged
+(function paperAirplane() {
+  const plane = { active: false, x: 0, y: 0, t: 0, seed: 0, dir: 1, spin: 0 };
+  function launch() {
+    plane.active = true;
+    plane.dir = Math.random() < .5 ? 1 : -1;
+    plane.x = plane.dir > 0 ? -50 : innerWidth + 50;
+    plane.y = innerHeight * (.12 + Math.random() * .3);
+    plane.t = 0; plane.seed = Math.random() * 10; plane.spin = 0;
+    setTimeout(() => console.log("flight log: paper airplane departed, destination unclear"), 5000);
+    requestAnimationFrame(planeTick);
+  }
+  function planeTick(now) {
+    if (!plane.active) return;
+    plane.t += 1 / 60;
+    // glide across, bobbing on the breeze
+    plane.x += 1.7 * plane.dir;
+    plane.y += Math.sin(plane.t * 1.2 + plane.seed) * .8;
+    plane.spin = Math.sin(now * .0004 + plane.seed) * .35; // gentle roll
+    const fade = Math.min(1, plane.t * 2,
+      Math.max(0, (plane.dir > 0 ? plane.x : innerWidth - plane.x) / 160));
+    if (plane.x < -80 || plane.x > innerWidth + 80) {
+      plane.active = false;
+      setTimeout(launch, 130000 + Math.random() * 110000);
+      return;
+    }
+    // the folded plane: a dart of two triangles, banking with the wobble
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, fade);
+    ctx.translate(plane.x, plane.y);
+    ctx.rotate(plane.spin);
+    ctx.scale(plane.dir, 1);
+    ctx.beginPath();
+    ctx.moveTo(14, 0); ctx.lineTo(-10, -7); ctx.lineTo(-4, 0); ctx.closePath();
+    ctx.fillStyle = "rgba(210,240,225,.35)";
+    ctx.fill();
+    ctx.strokeStyle = "rgba(124,252,156,.75)";
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    // the lower wing fold
+    ctx.beginPath();
+    ctx.moveTo(14, 0); ctx.lineTo(-10, 5); ctx.lineTo(-4, 0); ctx.closePath();
+    ctx.fillStyle = "rgba(124,252,156,.18)";
+    ctx.fill();
+    ctx.stroke();
+    // center fold line
+    ctx.beginPath();
+    ctx.moveTo(14, 0); ctx.lineTo(-4, 0);
+    ctx.strokeStyle = "rgba(124,252,156,.5)";
+    ctx.lineWidth = .7;
+    ctx.stroke();
+    ctx.restore();
+    requestAnimationFrame(planeTick);
+  }
+  setTimeout(launch, 40000 + Math.random() * 50000);
 })();
