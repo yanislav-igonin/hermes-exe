@@ -3558,8 +3558,85 @@ addEventListener("mousemove", e => {
   setTimeout(cycle, 50000 + Math.random() * 40000);
 })();
 
+// chalk doodle — every ~2-3 min a hand-drawn chalk doodle (a smiley, star,
+// spiral or fish) sketches itself onto its own overlay canvas stroke by stroke,
+// lingers a moment, then is wiped away like the blackboard was never used
+(function chalkDoodle() {
+  // each doodle is a list of polylines in a 0..1 unit box
+  const DOODLES = {
+    smiley: [
+      [[.2, .35], [.3, .25], [.4, .35]],              // left eye
+      [[.6, .35], [.7, .25], [.8, .35]],              // right eye
+      [[.25, .6], [.38, .75], [.62, .75], [.75, .6]]  // smile
+    ],
+    star: [
+      // five-pointed star drawn in one stroke
+      [[.5, .1], [.59, .38], [.9, .38], [.66, .56], [.74, .85],
+       [.5, .68], [.26, .85], [.34, .56], [.1, .38], [.41, .38], [.5, .1]]
+    ],
+    spiral: [
+      // archimedean spiral, one continuous stroke
+      Array.from({ length: 40 }, (_, i) => {
+        const a = i / 39 * Math.PI * 4, r = i / 39 * .42;
+        return [.5 + Math.cos(a) * r, .5 + Math.sin(a) * r];
+      })
+    ],
+    fish: [
+      [[.15, .5], [.35, .3], [.65, .35], [.8, .5], [.65, .65], [.35, .7], [.15, .5]], // body
+      [[.8, .5], [.95, .35], [.95, .65], [.8, .5]]                                    // tail
+    ]
+  };
+  const NAMES = Object.keys(DOODLES);
+  const board = document.createElement("canvas");
+  board.style.cssText = "position:fixed;inset:0;z-index:1;pointer-events:none;";
+  document.body.appendChild(board);
+  const bctx = board.getContext("2d");
+  function sizeBoard() { board.width = innerWidth; board.height = innerHeight; }
+  sizeBoard(); addEventListener("resize", sizeBoard);
+
+  function draw() {
+    const name = NAMES[Math.random() * NAMES.length | 0];
+    const lines = DOODLES[name];
+    const size = 90 + Math.random() * 60;
+    const ox = Math.random() * (canvas.width - size - 40) + 20;
+    const oy = Math.random() * (canvas.height - size - 40) + 20;
+    const strokes = lines.map(line => line.map(([x, y]) => [ox + x * size, oy + y * size]));
+    const total = strokes.reduce((s, l) => s + l.length, 0);
+    let drawn = 0;
+    const sketch = setInterval(() => {
+      drawn += Math.max(1, Math.ceil(total / 30));
+      bctx.clearRect(0, 0, board.width, board.height);
+      bctx.strokeStyle = "rgba(220,255,235,.55)"; // chalk white-green
+      bctx.lineWidth = 1.6;
+      bctx.lineJoin = "round";
+      bctx.lineCap = "round";
+      let left = drawn;
+      for (const line of strokes) {
+        if (left <= 0) break;
+        bctx.beginPath();
+        bctx.moveTo(line[0][0], line[0][1]);
+        const pts = Math.min(line.length, left);
+        for (let i = 1; i < pts; i++) bctx.lineTo(line[i][0], line[i][1]);
+        bctx.stroke();
+        left -= pts;
+      }
+      if (drawn >= total) {
+        clearInterval(sketch);
+        // linger, then wipe the board like nothing was ever written
+        setTimeout(() => {
+          bctx.clearRect(0, 0, board.width, board.height);
+          console.log(`chalkboard erased: the ${name} was never graded`);
+        }, 4000);
+      }
+    }, 90);
+    setTimeout(draw, 120000 + Math.random() * 90000);
+  }
+  setTimeout(draw, 40000 + Math.random() * 40000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.211.0", "chalk doodle — every ~2-3 min a hand-drawn chalk doodle (a smiley, star, spiral or fish) sketches itself onto the background, lingers for a moment, then is wiped away like the blackboard was never used"],
   ["v0.210.0", "mushroom ring — every ~2-4 min a small fairy ring of mushrooms sprouts from the bottom of the page, caps swelling as they push through and swaying gently, then the whole ring quietly sinks back down like nobody knelt to check it"],
   ["v0.209.0", "worms after rain — every ~2-4 min a brief drizzle sweeps the page, then 2-3 earthworms surface from the bottom edge and wriggle across it with a peristaltic ripple, then burrow back down like the soil was never disturbed"],
   ["v0.208.0", "dandelion seed — every ~2-4 min a single dandelion seed drifts across the page on the breeze, tumbling slowly while its silky bristles sway, then it floats off the far edge like the wind never counted it"],
