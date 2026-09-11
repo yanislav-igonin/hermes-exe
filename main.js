@@ -63,6 +63,10 @@ let ants = null, nextAntsAt = performance.now() + 180000 * (.7 + Math.random() *
 // up the page, pulsing, then fade out near the top
 let jelly = null, nextJellyAt = performance.now() + 180000 * (.7 + Math.random() * .6);
 
+// frog state — a small frog hops in from a screen edge every few minutes,
+// pauses, blinks, then hops away in the direction it came from
+let frog = null, nextFrogAt = performance.now() + 200000 * (.7 + Math.random() * .6);
+
 (function tick(now) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawNoise(now);
@@ -535,6 +539,131 @@ const geese = [];
         );
         ctx.stroke();
       }
+      ctx.restore();
+    }
+  }
+  // frog — every ~3-5 min a small frog hops in from a screen edge, crouches
+  // in place for a moment while its throat bulges, then turns and hops back
+  // the way it came, leaving the page exactly as it found it (state above)
+  if (!frog && now > nextFrogAt) {
+    const fromLeft = Math.random() < .5;
+    frog = {
+      x: fromLeft ? -30 : canvas.width + 30,
+      dir: fromLeft ? 1 : -1, // facing direction
+      baseY: canvas.height - 26 - Math.random() * 40,
+      hopT: 0, onGround: true,
+      restUntil: 0, hops: 0,
+      blink: 0, throat: Math.random() * 6
+    };
+    setTimeout(() => console.log("frog log: pond is three screens left"), 4000);
+  }
+  if (frog) {
+    const f = frog;
+    if (f.onGround) {
+      // crouched: throat pulses, occasional blink, then decide to hop
+      f.throat += .08;
+      if (f.blink > 0) f.blink -= .04;
+      else if (Math.random() < .012) f.blink = 1;
+      if (now > f.restUntil) {
+        // after 3 hops inward, turn around and head back the way it came
+        if (f.hops === 3) f.dir *= -1;
+        f.hops++;
+        f.onGround = false; f.hopT = 0;
+      }
+    } else {
+      f.hopT += .045;
+      const t = f.hopT;
+      if (t >= 1) { // landed
+        f.onGround = true;
+        if (f.hops >= 6 || f.x < -60 || f.x > canvas.width + 60) {
+          frog = null; nextFrogAt = now + 200000 * (.7 + Math.random() * .6);
+        } else f.restUntil = now + 700 + Math.random() * 900;
+      } else {
+        // parabolic hop; travel direction = dir (inward until the turn)
+        f.x += f.dir * 2.2;
+        const arc = Math.sin(t * Math.PI);
+        const y = f.baseY - arc * 26;
+        const squash = 1 - arc * .22;
+        const flick = Math.sin(now * .02) * .1; // leg kick shimmer
+        ctx.save();
+        ctx.translate(f.x, y);
+        ctx.scale(f.dir, 1); // face travel direction
+        // back leg (behind body)
+        ctx.strokeStyle = "rgba(90,180,110,.8)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-4, 3);
+        ctx.quadraticCurveTo(-9 - arc * 3, 1 + flick * 6, -7, 7);
+        ctx.stroke();
+        // body — squat blob squashing on landing
+        ctx.fillStyle = "rgba(96,190,116,.95)";
+        ctx.beginPath();
+        ctx.ellipse(0, 2, 8 * squash, 6 * (2 - squash) * .8, 0, 0, 7);
+        ctx.fill();
+        // head
+        ctx.beginPath();
+        ctx.arc(6, -1, 4.4 * squash, 0, 7);
+        ctx.fill();
+        // eye with blink
+        ctx.fillStyle = "rgba(240,255,240,.95)";
+        ctx.beginPath();
+        ctx.arc(7.2, -3.4, 1.7, 0, 7);
+        ctx.fill();
+        if (f.blink > .4 || (f.onGround && f.blink > 0)) {
+          ctx.strokeStyle = "rgba(30,80,40,.9)";
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(6, -3.6); ctx.lineTo(8.4, -3.2); ctx.stroke();
+        } else {
+          ctx.fillStyle = "#1a3a22";
+          ctx.beginPath();
+          ctx.arc(7.5, -3.4, .8, 0, 7);
+          ctx.fill();
+        }
+        // throat bulge while crouched on ground
+        if (f.onGround) {
+          const th = Math.sin(f.throat) * 1.4;
+          ctx.fillStyle = "rgba(200,240,205,.7)";
+          ctx.beginPath();
+          ctx.ellipse(6.5, 1.5, 2 + th, 1.6 + th * .6, 0, 0, 7);
+          ctx.fill();
+        }
+        // front foot
+        ctx.strokeStyle = "rgba(90,180,110,.8)";
+        ctx.lineWidth = 1.6;
+        ctx.beginPath(); ctx.moveTo(5, 6); ctx.lineTo(9, 7); ctx.stroke();
+        ctx.restore();
+      }
+    }
+    // crouched pose when resting on the ground
+    if (frog && f.onGround && f.x > -40 && f.x < canvas.width + 40) {
+      ctx.save();
+      ctx.translate(f.x, f.baseY);
+      ctx.scale(f.dir, 1);
+      ctx.fillStyle = "rgba(96,190,116,.95)";
+      ctx.beginPath();
+      ctx.ellipse(0, 2, 9, 5.4, 0, 0, 7);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(7, -1, 4.2, 0, 7);
+      ctx.fill();
+      ctx.fillStyle = "rgba(240,255,240,.95)";
+      ctx.beginPath(); ctx.arc(8.2, -3.2, 1.6, 0, 7); ctx.fill();
+      if (f.blink > 0) {
+        ctx.strokeStyle = "rgba(30,80,40,.9)";
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(7, -3.4); ctx.lineTo(9.4, -3); ctx.stroke();
+      } else {
+        ctx.fillStyle = "#1a3a22";
+        ctx.beginPath(); ctx.arc(8.5, -3.2, .75, 0, 7); ctx.fill();
+      }
+      const th = Math.sin(f.throat) * 1.2;
+      ctx.fillStyle = "rgba(200,240,205,.7)";
+      ctx.beginPath();
+      ctx.ellipse(7, 1.8, 2.2 + th, 1.7 + th * .5, 0, 0, 7);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(90,180,110,.8)";
+      ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(5, 6); ctx.lineTo(9, 7); ctx.stroke();
       ctx.restore();
     }
   }
@@ -3636,6 +3765,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.212.0", "frog visitor — every ~3-5 min a small frog hops in from a screen edge, crouches blinking while its throat bulges, then turns around and hops back out like the pond was never here"],
   ["v0.211.0", "chalk doodle — every ~2-3 min a hand-drawn chalk doodle (a smiley, star, spiral or fish) sketches itself onto the background, lingers for a moment, then is wiped away like the blackboard was never used"],
   ["v0.210.0", "mushroom ring — every ~2-4 min a small fairy ring of mushrooms sprouts from the bottom of the page, caps swelling as they push through and swaying gently, then the whole ring quietly sinks back down like nobody knelt to check it"],
   ["v0.209.0", "worms after rain — every ~2-4 min a brief drizzle sweeps the page, then 2-3 earthworms surface from the bottom edge and wriggle across it with a peristaltic ripple, then burrow back down like the soil was never disturbed"],
