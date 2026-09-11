@@ -2698,6 +2698,71 @@ body.synthwave .firefly { background: rgba(255,196,140,.95); box-shadow: 0 0 8px
   0%, 100% { transform: rotate(9deg); }
   50%      { transform: rotate(-9deg) scaleY(1.06); }
 }
+/* lighthouse — v0.176.0 */
+.lighthouse {
+  position: fixed;
+  left: var(--lh-x, 50vw);
+  bottom: -170px;
+  width: 44px; height: 160px;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  animation: lh-rise var(--lh-dur, 18000ms) ease-in-out forwards;
+}
+.lh-tower {
+  position: absolute;
+  left: 8px; bottom: 0;
+  width: 28px; height: 140px;
+  background: linear-gradient(90deg, #3a4454, #6b7a90 45%, #262e3a);
+  border-radius: 5px 5px 0 0;
+  box-shadow: 0 0 10px rgba(200, 230, 255, .2);
+  overflow: hidden;
+}
+.lh-tower::before {
+  /* painted stripes */
+  content: "";
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(45deg, transparent 0 10px, rgba(230,240,255,.14) 10px 20px);
+}
+.lh-lamp {
+  position: absolute;
+  left: 7px; top: -12px;
+  width: 14px; height: 14px;
+  background: radial-gradient(circle, #fffbe6, #ffe9a0 55%, rgba(255,233,160,0));
+  border-radius: 50%;
+  box-shadow: 0 0 14px rgba(255, 245, 200, .9);
+  animation: lh-lamp-blink 1.6s ease-in-out infinite;
+}
+@keyframes lh-lamp-blink {
+  0%, 100% { opacity: .55; }
+  50%      { opacity: 1; }
+}
+.lh-beam {
+  position: absolute;
+  left: 14px; bottom: 148px;
+  width: 46vw; height: 60px;
+  transform-origin: left center;
+  background: linear-gradient(90deg, rgba(255, 248, 205, .28), rgba(255, 245, 200, .1) 40%, rgba(255, 245, 200, 0));
+  clip-path: polygon(0 50%, 100% 0, 100% 100%);
+  filter: blur(1.5px);
+  animation: lh-sweep var(--lh-dur, 18000ms) ease-in-out forwards;
+}
+@keyframes lh-rise {
+  0%   { transform: translateY(0); opacity: 0; }
+  8%   { opacity: 1; }
+  12%  { transform: translateY(-160px); opacity: 1; }
+  82%  { transform: translateY(-160px); opacity: 1; }
+  94%  { transform: translateY(-170px); opacity: .6; }
+  100% { transform: translateY(-40px); opacity: 0; }
+}
+@keyframes lh-sweep {
+  0%   { transform: rotate(calc(var(--lh-sweep, 0deg) / 2)) scaleY(.8); opacity: 0; }
+  6%   { opacity: 1; }
+  30%  { transform: rotate(calc(var(--lh-sweep, 0deg) / -2)) scaleY(1); }
+  62%  { transform: rotate(calc(var(--lh-sweep, 0deg) / 2)) scaleY(1); }
+  94%  { opacity: 1; }
+  100% { transform: rotate(calc(var(--lh-sweep, 0deg) / -2)) scaleY(.8); opacity: 0; }
+}
 /* periscope — v0.175.0 */
 .periscope {
   position: fixed;

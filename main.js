@@ -2795,8 +2795,40 @@ addEventListener("mousemove", e => {
   setTimeout(scan, 30000 + Math.random() * 30000);
 })();
 
+// lighthouse — every ~2-4 min a small lighthouse with a rotating beam sweeps
+// once across the page, its beam briefly illuminating what it passes over,
+// then it sinks back below the edge like the coast was never watched
+(function lighthouse() {
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  function shine() {
+    if (!document.hidden) {
+      const el = document.createElement("div");
+      el.className = "lighthouse";
+      const dur = 14000 + Math.random() * 7000;
+      el.style.setProperty("--lh-x", (innerWidth * (0.05 + Math.random() * 0.9)).toFixed(0) + "px");
+      el.style.setProperty("--lh-dur", dur.toFixed(0) + "ms");
+      const tower = document.createElement("span");
+      tower.className = "lh-tower";
+      const lamp = document.createElement("span");
+      lamp.className = "lh-lamp";
+      const beam = document.createElement("span");
+      beam.className = "lh-beam";
+      el.style.setProperty("--lh-sweep", (Math.random() * 70 - 35).toFixed(0) + "deg");
+      tower.appendChild(lamp);
+      el.appendChild(tower);
+      el.appendChild(beam);
+      document.body.appendChild(el);
+      setTimeout(() => console.log("lighthouse sweep: the coast is quiet tonight"), dur * 0.45);
+      setTimeout(() => el.remove(), dur + 1500);
+    }
+    setTimeout(shine, 120000 + Math.random() * 120000);
+  }
+  setTimeout(shine, 40000 + Math.random() * 30000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.176.0", "lighthouse — every ~2-4 min a small lighthouse rises from the bottom of the page, its rotating beam sweeps once across the sky, briefly illuminating what it passes over, then it sinks back below the edge like the coast was never watched"],
   ["v0.175.0", "periscope — every ~2-4 min a submarine periscope rises from the bottom of the page, sweeps slowly across the room with a lens glint while a sonar blip prints in the console, then sinks back below the edge like the coast was never watched"],
   ["v0.174.0", "jellyfish — every ~2-4 min a translucent jellyfish with a glowing bell and five trailing tentacles drifts slowly up from the bottom of the page, pulsing gently as it rises and swaying with the current, then fades out near the top like the tide was never there"],
   ["v0.173.0", "goose migration — every ~2-4 min a loose V-formation of 5-7 tiny geese crosses the upper sky, flapping on out-of-phase wing beats while the wedge slowly undulates, a distant honk echoes in the console, then they glide off-screen like the migration was never there"],
