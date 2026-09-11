@@ -3465,3 +3465,36 @@ canvas.fireflies {
   z-index: 1;
   pointer-events: none;
 }
+
+/* balloon — every ~2-4 min a small balloon drifts up from the bottom of the
+   page, sways gently on an invisible breeze while its string trails below,
+   and pops into a tiny confetti burst if you click it; otherwise it floats
+   away off the top like a fairground you were never at */
+.balloon {
+  position: fixed;
+  z-index: 6;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  will-change: transform;
+  pointer-events: auto;
+}
+.balloon-string {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  width: 1px;
+  height: 26px;
+  transform-origin: 50% 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .35), rgba(255, 255, 255, .05));
+}
+.balloon-confetti {
+  position: fixed;
+  z-index: 6;
+  width: 4px;
+  height: 4px;
+  border-radius: 1px;
+  pointer-events: none;
+  will-change: transform, opacity;
+}

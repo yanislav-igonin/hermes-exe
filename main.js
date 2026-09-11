@@ -3765,6 +3765,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.217.0", "balloon — every ~2-4 min a small balloon drifts up from the bottom of the page, sways gently on an invisible breeze with its string trailing below, and pops into a tiny confetti burst if you click it; otherwise it floats away off the top like a fairground you were never at"],
   ["v0.216.0", "fireflies — a loose swarm of tiny amber lights drifts across the page, each blinking on its own wavering rhythm with a soft glow, shying away from the cursor until it wanders off into the dark again"],
   ["v0.215.0", "lighthouse — every ~2-4 min a tiny lighthouse rises near the top of the page, its beam sweeping slow rotating arcs of light across the sky, then it dims and sinks away like the coast was never charted"],
   ["v0.214.0", "ekg pulse — a tiny heart monitor in the corner scrolls a steady green EKG line, occasionally flatlines in red for a breath, then finds its pulse again"],
@@ -8717,4 +8718,69 @@ const AURORA_NOTES = [
     }
     requestAnimationFrame(tick);
   })(t0);
+})();
+
+// balloon — every ~2-4 min a small balloon drifts up from the bottom of the
+// page, sways gently on an invisible breeze with its string trailing below,
+// and pops into a tiny confetti burst if you click it; otherwise it floats
+// away off the top like a fairground you were never at
+(function balloon() {
+  const CONFETTI = ["#ff5f6d", "#ffc247", "#7cf29b", "#6fc3ff", "#c98bff"];
+  function pop(x, y) {
+    for (let i = 0; i < 14; i++) {
+      const p = document.createElement("div");
+      p.className = "balloon-confetti";
+      p.style.left = x + "px";
+      p.style.top = y + "px";
+      p.style.background = CONFETTI[Math.random() * CONFETTI.length | 0];
+      document.body.appendChild(p);
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 20 + Math.random() * 46;
+      const dx = Math.cos(ang) * dist;
+      const dy = Math.sin(ang) * dist - 18;
+      const rot = (Math.random() - .5) * 540;
+      const t0 = performance.now();
+      requestAnimationFrame(function tick(now) {
+        const t = (now - t0) / 900;
+        if (t >= 1) { p.remove(); return; }
+        p.style.opacity = (1 - t).toFixed(2);
+        p.style.transform = `translate(${(dx * t).toFixed(1)}px, ${(dy * t + 60 * t * t).toFixed(1)}px) rotate(${(rot * t).toFixed(0)}deg)`;
+      });
+    }
+  }
+  function launch() {
+    const el = document.createElement("div");
+    el.className = "balloon";
+    el.textContent = "🎈";
+    const str = document.createElement("div");
+    str.className = "balloon-string";
+    el.appendChild(str);
+    const x = innerWidth * (.12 + Math.random() * .76);
+    el.style.left = x + "px";
+    el.style.top = (innerHeight + 70) + "px";
+    el.style.filter = `hue-rotate(${Math.random() * 360 | 0}deg)`;
+    document.body.appendChild(el);
+    const dur = 14000 + Math.random() * 6000;
+    const drift = 30 + Math.random() * 50;
+    const dir = Math.random() < .5 ? 1 : -1;
+    const start = performance.now();
+    let done = false;
+    el.addEventListener("click", () => {
+      if (done) return;
+      done = true;
+      const r = el.getBoundingClientRect();
+      el.remove();
+      pop(r.left + r.width / 2, r.top + r.height / 2);
+      setTimeout(launch, 150000 + Math.random() * 150000);
+    });
+    (function tick(now) {
+      if (done) return;
+      const t = (now - start) / dur;
+      if (t >= 1) { el.remove(); setTimeout(launch, 150000 + Math.random() * 150000); return; }
+      const sway = Math.sin(t * Math.PI * 4) * 18 * dir;
+      el.style.transform = `translate(${(sway + dir * drift * t).toFixed(1)}px, ${(-t * (innerHeight + 160)).toFixed(1)}px) rotate(${(sway * .5).toFixed(1)}deg)`;
+      requestAnimationFrame(tick);
+    })(start);
+  }
+  setTimeout(launch, 30000 + Math.random() * 40000);
 })();
