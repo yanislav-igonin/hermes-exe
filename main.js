@@ -4261,8 +4261,66 @@ addEventListener("mousemove", e => {
   setTimeout(drop, 25000 + Math.random() * 30000);
 })();
 
+// ice cream truck — every ~3-5 min a tiny ice cream truck rolls along the
+// bottom of the page, jingles a little tune note by note, and occasionally a
+// dropped scoop of ice cream plops onto the pavement behind it, then it
+// trundles off the far edge like the tune was never for sale
+(function iceCreamTruck() {
+  const layer = document.createElement("div");
+  layer.className = "ict-layer";
+  document.body.appendChild(layer);
+  const TUNE = [660, 660, 660, 510, 660, 770, 510]; // a very familiar chime, legally distinct
+  function visit() {
+    layer.innerHTML = "";
+    const fromLeft = Math.random() < .5;
+    const dir = fromLeft ? 1 : -1;
+    const dur = 30000 + Math.random() * 10000;
+    const truck = document.createElement("span");
+    truck.className = "ict-truck";
+    truck.innerHTML =
+      '<svg viewBox="0 0 64 34" aria-hidden="true">' +
+        '<rect class="ict-body" x="2" y="8" width="46" height="18" rx="3" fill="currentColor"/>' +
+        '<rect class="ict-cab" x="46" y="14" width="14" height="12" rx="2" fill="currentColor"/>' +
+        '<rect class="ict-window" x="48" y="16" width="8" height="6" rx="1" fill="rgba(6,10,8,.85)"/>' +
+        '<rect class="ict-sign" x="6" y="12" width="22" height="8" rx="2" fill="rgba(6,10,8,.85)"/>' +
+        '<circle class="ict-wheel" cx="14" cy="27" r="5"/>' +
+        '<circle class="ict-wheel" cx="44" cy="27" r="5"/>' +
+        '<circle class="ict-light" cx="58" cy="12" r="2"/>' +
+      '</svg>';
+    truck.style.setProperty("--ict-dur", dur + "ms");
+    truck.style.setProperty("--ict-flip", dir === 1 ? "1" : "-1");
+    truck.style.setProperty("--ict-y", (72 + Math.random() * 14).toFixed(1) + "vh");
+    layer.appendChild(truck);
+    layer.classList.add("ict-on");
+    // the tune plays while it passes, one note per jingle bar
+    let note = 0;
+    const jingle = setInterval(() => {
+      console.log("♪ " + TUNE[note % TUNE.length] + "Hz — the ice cream truck is passing");
+      note++;
+      if (note > TUNE.length * 2) clearInterval(jingle);
+    }, 900);
+    // one dropped scoop, mid-route, plonks onto the pavement
+    setTimeout(() => {
+      const scoop = document.createElement("span");
+      scoop.className = "ict-scoop";
+      scoop.style.setProperty("--ict-sx", (12 + Math.random() * 70).toFixed(1) + "vw");
+      scoop.style.setProperty("--ict-sy", (78 + Math.random() * 12).toFixed(1) + "vh");
+      layer.appendChild(scoop);
+      setTimeout(() => scoop.remove(), 7000);
+    }, dur * .45);
+    setTimeout(() => {
+      layer.classList.remove("ict-on");
+      layer.innerHTML = "";
+      clearInterval(jingle);
+    }, dur + 2000);
+    setTimeout(visit, 180000 + Math.random() * 120000);
+  }
+  setTimeout(visit, 40000 + Math.random() * 50000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.233.0", "ice cream truck — every ~3-5 min a tiny ice cream truck rolls along the bottom of the page jingling a little tune note by note, drops a single scoop of ice cream onto the pavement mid-route, then trundles off the far edge like the tune was never for sale"],
   ["v0.232.0", "ink blot — every ~2-5 min a drop of ink falls from above the page, splats against it and blooms into a lopsided blot with torn edges, which slowly spreads, darkens at the rim and fades away like it was never signed"],
   ["v0.231.0", "balloon release — every ~2-4 min a handful of small balloons rises slowly from the bottom of the page, each wobbling side to side on its own string in its own colour, then they drift up out of view like the carnival packed up and left"],
   ["v0.230.0", "firefly swarm — every ~2-5 min a loose cluster of tiny glowing fireflies rises from the lower half of the page, drifting and blinking dimly on their own, then flashing bright together in two brief sync waves before dispersing like the summer was imagined"],

@@ -3704,3 +3704,47 @@ body.synthwave .paper-dart { color: rgba(255,205,150,.8); text-shadow: 0 0 6px r
 }
 body.vaporwave .ink-blot { color: rgba(201,166,232,.85); }
 body.synthwave .ink-blot { color: rgba(255,140,46,.85); }
+
+/* ice cream truck: every ~3-5 min a tiny truck rolls along the bottom of the
+   page jingling its tune, drops one scoop on the pavement, then trundles off */
+.ict-layer {
+  position: fixed; inset: 0; z-index: 9994; pointer-events: none; overflow: hidden;
+}
+.ict-truck {
+  position: absolute; left: -80px; top: var(--ict-y, 78vh);
+  width: 96px; height: 51px;
+  color: rgba(124,252,156,.75);
+  opacity: 0;
+}
+.ict-layer.ict-on .ict-truck {
+  animation: ict-roll var(--ict-dur, 30s) linear forwards;
+}
+@keyframes ict-roll {
+  0%   { opacity: 0; translate: 0 0; }
+  5%   { opacity: .85; }
+  50%  { translate: 50vw 0; }
+  92%  { opacity: .85; }
+  100% { opacity: 0; translate: calc(100vw + 160px) 0; }
+}
+.ict-truck svg { width: 100%; height: 100%; display: block; overflow: visible; transform: scaleX(var(--ict-flip, 1)); }
+.ict-truck .ict-wheel { fill: rgba(6,10,8,.9); stroke: rgba(124,252,156,.9); stroke-width: 1.5; }
+.ict-truck .ict-light { fill: rgba(124,252,156,.9); animation: ict-blink 700ms steps(2) infinite; }
+@keyframes ict-blink { 50% { opacity: .2; } }
+.ict-scoop {
+  position: absolute; left: var(--ict-sx, 40vw); top: var(--ict-sy, 82vh);
+  width: 10px; height: 10px; border-radius: 50%;
+  background: rgba(124,252,156,.7);
+  animation: ict-plop 7s ease-in forwards;
+}
+@keyframes ict-plop {
+  0%   { opacity: 0; transform: translateY(-26px) scaleY(1.3); }
+  10%  { opacity: .85; transform: translateY(0) scaleY(1); }
+  20%  { transform: translateY(-5px); }
+  30%  { transform: translateY(0); }
+  75%  { opacity: .6; }
+  100% { opacity: 0; transform: translateY(2px) scale(.9); }
+}
+body.vaporwave .ict-truck { color: rgba(201,166,232,.8); }
+body.vaporwave .ict-scoop { background: rgba(201,166,232,.7); }
+body.synthwave .ict-truck { color: rgba(255,140,46,.8); }
+body.synthwave .ict-scoop { background: rgba(255,140,46,.7); }
