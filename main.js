@@ -3134,8 +3134,83 @@ addEventListener("mousemove", e => {
   requestAnimationFrame(tick);
 })();
 
+// drifting cloud — every ~2-4 min a soft fluffy cloud crosses the high sky,
+// its pale shadow sliding along the ground beneath it, then both drift away
+// like the weather was never there
+(function driftingCloud() {
+  let cloud = null;
+  let nextAt = performance.now() + 120000 * (.7 + Math.random() * .6);
+  let t = 0;
+  function spawn() {
+    cloud = {
+      x: -160,
+      dir: Math.random() < .5 ? 1 : -1,
+      y: canvas.height * (.08 + Math.random() * .12),
+      vx: .35 + Math.random() * .25,
+      bob: Math.random() * 6.28,
+      bobSpeed: .012 + Math.random() * .008,
+      puffs: Array.from({ length: 6 }, (_, i) => ({
+        ox: i * 34 - 85 + (Math.random() - .5) * 12,
+        oy: (Math.random() - .5) * 14,
+        r: 26 + Math.random() * 18
+      })),
+      life: 1
+    };
+    if (cloud.dir < 0) { cloud.x = canvas.width + 160; cloud.vx = -cloud.vx; }
+  }
+  function drawCloud(l) {
+    // shadow on the ground — soft dark ellipse trailing beneath the cloud
+    const shadowY = canvas.height - 24;
+    const shadowX = l.x + l.dir * 40;
+    ctx.save();
+    ctx.globalAlpha = .1 * l.life;
+    ctx.filter = "blur(8px)";
+    ctx.beginPath();
+    ctx.ellipse(shadowX, shadowY, 120, 22, 0, 0, 6.29);
+    ctx.fillStyle = "#000";
+    ctx.fill();
+    ctx.restore();
+    // the cloud itself
+    ctx.save();
+    ctx.translate(l.x, l.y + Math.sin(l.bob) * 4);
+    ctx.globalAlpha = .92 * l.life;
+    for (const p of l.puffs) {
+      ctx.beginPath();
+      ctx.arc(p.ox, p.oy, p.r, 0, 6.29);
+      ctx.fillStyle = "rgba(255,255,255,.85)";
+      ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.ellipse(0, 12, 130, 30, 0, 0, 6.29);
+    ctx.fillStyle = "rgba(255,255,255,.85)";
+    ctx.fill();
+    ctx.restore();
+  }
+  function tick(now) {
+    if (!cloud && now > nextAt) {
+      spawn();
+      t = 0;
+      setTimeout(() => console.log("a cloud wanders by, dragging its shadow along the ground"), 6400);
+    }
+    if (cloud) {
+      t++;
+      const l = cloud;
+      l.bob += l.bobSpeed;
+      l.x += l.vx;
+      if (l.dir > 0 && l.x > canvas.width + 200 || l.dir < 0 && l.x < -200) {
+        cloud = null; nextAt = now + 120000 * (.7 + Math.random() * .6);
+      } else {
+        drawCloud(l);
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
 // changelog
 const changelog = [
+  ["v0.185.0", "drifting cloud — every ~2-4 min a soft fluffy cloud crosses the high sky while its pale blurred shadow slides along the ground beneath it, bobbing gently on the breeze, then both drift away like the weather was never there"],
   ["v0.184.0", "falling leaf — every ~2-4 min a small autumn leaf tumbles down through the page, rocking and spiralling on the breeze with its midrib catching the light, then it drifts out of sight like the wind was never there"],
   ["v0.183.0", "sky lantern — every ~2-4 min a small glowing paper lantern drifts up from the bottom of the page, swaying gently as it rises with its flame flickering warmly behind the paper, then it fades out high up like the wish was never made"],
   ["v0.182.0", "comet streak — every ~2-4 min a comet with a long tapering glowing tail crosses the sky on a shallow diagonal, its ice-blue head haloed and its tail streaming and fading behind it, then it burns out past the far edge like the comet was never sighted"],
