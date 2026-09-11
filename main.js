@@ -71,6 +71,11 @@ let frog = null, nextFrogAt = performance.now() + 200000 * (.7 + Math.random() *
 // every few minutes, a rolled note sealed inside, then the tide takes it away
 let bottle = null, nextBottleAt = performance.now() + 180000 * (.7 + Math.random() * .6);
 
+// tumbleweed state — a dry tumbleweed tumbles across the page every few
+// minutes, bouncing along the bottom, then rolls off like the prairie
+// was never fenced
+let tumbleweed = null, nextTumbleweedAt = performance.now() + 180000 * (.7 + Math.random() * .6);
+
 (function tick(now) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawNoise(now);
@@ -721,6 +726,63 @@ const geese = [];
       ctx.beginPath();
       ctx.moveTo(-9, -3.5); ctx.lineTo(-6, -3.8);
       ctx.stroke();
+      ctx.restore();
+    }
+  }
+  // tumbleweed — every ~2-4 min a dry tangled tumbleweed rolls in from a
+  // screen edge, bouncing along the bottom of the page, shedding a few
+  // stray twigs on the hard landings, then it tumbles off the far edge
+  // like the prairie was never fenced (state above the loop)
+  if (!tumbleweed && now > nextTumbleweedAt) {
+    const dir = Math.random() < .5 ? 1 : -1;
+    tumbleweed = { dir, x: dir > 0 ? -40 : canvas.width + 40, y: canvas.height - 24, vy: 0, spin: 0, phase: Math.random() * 6, twigs: [] };
+  }
+  if (tumbleweed) {
+    const t = tumbleweed;
+    t.x += 2.2 * t.dir;
+    t.vy += .12; t.y += t.vy; t.spin += .12 * t.dir; t.phase += .07;
+    const groundY = canvas.height - 24 - Math.abs(Math.sin(t.phase)) * 6;
+    if (t.y > groundY) {
+      t.y = groundY;
+      t.vy = -(2.6 + Math.random() * 2.2);
+      if (Math.random() < .7 && t.twigs.length < 6) t.twigs.push({ x: t.x, y: t.y, vx: (Math.random() - .5) * 1.6 - t.dir, vy: -1 - Math.random() * 1.5, rot: Math.random() * 6, vr: (Math.random() - .5) * .2, life: 1 });
+    }
+    if (t.x < -60 || t.x > canvas.width + 60) { tumbleweed = null; nextTumbleweedAt = now + 180000 * (.7 + Math.random() * .6); }
+    else {
+      // shed twigs skitter, settle and fade where they land
+      for (let i = t.twigs.length - 1; i >= 0; i--) {
+        const w = t.twigs[i];
+        w.vy += .05; w.x += w.vx; w.y += w.vy; w.rot += w.vr; w.life -= .004;
+        const gy = canvas.height - 18;
+        if (w.y > gy) { w.y = gy; w.vy = 0; w.vx *= .92; }
+        if (w.life <= 0) { t.twigs.splice(i, 1); continue; }
+        ctx.save(); ctx.translate(w.x, w.y); ctx.rotate(w.rot);
+        ctx.strokeStyle = `rgba(180,140,90,${.7 * w.life})`; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(-4, 0); ctx.quadraticCurveTo(0, -2, 4, 1); ctx.stroke();
+        ctx.restore();
+      }
+      ctx.save();
+      ctx.translate(t.x, t.y);
+      ctx.rotate(t.spin);
+      // tumbleweed body — a loose skeletal sphere of crisscrossed branches
+      ctx.strokeStyle = "rgba(185,145,95,.8)";
+      ctx.lineWidth = 1;
+      for (let a = 0; a < 9; a++) {
+        const ang = a / 9 * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(ang) * 11, Math.sin(ang) * 11 * .85);
+        ctx.quadraticCurveTo(Math.cos(ang + 1.2) * 5, Math.sin(ang + 1.2) * 5, Math.cos(ang + 2.4) * 10, Math.sin(ang + 2.4) * 8);
+        ctx.stroke();
+      }
+      // inner tangle
+      ctx.strokeStyle = "rgba(160,120,75,.6)";
+      for (let a = 0; a < 5; a++) {
+        const ang = a / 5 * Math.PI * 2 + .5;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(ang) * 3, Math.sin(ang) * 2.5);
+        ctx.lineTo(Math.cos(ang + 2.5) * 7, Math.sin(ang + 2.5) * 6);
+        ctx.stroke();
+      }
       ctx.restore();
     }
   }
@@ -3970,6 +4032,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.224.0", "tumbleweed — every ~2-4 min a dry tangled tumbleweed rolls in from a screen edge and bounces along the bottom of the page, shedding stray twigs on its hardest landings, then tumbles off the far edge like the prairie was never fenced"],
   ["v0.223.0", "message in a bottle — every ~2-4 min a corked glass bottle washes in along the bottom of the page, bobbing on invisible waves with a rolled note sealed inside, then the tide carries it back out like the message was never read"],
   ["v0.222.0", "shooting star — every ~2-4 min a meteor streaks diagonally across the sky, glowing head flickering with a tapering trail that burns out behind it, then the night is quiet again like nothing was wished on"],
   ["v0.221.0", "paper airplane — every ~2-4 min a folded paper airplane glides in from a screen edge, bobbing on the air with banking wobbles, does one loop mid-flight and veers off the far edge like the note was never thrown"],
