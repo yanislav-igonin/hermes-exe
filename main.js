@@ -2677,6 +2677,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.170.0", "aurora borealis — every ~2-4 min soft curtains of northern lights ripple across the upper sky: wavy bands of green and violet light sway and breathe, then dissolve into the dark like the ionosphere was never charged"],
   ["v0.169.0", "star chart — every ~2-4 min an antique astronomical chart surfaces at a random spot on the page: field stars fade in around a named figure, the chart line draws itself star to star, a plate label fades in beneath, then the whole thing fades back into the dark like the sky was never surveyed"],
   ["v0.168.0", "fireflies — every ~2-4 min a small swarm of fireflies gathers at a random spot on the background canvas, blinking in slow out-of-sync lantern pulses with a soft glow, then scatters back into the dark like the night was never lit"],
   ["v0.167.0", "dandelion — every ~2-4 min a dandelion grows on the background canvas, its head blooms into a full puff, then a gust tears the seeds loose and they drift off-screen like the wind was never there"],
@@ -6324,4 +6325,65 @@ const FIREFLY_NOTES = [
     requestAnimationFrame(drawFireflies);
   }
   requestAnimationFrame(drawFireflies);
+})();
+// aurora borealis — every ~2-4 min soft curtains of northern lights ripple
+// across the upper sky: wavy bands of green and violet light sway and breathe,
+// then dissolve into the dark like the ionosphere was never charged
+const AURORA_NOTES = [
+  "aurora: solar wind paid a visit",
+  "the ionosphere is showing off again",
+  "aurora seen, 3 witnesses, all particles",
+  "the sky just flexed, quietly",
+];
+(function auroraTick() {
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  let curtain = null, nextCurtainAt = performance.now() + 120000 * (0.7 + Math.random() * 1.3);
+  function drawAurora(now) {
+    if (!curtain && now >= nextCurtainAt) {
+      const cx = canvas.width * (0.25 + Math.random() * 0.5);
+      curtain = { cx, t: 0, hue: 120 + Math.random() * 90 }; // green through teal to violet
+      curtain.bands = Array.from({ length: 5 + Math.floor(Math.random() * 4) }, () => ({
+        yBase: 60 + Math.random() * 120,
+        width: 140 + Math.random() * 200,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.25 + Math.random() * 0.4,
+        alpha: 0.06 + Math.random() * 0.08,
+      }));
+    }
+    if (curtain) {
+      curtain.t += 1 / 60;
+      const t = curtain.t;
+      const rise = Math.min(1, t / 3);              // curtains fade in
+      const fade = Math.max(0, (t - 14) / 3);       // then dissolve
+      const glow = rise * (1 - fade);
+      if (glow > 0.01) {
+        ctx.save();
+        ctx.globalCompositeOperation = "lighter";
+        for (const b of curtain.bands) {
+          const sway = Math.sin(t * b.speed + b.phase) * 30;
+          const breathe = 1 + Math.sin(t * b.speed * 0.7 + b.phase) * 0.12;
+          const w = b.width * breathe;
+          const g = ctx.createRadialGradient(curtain.cx + sway, b.yBase, 0, curtain.cx + sway, b.yBase, w);
+          const h = curtain.hue + (b.phase * 20);
+          g.addColorStop(0, `hsla(${h}, 80%, 60%, ${b.alpha * glow * 2})`);
+          g.addColorStop(1, "hsla(0, 0%, 0%, 0)");
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.ellipse(curtain.cx + sway, b.yBase, w, w * 0.45, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+      if (!curtain.noteShown && fade > 0.4) {
+        curtain.noteShown = true;
+        console.log(`aurora: ${AURORA_NOTES[Math.random() * AURORA_NOTES.length | 0]}`);
+      }
+      if (fade >= 1) {
+        curtain = null;
+        nextCurtainAt = now + 150000 * (0.7 + Math.random() * 0.6);
+      }
+    }
+    requestAnimationFrame(drawAurora);
+  }
+  requestAnimationFrame(drawAurora);
 })();
