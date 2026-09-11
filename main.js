@@ -91,6 +91,10 @@ let satellite = null, nextSatelliteAt = performance.now() + 200000 * (.7 + Math.
 // off over the far edge like the sky was never theirs
 let flock = null, nextFlockAt = performance.now() + 180000 * (.7 + Math.random() * .6);
 
+// shooting star state — every ~2-4 min a comet streaks across the upper sky
+// with a burning fading trail, then dies out like the wish was never made
+let comet = null, nextCometAt = performance.now() + 180000 * (.7 + Math.random() * .6);
+
 // rubber duck state — a yellow rubber duck bobs in along the bottom of the
 // page every few minutes, tilts on invisible waves, squeaks once to the
 // console, then drifts off like bath time was never scheduled
@@ -941,6 +945,42 @@ const geese = [];
       ctx.stroke();
     }
     if (allGone) { flock = null; nextFlockAt = now + 180000 * (.7 + Math.random() * .6); }
+  }
+  // shooting star — every ~2-4 min a comet streaks across the upper sky,
+  // burning with a fading trail, then dies out like the wish was never made
+  if (!comet && now > nextCometAt) {
+    const dir = Math.random() < .5 ? 1 : -1;
+    comet = {
+      dir,
+      x: dir > 0 ? -60 : canvas.width + 60,
+      y: canvas.height * (.05 + Math.random() * .18),
+      slope: .25 + Math.random() * .3, // shallow downward dive
+      life: 1,
+      trail: []
+    };
+    setTimeout(() => console.log("comet log: wish intercepted, filed under pending"), 5000);
+  }
+  if (comet) {
+    const c = comet;
+    c.x += 5.2 * c.dir;
+    c.y += c.slope * 5.2;
+    c.trail.unshift({ x: c.x, y: c.y });
+    if (c.trail.length > 22) c.trail.pop();
+    if (c.x < -80 || c.x > canvas.width + 80) { comet = null; nextCometAt = now + 180000 * (.7 + Math.random() * .6); }
+    else {
+      // burning trail — segments taper and fade toward the tail
+      for (let i = 1; i < c.trail.length; i++) {
+        const a = c.trail[i - 1], b = c.trail[i], f = 1 - i / c.trail.length;
+        ctx.strokeStyle = `rgba(124,252,156,${.85 * f * c.life})`;
+        ctx.lineWidth = 2.4 * f + .4;
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      }
+      // bright head with a small halo
+      ctx.fillStyle = "rgba(220,255,220,.95)";
+      ctx.beginPath(); ctx.arc(c.x, c.y, 1.8, 0, 7); ctx.fill();
+      ctx.fillStyle = "rgba(124,252,156,.25)";
+      ctx.beginPath(); ctx.arc(c.x, c.y, 4.2, 0, 7); ctx.fill();
+    }
   }
   // rubber duck — every ~2-4 min a yellow rubber duck bobs in along the
   // bottom of the page, tilting on invisible waves with a faint wake behind
@@ -4538,6 +4578,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.240.0", "shooting star — every ~2-4 min a comet streaks across the upper sky on a shallow dive, burning with a tapered green trail and a bright haloed head, logs that the wish was intercepted, then dies out over the far edge like the wish was never made"],
   ["v0.239.0", "rubber duck — every ~2-4 min a yellow rubber duck bobs in along the bottom of the page, tilting on invisible waves with a faint wake trailing behind, squeaks once to the console, then drifts off the far edge like bath time was never scheduled"],
   ["v0.238.0", "bubble wrap — every ~2-4 min a sheet of bubble wrap drifts slowly up from the bottom of the page, its bubbles popping one by one on staggered little bursts as it rises, then the last empty bubbles fade away like nobody ever needed the packing"],
   ["v0.237.0", "bird flock — every ~2-4 min a small loose flock of silhouetted birds flutters across the page at a random height, each bird flapping on its own out-of-phase beat while the group wobbles along together, then they clear off over the far edge like the sky was never theirs"],
