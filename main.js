@@ -2590,6 +2590,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.165.0", "origami crane — every ~2-4 min a folded paper square unfolds wing by wing into a tiny crane at a random spot, flutters up in a lazy circle while a fold note prints in the console, then dissolves like the paper was never creased"],
   ["v0.164.0", "sonar ping — every ~90s a faint sonar pulse expands from a random point on the background canvas, shoving particles as the wavefront passes, then an echo whispers in the console and the ocean goes quiet again"],
   ["v0.163.0", "shooting star — every ~2-4 min a meteor streaks diagonally across the sky with a fading ember trail, then a wish is whispered in the console a beat later like the sky was never there"],
   ["v0.162.0", "pixel dust — every click bursts a small puff of 20-40 tiny colored squares that scatter outward from the click point, drift and sink gently, then fade away over about a second like the impact was never made"],
@@ -5938,4 +5939,92 @@ addEventListener("dblclick", e => {
     setTimeout(streak, 120000 + Math.random() * 120000);
   }
   setTimeout(streak, 20000 + Math.random() * 30000);
+})();
+
+// origami crane — every ~2-4 min a folded paper square unfolds into a tiny
+// crane on the background canvas, wing by wing, then flutters up in a small
+// circle and dissolves like the fold was never made
+(function () {
+  const CRANE_NOTES = ["fold 1, unfold 2", "paper remembers the crease", "1000 cranes to go", "a wish pressed flat"];
+  let crane = null, nextCraneAt = performance.now() + 25000 * (.7 + Math.random() * .6);
+
+  function craneTick(now) {
+    if (!crane && now > nextCraneAt) {
+      crane = {
+        x: 60 + Math.random() * (canvas.width - 120),
+        y: 60 + Math.random() * (canvas.height * .5),
+        t: 0, // 0 = folding stage, 1+ = flight stage
+        fold: 0, // 0..1 unfold progress
+        dir: Math.random() < .5 ? 1 : -1,
+        noteShown: false
+      };
+    }
+    if (crane) {
+      crane.t += 1 / 60;
+      if (crane.t < 1.6) {
+        // unfold stage: draw paper square creasing open into wings
+        crane.fold = Math.min(1, crane.t / 1.4);
+        const f = crane.fold, s = 14;
+        ctx.save();
+        ctx.translate(crane.x, crane.y);
+        ctx.rotate((1 - f) * .8 * crane.dir);
+        ctx.strokeStyle = `rgba(220,230,245,${.25 + .55 * f})`;
+        ctx.lineWidth = 1.2;
+        ctx.fillStyle = `rgba(230,238,250,${.12 * f})`;
+        // body diamond
+        ctx.beginPath();
+        ctx.moveTo(0, -s * f); ctx.lineTo(s * f, 0); ctx.lineTo(0, s * .8); ctx.lineTo(-s * f, 0);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+        // wings unfold outward
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(-s * (1 + f) * crane.dir, -s * f * 1.4 - 2);
+        ctx.moveTo(0, 0);
+        ctx.lineTo(s * (1 + f) * crane.dir, -s * f * 1.4 - 2);
+        ctx.stroke();
+        // neck and tail creases
+        ctx.beginPath();
+        ctx.moveTo(0, 0); ctx.lineTo(0, -s * (1.2 + f * .5));
+        ctx.moveTo(0, 0); ctx.lineTo(0, s * (0.8 + f * .3));
+        ctx.stroke();
+        ctx.restore();
+      } else {
+        // flight stage: flutter up in a lazy circle, fading out
+        const ft = crane.t - 1.6;
+        const fade = Math.max(0, 1 - ft / 3.5);
+        if (fade <= 0) {
+          crane = null;
+          nextCraneAt = now + 120000 * (.7 + Math.random() * .6);
+        } else {
+          const ang = ft * 1.4 * crane.dir;
+          const cx = crane.x + Math.sin(ang) * 40 * crane.dir;
+          const cy = crane.y - ft * 28;
+          const flap = Math.sin(ft * 14) * 6;
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate(Math.sin(ft * 3) * .25 * crane.dir);
+          ctx.strokeStyle = `rgba(220,230,245,${.7 * fade})`;
+          ctx.fillStyle = `rgba(230,238,250,${.14 * fade})`;
+          ctx.lineWidth = 1.2;
+          const s = 14;
+          ctx.beginPath();
+          ctx.moveTo(0, -s); ctx.lineTo(s, 0); ctx.lineTo(0, s * .8); ctx.lineTo(-s, 0);
+          ctx.closePath(); ctx.fill(); ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(0, 0); ctx.lineTo(-s * crane.dir, -10 - flap);
+          ctx.moveTo(0, 0); ctx.lineTo(s * crane.dir, -10 + flap);
+          ctx.moveTo(0, 0); ctx.lineTo(0, -s * 1.7);
+          ctx.moveTo(0, 0); ctx.lineTo(0, s * 1.1);
+          ctx.stroke();
+          ctx.restore();
+          if (!crane.noteShown && ft > .8) {
+            crane.noteShown = true;
+            console.log(`origami: ${CRANE_NOTES[Math.random() * CRANE_NOTES.length | 0]}`);
+          }
+        }
+      }
+    }
+    requestAnimationFrame(craneTick);
+  }
+  requestAnimationFrame(craneTick);
 })();
