@@ -4204,8 +4204,66 @@ addEventListener("mousemove", e => {
   requestAnimationFrame(step);
 })();
 
+// ink blot — every ~2-5 min a drop of ink falls from above, splats against
+// the page and blooms into a lopsided blot with torn edges, which slowly
+// spreads, darkens at the rim and fades away like it was never signed
+(function inkBlot() {
+  const layer = document.createElement("div");
+  layer.className = "ink-blot-layer";
+  document.body.appendChild(layer);
+  function drop() {
+    const blot = document.createElement("span");
+    blot.className = "ink-blot";
+    // lopsided organic outline: radius per lobe, torn wobble on top
+    const lobes = 9 + (Math.random() * 4 | 0);
+    const base = 26 + Math.random() * 30;
+    const radii = [];
+    for (let i = 0; i < lobes; i++) radii.push(base * (.55 + Math.random() * .9));
+    const pts = [];
+    for (let i = 0; i < lobes; i++) {
+      const a = (i / lobes) * Math.PI * 2;
+      const r = radii[i];
+      pts.push([50 + Math.cos(a) * r, 50 + Math.sin(a) * r * .85]);
+    }
+    let d = "M" + pts[0][0].toFixed(1) + " " + pts[0][1].toFixed(1);
+    for (let i = 0; i < lobes; i++) {
+      const p1 = pts[i], p2 = pts[(i + 1) % lobes];
+      const mx = (p1[0] + p2[0]) / 2 + (Math.random() - .5) * 10;
+      const my = (p1[1] + p2[1]) / 2 + (Math.random() - .5) * 10;
+      d += " Q" + mx.toFixed(1) + " " + my.toFixed(1) + " " + p2[0].toFixed(1) + " " + p2[1].toFixed(1);
+    }
+    d += " Z";
+    // a couple of stray satellite specks around the splat
+    let specks = "";
+    const nSpecks = 2 + (Math.random() * 3 | 0);
+    for (let i = 0; i < nSpecks; i++) {
+      const a = Math.random() * Math.PI * 2, r = base * (1.15 + Math.random() * .7);
+      specks += '<circle cx="' + (50 + Math.cos(a) * r).toFixed(1) + '" cy="' + (50 + Math.sin(a) * r * .85).toFixed(1) +
+        '" r="' + (1.2 + Math.random() * 2.4).toFixed(1) + '" fill="currentColor"/>';
+    }
+    blot.innerHTML =
+      '<svg viewBox="0 0 100 100" aria-hidden="true">' +
+        '<path class="ib-blot" d="' + d + '" fill="currentColor"/>' +
+        '<circle class="ib-core" cx="50" cy="50" r="' + (base * .28).toFixed(1) + '" fill="currentColor"/>' +
+        specks +
+      '</svg>';
+    blot.style.setProperty("--ib-x", (5 + Math.random() * 90).toFixed(1) + "vw");
+    blot.style.setProperty("--ib-y", (8 + Math.random() * 70).toFixed(1) + "vh");
+    blot.style.setProperty("--ib-scale", (.7 + Math.random() * .9).toFixed(2));
+    blot.style.setProperty("--ib-dur", (9000 + Math.random() * 7000).toFixed(0) + "ms");
+    blot.style.color = "rgba(12,10,18,.9)";
+    layer.innerHTML = "";
+    layer.appendChild(blot);
+    layer.classList.add("i-on");
+    setTimeout(() => layer.classList.remove("i-on"), 20000);
+    setTimeout(drop, 120000 + Math.random() * 180000);
+  }
+  setTimeout(drop, 25000 + Math.random() * 30000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.232.0", "ink blot — every ~2-5 min a drop of ink falls from above the page, splats against it and blooms into a lopsided blot with torn edges, which slowly spreads, darkens at the rim and fades away like it was never signed"],
   ["v0.231.0", "balloon release — every ~2-4 min a handful of small balloons rises slowly from the bottom of the page, each wobbling side to side on its own string in its own colour, then they drift up out of view like the carnival packed up and left"],
   ["v0.230.0", "firefly swarm — every ~2-5 min a loose cluster of tiny glowing fireflies rises from the lower half of the page, drifting and blinking dimly on their own, then flashing bright together in two brief sync waves before dispersing like the summer was imagined"],
   ["v0.229.0", "wind-up robot — every ~2-4 min a tiny boxy robot with a winding key on its back marches in from a screen edge along the bottom of the page on stiff little legs, ticking and wobbling, gradually slowing as its spring runs down, then it topples over mid-stride and fades away like it was never wound"],
