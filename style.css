@@ -3748,3 +3748,49 @@ body.vaporwave .ict-truck { color: rgba(201,166,232,.8); }
 body.vaporwave .ict-scoop { background: rgba(201,166,232,.7); }
 body.synthwave .ict-truck { color: rgba(255,140,46,.8); }
 body.synthwave .ict-scoop { background: rgba(255,140,46,.7); }
+
+.yy-layer {
+  position: fixed; inset: 0; z-index: 9994; pointer-events: none; overflow: hidden;
+}
+.yy-dropper {
+  position: absolute; left: var(--yy-x, 40vw); top: 0;
+  width: 20px; height: 120px;
+  opacity: 0;
+  animation: yy-drop var(--yy-drop, 1800ms) cubic-bezier(.55,0,1,.45) forwards,
+             yy-idle var(--yy-idle, 4000ms) ease-in-out var(--yy-drop, 1800ms) forwards,
+             yy-reel 1200ms ease-in calc(var(--yy-drop, 1800ms) + var(--yy-idle, 4000ms)) forwards;
+}
+.yy-dropper .yy-string {
+  position: absolute; left: 50%; top: 0;
+  width: 1px; height: 100px;
+  background: rgba(124,252,156,.4);
+}
+.yy-dropper .yy-disc {
+  position: absolute; left: 50%; top: 100px;
+  width: 20px; height: 20px; margin-left: -10px;
+  overflow: visible; display: block;
+  animation: yy-spin 260ms linear infinite;
+}
+.yy-dropper .yy-rim { fill: rgba(124,252,156,.75); stroke: rgba(124,252,156,.9); stroke-width: 1; }
+.yy-dropper .yy-hub { fill: rgba(6,10,8,.9); stroke: rgba(124,252,156,.9); stroke-width: .8; }
+@keyframes yy-drop {
+  0%   { opacity: 0; translate: 0 -120px; }
+  8%   { opacity: .85; }
+  100% { opacity: .85; translate: 0 0; }
+}
+@keyframes yy-idle {
+  0%, 100% { translate: 0 0; }
+  25%      { translate: 2px 6px; }
+  60%      { translate: -2px 3px; }
+}
+@keyframes yy-spin { to { rotate: 360deg; } }
+@keyframes yy-reel {
+  0%   { opacity: .85; translate: 0 0; }
+  100% { opacity: 0;   translate: 0 -120px; }
+}
+body.vaporwave .yy-dropper .yy-string { background: rgba(201,166,232,.4); }
+body.vaporwave .yy-dropper .yy-rim { fill: rgba(201,166,232,.8); stroke: rgba(201,166,232,.9); }
+body.vaporwave .yy-dropper .yy-hub { stroke: rgba(201,166,232,.9); }
+body.synthwave .yy-dropper .yy-string { background: rgba(255,140,46,.4); }
+body.synthwave .yy-dropper .yy-rim { fill: rgba(255,140,46,.8); stroke: rgba(255,140,46,.9); }
+body.synthwave .yy-dropper .yy-hub { stroke: rgba(255,140,46,.9); }

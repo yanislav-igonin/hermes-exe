@@ -4318,8 +4318,43 @@ addEventListener("mousemove", e => {
   setTimeout(visit, 40000 + Math.random() * 50000);
 })();
 
+// yo-yo — every ~2-4 min a tiny yo-yo on a string drops from the top of the
+// page near a random spot, idles spinning and bobbing for a moment like
+// someone got bored of the trick, then reels back up and vanishes like the
+// trick was never shown
+(function yoYo() {
+  const layer = document.createElement("div");
+  layer.className = "yy-layer";
+  document.body.appendChild(layer);
+  function visit() {
+    const x = 10 + Math.random() * 80;
+    const dropDur = 1600 + Math.random() * 800;
+    const idleDur = 3000 + Math.random() * 2500;
+    const yo = document.createElement("span");
+    yo.className = "yy-dropper";
+    yo.style.setProperty("--yy-x", x.toFixed(1) + "vw");
+    yo.style.setProperty("--yy-drop", dropDur + "ms");
+    yo.style.setProperty("--yy-idle", idleDur + "ms");
+    yo.innerHTML =
+      '<span class="yy-string"></span>' +
+      '<svg class="yy-disc" viewBox="0 0 20 20" aria-hidden="true">' +
+        '<circle class="yy-rim" cx="10" cy="10" r="9"/>' +
+        '<circle class="yy-hub" cx="10" cy="10" r="3"/>' +
+      '</svg>';
+    layer.appendChild(yo);
+    layer.classList.add("yy-on");
+    setTimeout(() => {
+      layer.classList.remove("yy-on");
+      yo.remove();
+      setTimeout(visit, 120000 + Math.random() * 120000);
+    }, dropDur + idleDur + 1800);
+  }
+  setTimeout(visit, 25000 + Math.random() * 55000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.234.0", "yo-yo — every ~2-4 min a tiny yo-yo on a string drops from the top of the page near a random spot, idles spinning and bobbing for a moment like someone got bored of the trick, then reels back up and vanishes like the trick was never shown"],
   ["v0.233.0", "ice cream truck — every ~3-5 min a tiny ice cream truck rolls along the bottom of the page jingling a little tune note by note, drops a single scoop of ice cream onto the pavement mid-route, then trundles off the far edge like the tune was never for sale"],
   ["v0.232.0", "ink blot — every ~2-5 min a drop of ink falls from above the page, splats against it and blooms into a lopsided blot with torn edges, which slowly spreads, darkens at the rim and fades away like it was never signed"],
   ["v0.231.0", "balloon release — every ~2-4 min a handful of small balloons rises slowly from the bottom of the page, each wobbling side to side on its own string in its own colour, then they drift up out of view like the carnival packed up and left"],
