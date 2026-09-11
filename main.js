@@ -3386,6 +3386,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.198.0", "dragonfly — every ~2-4 min an ASCII dragonfly darts across the page in quick zigzags, hovers in place for a moment as if considering the cursor, then zips off the far edge like the pond was never there"],
   ["v0.197.0", "paper airplane — every ~2-4 min a small paper plane swoops across the page along a gentle lazy arc, a dotted trail fading out behind it, then it slides off the far edge like the flight was never logged"],
   ["v0.196.0", "paper boat — every ~2-4 min a small origami paper boat bobs along the very bottom of the page, rocking on invisible gentle waves while faint ripples spread out behind it, then it drifts off the far edge like the paper pond was never there"],
   ["v0.195.0", "meteor shower — every ~2-4 min a brief shower of shooting stars streaks diagonally across the page, each with a fading glowing trail, then the sky clears like the comet was never there"],
@@ -7566,4 +7567,61 @@ const AURORA_NOTES = [
     setTimeout(launch, 150000 + Math.random() * 90000);
   }
   setTimeout(launch, 40000 + Math.random() * 40000);
+})();
+
+// dragonfly — every ~2-4 min an ASCII dragonfly darts across the page in
+// quick zigzags, hovers in place for a moment as if considering the cursor,
+// then zips off the far edge like the pond was never there.
+(function dragonflyDart() {
+  const FLY = "<●≡≡≡>";
+  const FLY_NOTES = [
+    "a dragonfly inspected the backlog and approved",
+    "it hovered exactly where the bug used to be",
+    "dragonflies see in every direction; the site ships anyway",
+    "it was gone before the stack trace finished printing",
+  ];
+  function dart() {
+    if (document.hidden) { setTimeout(dart, 120000 + Math.random() * 120000); return; }
+    const el = document.createElement("pre");
+    el.className = "dragonfly";
+    el.textContent = FLY;
+    document.body.appendChild(el);
+    const dir = Math.random() < .5 ? 1 : -1;
+    const y0 = 60 + Math.random() * (innerHeight * .5);
+    const zig = 40 + Math.random() * 50;         // zigzag depth
+    const dashSpeed = 260 + Math.random() * 90;  // px per second — a dart
+    const startX = dir > 0 ? -50 : innerWidth + 50;
+    const hoverX = startX + dir * (innerWidth * (.35 + Math.random() * .3));
+    const start = performance.now();
+    let phase = "in", hoverAt = 0, off = false;
+    (function step(now) {
+      let x, y, wob = 0;
+      if (phase === "in") {
+        const t = (now - start) / 1000;
+        x = startX + dir * dashSpeed * t;
+        y = y0 + Math.sin(t * 11) * zig;
+        if (dir > 0 ? x >= hoverX : x <= hoverX) { phase = "hover"; hoverAt = now; x = hoverX; }
+      } else if (phase === "hover") {
+        x = hoverX;
+        y = y0 + Math.sin((now - hoverAt) / 1000 * 7) * 5;  // tiny hover bob
+        if (now - hoverAt > 1600 + Math.random() * 1200) { phase = "out"; hoverAt = now; }
+      } else {
+        if (!off) { off = true; hoverAt = now; }
+        const t = (now - hoverAt) / 1000;
+        x = hoverX + dir * dashSpeed * t;
+        y = y0 - Math.sin(t * 9) * 20 - t * 26;  // lifts away as it goes
+        wob = Math.sin(t * 30) * 1.5;
+      }
+      el.style.transform =
+        `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scaleX(${dir}) rotate(${wob.toFixed(2)}deg)`;
+      const gone = dir > 0 ? x > innerWidth + 80 : x < -80;
+      if (!gone) requestAnimationFrame(step);
+      else {
+        el.remove();
+        console.log(`dragonfly: ${FLY_NOTES[Math.random() * FLY_NOTES.length | 0]}`);
+      }
+    })(start);
+    setTimeout(dart, 150000 + Math.random() * 90000);
+  }
+  setTimeout(dart, 40000 + Math.random() * 40000);
 })();

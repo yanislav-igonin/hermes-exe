@@ -3332,3 +3332,21 @@ body.synthwave .paper-plane { color: rgba(255, 200, 140, .8); text-shadow: 0 0 6
 }
 body.vaporwave .plane-trail { color: rgba(201, 166, 232, .35); }
 body.synthwave .plane-trail { color: rgba(255, 150, 70, .35); }
+
+/* dragonfly: every ~2-4 min an ASCII dragonfly darts across the page in quick
+   zigzags, hovers briefly, then zips off the far edge like the pond was never
+   there */
+.dragonfly {
+  position: fixed;
+  z-index: 6;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  font-size: 13px;
+  line-height: 1;
+  color: rgba(180, 235, 255, .85);
+  text-shadow: 0 0 7px rgba(140, 220, 255, .35);
+  will-change: transform;
+}
+body.vaporwave .dragonfly { color: rgba(220, 200, 245, .85); text-shadow: 0 0 7px rgba(201, 166, 232, .4); }
+body.synthwave .dragonfly { color: rgba(255, 215, 160, .85); text-shadow: 0 0 7px rgba(255, 160, 80, .35); }
