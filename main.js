@@ -2590,6 +2590,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.167.0", "dandelion — every ~2-4 min a dandelion grows on the background canvas, its head blooms into a full puff, then a gust tears the seeds loose and they drift off-screen like the wind was never there"],
   ["v0.166.0", "paper boat — every ~2-4 min a tiny folded paper boat sails along the bottom of the page, bobbing on an invisible tide and occasionally listing in the waves, then drifts off-screen like the ocean was never there"],
   ["v0.165.0", "origami crane — every ~2-4 min a folded paper square unfolds wing by wing into a tiny crane at a random spot, flutters up in a lazy circle while a fold note prints in the console, then dissolves like the paper was never creased"],
   ["v0.164.0", "sonar ping — every ~90s a faint sonar pulse expands from a random point on the background canvas, shoving particles as the wavefront passes, then an echo whispers in the console and the ocean goes quiet again"],
@@ -6079,4 +6080,95 @@ const BOAT_NOTES = [
     requestAnimationFrame(drawBoat);
   }
   requestAnimationFrame(drawBoat);
+})();
+
+// dandelion — a dandelion grows at a random spot, blooms into a puff, then the
+// seeds tear loose in a gust and drift off-screen
+const DANDELION_NOTES = [
+  "make a wish before the last seed lets go",
+  "the wind collects wishes it never promises to keep",
+  "a dandelion forgot it was a weed",
+  "seeds: extremely small, extremely ambitious",
+];
+(function dandelionTick() {
+  let d = null, nextDAt = performance.now() + 30000 * (0.7 + Math.random() * 1.3);
+  function drawDandelion(now) {
+    if (!d && now >= nextDAt) {
+      d = {
+        x: 60 + Math.random() * (canvas.width - 120),
+        y: canvas.height - 40 - Math.random() * (canvas.height * 0.35),
+        t: 0, gust: 0, seeds: [], noteShown: false
+      };
+    }
+    if (d) {
+      d.t += 1 / 60;
+      const grow = Math.min(1, d.t / 2.2);            // stem grows up
+      const bloom = Math.max(0, Math.min(1, (d.t - 2.2) / 1.4)); // puff blooms
+      const stemH = 52 * grow;
+      if (d.gust === 0 && bloom >= 1 && Math.random() < 0.004) d.gust = (Math.random() < 0.5 ? 1 : -1);
+      if (d.gust !== 0 && d.seeds.length === 0 && bloom >= 1) {
+        // tear all seeds loose at once
+        for (let i = 0; i < 14; i++) {
+          const ang = Math.PI * 2 * i / 14;
+          d.seeds.push({ ang, dist: 0, vy: 0.2 + Math.random() * 0.4, sway: Math.random() * Math.PI * 2, drift: d.gust * (0.3 + Math.random() * 0.5) });
+        }
+        d.gone = 0;
+      }
+      if (d.seeds.length) {
+        let allGone = true;
+        for (const s of d.seeds) {
+          s.dist += 0.8 + s.vy; s.sway += 0.06; s.drift *= 1.004;
+          const sx = d.x + Math.cos(s.ang) * (6 + s.dist * 0.4) + Math.sin(s.sway) * 10 * s.drift;
+          const sy = d.y - stemH - Math.sin(s.ang) * (6 + s.dist * 0.4) - s.dist * 0.5 + Math.sin(s.sway) * 6;
+          if (sx > -30 && sx < canvas.width + 30 && sy > -30) {
+            allGone = false;
+            ctx.strokeStyle = `rgba(230,235,245,${Math.max(0, 0.7 - s.dist / 160)})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(sx, sy); ctx.lineTo(sx, sy + 7); ctx.stroke();
+            ctx.beginPath();
+            for (let k = -1; k <= 1; k++) { ctx.moveTo(sx, sy + 7); ctx.lineTo(sx + k * 3, sy + 11); }
+            ctx.stroke();
+          }
+        }
+        if (allGone) {
+          d = null;
+          nextDAt = now + 150000 * (0.7 + Math.random() * 0.6);
+          console.log(`dandelion: ${DANDELION_NOTES[Math.random() * DANDELION_NOTES.length | 0]}`);
+        }
+      } else {
+        // stem + leaves
+        ctx.strokeStyle = `rgba(200,220,200,${0.5 * grow + 0.2 * bloom})`;
+        ctx.lineWidth = 1.3;
+        ctx.beginPath();
+        ctx.moveTo(d.x, d.y);
+        ctx.quadraticCurveTo(d.x + Math.sin(d.t * 0.8) * 4, d.y - stemH * 0.6, d.x + Math.sin(d.t * 0.6) * 6, d.y - stemH);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(d.x, d.y - stemH * 0.35); ctx.lineTo(d.x - 8 * grow, d.y - stemH * 0.3);
+        ctx.moveTo(d.x, d.y - stemH * 0.5); ctx.lineTo(d.x + 7 * grow, d.y - stemH * 0.45);
+        ctx.stroke();
+        if (bloom > 0) {
+          // puff of seeds on a head
+          const hx = d.x + Math.sin(d.t * 0.6) * 6, hy = d.y - stemH - 5 * bloom;
+          ctx.strokeStyle = `rgba(235,238,248,${0.75 * bloom})`;
+          ctx.fillStyle = `rgba(240,242,250,${0.15 * bloom})`;
+          ctx.beginPath(); ctx.arc(hx, hy, 7 * bloom, 0, Math.PI * 2); ctx.fill();
+          for (let i = 0; i < 14; i++) {
+            const ang = Math.PI * 2 * i / 14 + d.t * 0.05;
+            ctx.beginPath();
+            ctx.moveTo(hx, hy);
+            ctx.lineTo(hx + Math.cos(ang) * 7 * bloom, hy + Math.sin(ang) * 7 * bloom);
+            ctx.stroke();
+          }
+          if (!d.noteShown && bloom > 0.6) {
+            d.noteShown = true;
+            console.log("dandelion: the head is full — waiting on a gust");
+          }
+        }
+      }
+    }
+    requestAnimationFrame(drawDandelion);
+  }
+  requestAnimationFrame(drawDandelion);
 })();
