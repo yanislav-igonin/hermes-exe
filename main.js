@@ -2930,6 +2930,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.179.0", "satellite pass — every ~2-4 min a tiny satellite with glinting solar panels and a blinking beacon crosses the high sky on a slow, deliberate orbit, then slips past the far edge like the orbit was never there"],
   ["v0.178.0", "meteor streak — every ~2-4 min an occasional shooting star crosses the upper sky, shedding a trail of small fading ember particles behind it as it burns, then the sky goes quiet again like the star was never there"],
   ["v0.177.0", "meteor shower — every ~2-4 min a brief shower of meteors streaks out of one corner of the upper sky with tapering glowing trails, then the sky dries up like the shower was never there"],
   ["v0.176.0", "lighthouse — every ~2-4 min a small lighthouse rises from the bottom of the page, its rotating beam sweeps once across the sky, briefly illuminating what it passes over, then it sinks back below the edge like the coast was never watched"],
@@ -6647,6 +6648,36 @@ const AURORA_NOTES = [
     requestAnimationFrame(drawAurora);
   }
   requestAnimationFrame(drawAurora);
+})();
+
+// satellite — every ~2-4 min a tiny satellite crosses the upper sky,
+// beacon blinking, then slips past the far edge like the orbit was never there
+(function satellite() {
+  function pass() {
+    setTimeout(pass, 120000 + Math.random() * 120000);
+    if (document.hidden) return;
+    const sky = document.createElement("div");
+    sky.className = "satellite";
+    const dir = Math.random() < 0.5 ? 1 : -1;
+    const y = 4 + Math.random() * 14; // vh, high sky band
+    const dur = 24000 + Math.random() * 8000; // slow, deliberate pass
+    sky.style.setProperty("--sa-y", y.toFixed(1) + "vh");
+    sky.style.setProperty("--sa-dur", dur.toFixed(0) + "ms");
+    sky.style.setProperty("--sa-drift", (Math.random() * 4 - 2).toFixed(1) + "vh");
+    const body = document.createElement("span");
+    body.className = "sat-body";
+    const panel = document.createElement("span");
+    panel.className = "sat-panel";
+    const beacon = document.createElement("span");
+    beacon.className = "sat-beacon";
+    body.appendChild(panel);
+    body.appendChild(beacon);
+    sky.appendChild(body);
+    if (dir < 0) sky.classList.add("sat-rev");
+    document.body.appendChild(sky);
+    setTimeout(() => sky.remove(), dur + 1500);
+  }
+  setTimeout(pass, 45000 + Math.random() * 60000);
 })();
 
 // kite — every ~2-4 min a small diamond kite with a fluttering ribbon tail
