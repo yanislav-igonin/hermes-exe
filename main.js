@@ -3421,8 +3421,57 @@ addEventListener("mousemove", e => {
   setTimeout(release, 40000 + Math.random() * 40000);
 })();
 
+// fireflies — every ~2-4 min a small swarm of fireflies drifts up from the
+// lower sky, each pulsing softly in and out of the dark, then the swarm
+// scatters and the night is still like nobody saw them
+(function fireflies() {
+  const flies = [];
+  let nextAt = performance.now() + 120000 * (.7 + Math.random() * .6);
+  function spawnSwarm() {
+    const n = 7 + Math.floor(Math.random() * 6);
+    const cx = canvas.width * (.25 + Math.random() * .5);
+    const cy = canvas.height * (.55 + Math.random() * .2);
+    for (let i = 0; i < n; i++) {
+      flies.push({
+        x: cx + (Math.random() - .5) * 160,
+        y: cy + (Math.random() - .5) * 90,
+        vx: (Math.random() - .5) * .3,
+        vy: -.08 - Math.random() * .18,
+        phase: Math.random() * Math.PI * 2,
+        pulse: .02 + Math.random() * .03,
+        life: 1
+      });
+    }
+    setTimeout(() => console.log("a swarm of fireflies drifts up through the dark, then is gone"), 9000);
+  }
+  function tick(now) {
+    if (flies.length === 0 && now > nextAt) spawnSwarm();
+    for (let i = flies.length - 1; i >= 0; i--) {
+      const f = flies[i];
+      f.x += f.vx + Math.sin(now / 900 + f.phase) * .15;
+      f.y += f.vy + Math.cos(now / 1100 + f.phase) * .1;
+      f.life -= .0012;
+      if (f.life <= 0) { flies.splice(i, 1); continue; }
+      const glow = Math.max(0, Math.sin(now / 1000 * f.pulse * 60 + f.phase)) * f.life;
+      if (glow < .05) continue;
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, 1.3, 0, 7);
+      ctx.fillStyle = `rgba(220,255,140,${.85 * glow})`;
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, 4, 0, 7);
+      ctx.fillStyle = `rgba(220,255,140,${.12 * glow})`;
+      ctx.fill();
+    }
+    if (flies.length === 0 && now > nextAt + 1) nextAt = now + 120000 * (.7 + Math.random() * .6);
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
 // changelog
 const changelog = [
+  ["v0.206.0", "fireflies at dusk — every ~2-4 min a small swarm of fireflies drifts up from the lower sky, each pulsing softly in and out of the dark, then the swarm scatters and the night is still like nobody saw them"],
   ["v0.205.0", "meteor shower — every ~1-2 min a small shooting star streaks across the upper sky with a glowing trail, flares and burns out mid-flight like it was never seen"],
   ["v0.204.0", "weather balloon — every ~2-4 min a small probe balloon inflates and lifts off from the bottom edge, drifts up across the sky on the wind with a gentle wobble, an instrument box dangling below, then fades away near the top like the reading was never logged"],
   ["v0.203.0", "radio telescope — every ~2-3 min a small dish rises from the bottom edge and slowly sweeps a faint signal beam across a swath of sky, then retracts back down like it never listened"],
