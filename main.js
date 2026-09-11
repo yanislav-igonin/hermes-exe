@@ -3423,6 +3423,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.204.0", "weather balloon — every ~2-4 min a small probe balloon inflates and lifts off from the bottom edge, drifts up across the sky on the wind with a gentle wobble, an instrument box dangling below, then fades away near the top like the reading was never logged"],
   ["v0.203.0", "radio telescope — every ~2-3 min a small dish rises from the bottom edge and slowly sweeps a faint signal beam across a swath of sky, then retracts back down like it never listened"],
   ["v0.202.0", "aurora borealis — every ~2-4 min soft bands of green/teal aurora light wave across the upper part of the page for a few seconds, rippling like a slow curtain, then dissolve back into the night sky like the solar wind was never there"],
   ["v0.200.0", "tumbleweed — every ~2-4 min a scraggly tumbleweed bounces in from one edge of the page and rolls across it, spinning and shedding the odd dry bit of itself as it goes, then tumbles off the far edge like the desert was never there"],
@@ -7900,4 +7901,79 @@ const AURORA_NOTES = [
     requestAnimationFrame(scanTick);
   }
   setTimeout(listen, 40000 + Math.random() * 50000);
+})();
+
+// weather balloon — every ~2-4 min a small probe balloon inflates and lifts
+// off from the bottom edge, drifts diagonally up across the sky on the wind
+// with a gentle wobble, then fades away near the top like it never measured
+(function weatherBalloon() {
+  let flight = null; // { x, y, vx, wind, t, seed }
+  function launch() {
+    flight = {
+      x: 40 + Math.random() * (innerWidth - 80),
+      y: innerHeight + 90,
+      wind: (Math.random() < .5 ? 1 : -1) * (.35 + Math.random() * .5),
+      t: 0,
+      seed: Math.random() * 10
+    };
+    setTimeout(() => console.log("balloon telemetry: 1013 hPa, ascending normally"), 4500);
+    requestAnimationFrame(balloonTick);
+  }
+  function balloonTick(now) {
+    const f = flight;
+    if (!f) return;
+    f.t += 1 / 60;
+    // slow ascent with a lazy sideways drift
+    f.y -= 0.9;
+    f.x += f.wind + Math.sin(now * .0012 + f.seed) * .3;
+    // gentle wobble like the wind is arguing with itself
+    const wob = Math.sin(now * .002 + f.seed) * 6;
+    const aboveScreen = f.y < -60;
+    const fade = Math.min(1, f.t * 2, Math.max(0, (f.y + 60) / 160)); // inflate at start, fade near the top
+    if (aboveScreen || fade <= 0) {
+      flight = null;
+      setTimeout(launch, 130000 + Math.random() * 110000);
+      return;
+    }
+    const by = f.y, bx = f.x + wob;
+    // the balloon: a slightly squashed translucent circle
+    ctx.save();
+    ctx.globalAlpha = fade;
+    const grad = ctx.createLinearGradient(bx - 16, by - 16, bx + 16, by + 16);
+    grad.addColorStop(0, "rgba(200,230,255,.5)");
+    grad.addColorStop(1, "rgba(120,160,200,.25)");
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.ellipse(bx, by, 17, 20, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(220,240,255,.7)";
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    // highlight glint
+    ctx.beginPath();
+    ctx.arc(bx - 6, by - 7, 4, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255,255,255,.45)";
+    ctx.fill();
+    // tether string down to the instrument box
+    ctx.beginPath();
+    ctx.moveTo(bx, by + 20);
+    ctx.quadraticCurveTo(bx + wob * .6, by + 34, bx + wob * .8, by + 46);
+    ctx.strokeStyle = "rgba(200,220,240,.5)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    // little instrument box dangling at the end
+    ctx.fillStyle = "rgba(124,252,156,.6)";
+    ctx.fillRect(bx + wob * .8 - 4, by + 46, 8, 6);
+    ctx.strokeStyle = "rgba(124,252,156,.9)";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(bx + wob * .8 - 4, by + 46, 8, 6);
+    // a tiny blinking indicator light
+    if (Math.sin(now * .008 + f.seed) > .4) {
+      ctx.fillStyle = "rgba(255,80,80,.9)";
+      ctx.fillRect(bx + wob * .8 - 1, by + 47, 2, 2);
+    }
+    ctx.restore();
+    requestAnimationFrame(balloonTick);
+  }
+  setTimeout(launch, 60000 + Math.random() * 80000);
 })();
