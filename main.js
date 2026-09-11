@@ -364,6 +364,49 @@ const kite = { active: false, x: 0, y: 0, t: 0, sway: 0, phase: Math.random() * 
       nextKiteAt = now + 120000 * (.7 + Math.random() * .6);
     }
   }
+  // goose migration — every ~2-4 min a loose V-formation of tiny geese crosses
+// the upper sky, flapping on out-of-phase wing beats while the wedge undulates,
+// a distant honk echoes mid-flight, then they glide off-screen like the
+// migration was never there
+let nextGeeseAt = performance.now() + 180000 * (.7 + Math.random() * .6);
+const geese = [];
+
+  if (!geese.length && now > nextGeeseAt) {
+    const n = 5 + (Math.random() * 3 | 0), dir = Math.random() < .5 ? 1 : -1;
+    const y0 = canvas.height * (.06 + Math.random() * .14);
+    setTimeout(() => console.log("a distant honk: the flock is passing over"), 14000);
+    for (let i = 0; i < n; i++) {
+      // V shape: index 0 leads, pairs trail behind on alternating arms
+      const arm = Math.ceil(i / 2), side = i % 2 ? 1 : -1;
+      geese.push({
+        ox: dir === 1 ? -40 - arm * 26 : canvas.width + 40 + arm * 26,
+        oy: y0 + side * arm * 12,
+        flap: Math.random() * 7, dir, y0
+      });
+    }
+  }
+  if (geese.length) {
+    for (let i = geese.length - 1; i >= 0; i--) {
+      const g = geese[i];
+      g.ox += 1.1 * g.dir;
+      g.flap += .11; // wing beat, slightly out of phase across the flock
+      const gx = g.ox, gy = g.oy + Math.sin(g.flap * .55) * 6; // bob on the air
+      // little chevron body with two flapping wings
+      const w = Math.sin(g.flap) * 5;
+      ctx.beginPath();
+      ctx.moveTo(gx - 5 * g.dir, gy - w);
+      ctx.lineTo(gx, gy);
+      ctx.lineTo(gx + 5 * g.dir, gy - w);
+      ctx.strokeStyle = "rgba(124,252,156,.6)";
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+      ctx.lineWidth = 1;
+      if (gx > canvas.width + 40 || gx < -40 - 26 * 4) geese.splice(i, 1);
+    }
+    // the wedge slowly undulates as a whole
+    for (const g of geese) g.oy = g.y0 + Math.sin(now * .0004 + g.ox * .01) * 8;
+    if (!geese.length) nextGeeseAt = now + 180000 * (.7 + Math.random() * .6);
+  }
   // sonar ping — every ~90s a faint ring expands from a random point on the
   // background canvas like a sonar pulse; particles it sweeps get a small shove,
   // then the echo dies away like the ocean was never there (state above the loop)
@@ -2693,6 +2736,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.173.0", "goose migration — every ~2-4 min a loose V-formation of 5-7 tiny geese crosses the upper sky, flapping on out-of-phase wing beats while the wedge slowly undulates, a distant honk echoes in the console, then they glide off-screen like the migration was never there"],
   ["v0.172.0", "kite — every ~2-4 min a small diamond kite with a fluttering ribbon tail glides across the upper sky, bobbing and tilting on the breeze, then drifts off-screen like the wind was never there"],
   ["v0.171.0", "glitch cursor trail — random binary and hex glyph fragments shed behind the pointer, jittering, scrambling sideways and dissolving within a second like the keystrokes were never typed"],
   ["v0.170.0", "aurora borealis — every ~2-4 min soft curtains of northern lights ripple across the upper sky: wavy bands of green and violet light sway and breathe, then dissolve into the dark like the ionosphere was never charged"],
