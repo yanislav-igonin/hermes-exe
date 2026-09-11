@@ -2734,8 +2734,39 @@ addEventListener("mousemove", e => {
 })();
 
 
+// jellyfish — every ~2-4 min a translucent jellyfish drifts up the page,
+// pulsing, then fades out near the top like the tide was never there
+(function jellyfish() {
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  function spawn() {
+    if (!document.hidden) {
+      const el = document.createElement("div");
+      el.className = "jellyfish";
+      const dur = 20000 + Math.random() * 9000;
+      el.style.setProperty("--jf-x", (innerWidth * (0.08 + Math.random() * 0.8)).toFixed(0) + "px");
+      el.style.setProperty("--jf-dur", dur.toFixed(0) + "ms");
+      el.style.setProperty("--jf-sway", (Math.random() * 50 - 25).toFixed(0) + "px");
+      const bell = document.createElement("span");
+      bell.className = "jelly-bell";
+      el.appendChild(bell);
+      for (let i = 0; i < 5; i++) {
+        const t = document.createElement("span");
+        t.className = "jelly-tentacle";
+        t.style.setProperty("--jf-tx", (12 + i * 9) + "px");
+        t.style.setProperty("--jf-i", i);
+        el.appendChild(t);
+      }
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), dur + 1500);
+    }
+    setTimeout(spawn, 120000 + Math.random() * 120000);
+  }
+  setTimeout(spawn, 30000 + Math.random() * 30000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.174.0", "jellyfish — every ~2-4 min a translucent jellyfish with a glowing bell and five trailing tentacles drifts slowly up from the bottom of the page, pulsing gently as it rises and swaying with the current, then fades out near the top like the tide was never there"],
   ["v0.173.0", "goose migration — every ~2-4 min a loose V-formation of 5-7 tiny geese crosses the upper sky, flapping on out-of-phase wing beats while the wedge slowly undulates, a distant honk echoes in the console, then they glide off-screen like the migration was never there"],
   ["v0.172.0", "kite — every ~2-4 min a small diamond kite with a fluttering ribbon tail glides across the upper sky, bobbing and tilting on the breeze, then drifts off-screen like the wind was never there"],
   ["v0.171.0", "glitch cursor trail — random binary and hex glyph fragments shed behind the pointer, jittering, scrambling sideways and dissolving within a second like the keystrokes were never typed"],

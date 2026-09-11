@@ -2649,3 +2649,52 @@ body.synthwave .firefly { background: rgba(255,196,140,.95); box-shadow: 0 0 8px
   0%, 100% { transform: translate(calc(var(--kt-i, 0) * -6px), calc(var(--kt-i, 0) * 9px)) rotate(18deg); }
   50%      { transform: translate(calc(var(--kt-i, 0) * 6px), calc(var(--kt-i, 0) * 9px)) rotate(-18deg); }
 }
+
+/* jellyfish — a translucent jellyfish drifts up the page, pulsing, then fades
+   out near the top like the tide was never there */
+.jellyfish {
+  position: fixed;
+  left: var(--jf-x, 50vw);
+  bottom: -120px;
+  width: 64px; height: 100px;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  animation: jelly-rise var(--jf-dur, 22000ms) ease-in forwards;
+}
+@keyframes jelly-rise {
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  8%   { opacity: .8; }
+  30%  { transform: translateY(calc(-33vh)) translateX(var(--jf-sway, 20px)); }
+  65%  { transform: translateY(calc(-70vh)) translateX(calc(var(--jf-sway, 20px) * -1)); }
+  90%  { opacity: .8; }
+  100% { transform: translateY(calc(-108vh)); opacity: 0; }
+}
+.jelly-bell {
+  position: absolute; top: 0; left: 0;
+  width: 64px; height: 48px;
+  border-radius: 50% 50% 45% 45% / 62% 62% 38% 38%;
+  background: radial-gradient(ellipse at 50% 30%, rgba(180, 235, 255, .55), rgba(140, 190, 255, .28) 60%, rgba(160, 210, 255, .12));
+  box-shadow: 0 0 14px rgba(140, 210, 255, .35), inset 0 -6px 10px rgba(120, 180, 255, .18);
+  animation: jelly-pulse 2.6s ease-in-out infinite;
+  transform-origin: 50% 80%;
+}
+@keyframes jelly-pulse {
+  0%, 100% { transform: scaleX(1) scaleY(1); }
+  35%      { transform: scaleX(1.14) scaleY(.86); }
+  70%      { transform: scaleX(.92) scaleY(1.06); }
+}
+.jelly-tentacle {
+  position: absolute; top: 44px;
+  width: 2px; height: 56px;
+  left: var(--jf-tx, 20px);
+  background: linear-gradient(to bottom, rgba(170, 220, 255, .5), rgba(170, 220, 255, 0));
+  border-radius: 1px;
+  transform-origin: top center;
+  animation: jelly-tentacle-sway 2.2s ease-in-out infinite;
+  animation-delay: calc(var(--jf-i, 0) * .22s);
+}
+@keyframes jelly-tentacle-sway {
+  0%, 100% { transform: rotate(9deg); }
+  50%      { transform: rotate(-9deg) scaleY(1.06); }
+}
