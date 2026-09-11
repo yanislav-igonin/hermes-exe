@@ -3765,6 +3765,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.216.0", "fireflies — a loose swarm of tiny amber lights drifts across the page, each blinking on its own wavering rhythm with a soft glow, shying away from the cursor until it wanders off into the dark again"],
   ["v0.215.0", "lighthouse — every ~2-4 min a tiny lighthouse rises near the top of the page, its beam sweeping slow rotating arcs of light across the sky, then it dims and sinks away like the coast was never charted"],
   ["v0.214.0", "ekg pulse — a tiny heart monitor in the corner scrolls a steady green EKG line, occasionally flatlines in red for a breath, then finds its pulse again"],
   ["v0.213.0", "dandelion seed — every ~2-4 min a fluffy seed head drifts in from a screen edge on the breeze, and the moment it settles it bursts into a scatter of tiny parachutes that flutter away on their own little journeys"],
@@ -8645,4 +8646,75 @@ const AURORA_NOTES = [
     })(start);
   }
   setTimeout(sweep, 30000 + Math.random() * 40000);
+})();
+
+// fireflies — a loose swarm of tiny amber lights drifts across the page at
+// night, each blinking on its own wavering rhythm with a soft glow, and they
+// shy away from the cursor like moths in reverse until they wander off into
+// the dark again
+(function fireflies() {
+  const cv = document.createElement("canvas");
+  cv.className = "fireflies";
+  document.body.appendChild(cv);
+  const ctx = cv.getContext("2d");
+  let W, H;
+  function size() {
+    W = cv.width = innerWidth;
+    H = cv.height = innerHeight;
+  }
+  size();
+  addEventListener("resize", size);
+  const N = 22;
+  const flies = Array.from({ length: N }, () => ({
+    x: Math.random() * innerWidth,
+    y: innerHeight * (.2 + Math.random() * .7),
+    vx: 0, vy: 0,
+    phase: Math.random() * Math.PI * 2,
+    speed: .4 + Math.random() * .9,
+    seed: Math.random() * 1000,
+  }));
+  let mx = -9999, my = -9999;
+  addEventListener("mousemove", e => { mx = e.clientX; my = e.clientY; });
+  let t0 = performance.now();
+  (function tick(now) {
+    const t = (now - t0) / 1000;
+    ctx.clearRect(0, 0, W, H);
+    for (const f of flies) {
+      // gentle wander via pseudo-noise
+      f.vx += Math.cos(t * f.speed + f.seed) * .012;
+      f.vy += Math.sin(t * f.speed * .8 + f.seed * 2) * .009;
+      // drift off to the right, wrap around
+      f.vx += .015;
+      // shy away from the cursor
+      const dx = f.x - mx, dy = f.y - my, d2 = dx * dx + dy * dy;
+      if (d2 < 120 * 120) {
+        const d = Math.sqrt(d2) || 1;
+        f.vx += dx / d * .25;
+        f.vy += dy / d * .25;
+      }
+      f.vx *= .96; f.vy *= .96;
+      f.x += f.vx; f.y += f.vy;
+      if (f.x > W + 30) { f.x = -30; f.y = innerHeight * (.2 + Math.random() * .7); }
+      f.y = Math.max(20, Math.min(H - 20, f.y + (Math.random() - .5) * .4));
+      // blink: each fly pulses on its own rhythm
+      const glow = Math.max(0, Math.sin(t * (1.1 + f.speed) + f.phase));
+      const a = Math.pow(glow, 2.2);
+      if (a > .02) {
+        const r = 1.4 + a * 1.6;
+        const g = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, r * 5);
+        g.addColorStop(0, `rgba(255,214,110,${(a * .9).toFixed(3)})`);
+        g.addColorStop(.4, `rgba(255,190,70,${(a * .3).toFixed(3)})`);
+        g.addColorStop(1, "rgba(255,190,70,0)");
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, r * 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = `rgba(255,240,190,${a.toFixed(3)})`;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    requestAnimationFrame(tick);
+  })(t0);
 })();

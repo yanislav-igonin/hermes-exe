@@ -3457,3 +3457,11 @@ body.synthwave .tumbleweed { color: rgba(255, 170, 100, .8); text-shadow: 0 0 6p
 .lighthouse.fading { opacity: 0 !important; transition: opacity .9s ease-out; }
 body.vaporwave .lighthouse::before { color: rgba(201, 166, 232, .75); text-shadow: 0 0 8px rgba(201, 166, 232, .4); }
 body.synthwave .lighthouse::before { color: rgba(255, 170, 100, .8); text-shadow: 0 0 8px rgba(255, 140, 70, .4); }
+
+/* fireflies — full-page canvas behind the content, lights only, no pointer */
+canvas.fireflies {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
