@@ -2510,6 +2510,52 @@ addEventListener("mousemove", e => {
   setTimeout(streak, 45000 + Math.random() * 60000);
 })();
 
+// paper airplane — every ~2-4 min a folded paper airplane glides in from a
+// screen edge, bobbing on the air with banking wobbles, loops once mid-flight
+// and veers off the far edge like the note was never thrown
+(function paperAirplane() {
+  const plane = document.createElement("div");
+  plane.style.cssText = "position:fixed;z-index:3;pointer-events:none;will-change:transform;opacity:0;transition:opacity 1.5s ease-in-out;";
+  plane.innerHTML =
+    '<svg width="46" height="26" viewBox="0 0 46 26" style="display:block;filter:drop-shadow(0 1px 3px rgba(20,30,40,.35))">' +
+      // folded paper body: nose at right
+      '<path d="M2 13 L44 3 L20 14 Z" fill="rgba(244,246,248,.95)" stroke="rgba(150,160,170,.6)" stroke-width="0.8"/>' +
+      '<path d="M20 14 L44 3 L32 22 Z" fill="rgba(224,229,234,.95)" stroke="rgba(150,160,170,.6)" stroke-width="0.8"/>' +
+      // fold crease
+      '<line x1="44" y1="3" x2="20" y2="14" stroke="rgba(140,150,160,.55)" stroke-width="0.8"/>' +
+    "</svg>";
+  document.body.appendChild(plane);
+
+  function flight() {
+    const fromLeft = Math.random() < .5;
+    const y0 = 60 + Math.random() * (innerHeight * 0.35);
+    const x0 = fromLeft ? -60 : innerWidth + 60;
+    const x1 = fromLeft ? innerWidth + 60 : -60;
+    const driftY = (Math.random() - .5) * (innerHeight * 0.3);
+    const bobAmp = 14 + Math.random() * 12;
+    const dur = 16000 + Math.random() * 9000;
+    const loopAt = .35 + Math.random() * .2; // mid-flight loop
+    let t0 = null;
+    plane.style.opacity = "1";
+
+    (function frame(now) {
+      if (t0 === null) t0 = now;
+      const t = Math.min(1, (now - t0) / dur);
+      const x = x0 + (x1 - x0) * t;
+      const y = y0 + driftY * t + Math.sin(now * .004) * bobAmp;
+      // bank into the bob, plus a full roll through the loop
+      const bank = Math.sin(now * .004) * 22;
+      const roll = t > loopAt && t < loopAt + .18 ? (t - loopAt) / .18 * 360 : 0;
+      const dir = fromLeft ? 180 : 0;
+      plane.style.transform =
+        "translate(" + x + "px," + y + "px) rotate(" + (dir + bank) + "deg) rotateY(" + roll + "deg)";
+      if (t < 1) requestAnimationFrame(frame);
+      else { plane.style.opacity = "0"; setTimeout(flight, 120000 + Math.random() * 120000); }
+    })(performance.now());
+  }
+  setTimeout(flight, 35000 + Math.random() * 60000);
+})();
+
 // garden snail — every ~3-6 min a tiny snail crosses the bottom of the page
 // at a glacial pace, leaving a slowly fading slime trail behind it, antennae
 // twitching as it goes, then vanishes like the garden was never crossed
@@ -3818,6 +3864,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.221.0", "paper airplane — every ~2-4 min a folded paper airplane glides in from a screen edge, bobbing on the air with banking wobbles, does one loop mid-flight and veers off the far edge like the note was never thrown"],
   ["v0.220.0", "paper lantern — every ~2-4 min a glowing paper lantern lifts off from the bottom of the page and drifts upward on the warm air, swaying and flickering as it rises, then gutters out mid-sky like the wish was never made"],
   ["v0.219.0", "kite — every ~2-4 min a small kite swoops in from a screen edge and glides across the upper sky on a bobbing path, banked into the wind with its tail trailing and fluttering behind it, then drifts off the far edge like the wind was never flying it"],
   ["v0.218.0", "boomerang — every ~2-4 min a boomerang launches from a random spot on the page, flies out along a sweeping arc while spinning, curves back through the sky and returns to the exact point it was thrown from, then fades away like the thrower was never there"],
