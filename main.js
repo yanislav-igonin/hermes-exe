@@ -2871,8 +2871,66 @@ addEventListener("mousemove", e => {
   requestAnimationFrame(showerTick);
 })();
 
+// meteor streak — every ~2-4 min an occasional shooting star crosses the upper
+// sky, shedding a trail of small fading particles behind it as it burns,
+// then the sky goes quiet again like the star was never there
+(function meteorParticleStreak() {
+  const parts = [];
+  let nextAt = performance.now() + 120000 * (.7 + Math.random() * .6);
+  let star = null;
+  function spawn() {
+    const speed = 8 + Math.random() * 6;
+    const dir = Math.random() < .5 ? 1 : -1;
+    star = {
+      x: dir > 0 ? -20 : canvas.width + 20,
+      y: Math.random() * canvas.height * .3,
+      vx: speed * dir, vy: speed * (.3 + Math.random() * .2),
+      life: 1
+    };
+  }
+  function tick(now) {
+    if (!star && now > nextAt) {
+      spawn();
+      setTimeout(() => console.log("a shooting star crosses the page, scattering sparks"), 4200);
+    }
+    if (star) {
+      star.x += star.vx; star.y += star.vy; star.life -= .004;
+      // shed fading particles behind the head
+      if (Math.random() < .6) {
+        parts.push({
+          x: star.x + (Math.random() - .5) * 4,
+          y: star.y + (Math.random() - .5) * 4,
+          vx: -star.vx * (.1 + Math.random() * .15) + (Math.random() - .5),
+          vy: -star.vy * (.1 + Math.random() * .15) + (Math.random() - .5) + .3,
+          life: .9 + Math.random() * .3, size: 1 + Math.random() * 1.6
+        });
+      }
+      if (star.life <= 0 || star.x < -40 || star.x > canvas.width + 40 || star.y > canvas.height) {
+        star = null; nextAt = now + 120000 * (.7 + Math.random() * .6);
+      } else {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, 1.6, 0, 7);
+        ctx.fillStyle = `rgba(235,245,255,${.95 * star.life})`;
+        ctx.fill();
+      }
+    }
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const p = parts[i];
+      p.x += p.vx; p.y += p.vy; p.vy += .008; p.life -= .012;
+      if (p.life <= 0) { parts.splice(i, 1); continue; }
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, 7);
+      ctx.fillStyle = `rgba(255,225,170,${Math.min(.85, p.life)})`;
+      ctx.fill();
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
 // changelog
 const changelog = [
+  ["v0.178.0", "meteor streak — every ~2-4 min an occasional shooting star crosses the upper sky, shedding a trail of small fading ember particles behind it as it burns, then the sky goes quiet again like the star was never there"],
   ["v0.177.0", "meteor shower — every ~2-4 min a brief shower of meteors streaks out of one corner of the upper sky with tapering glowing trails, then the sky dries up like the shower was never there"],
   ["v0.176.0", "lighthouse — every ~2-4 min a small lighthouse rises from the bottom of the page, its rotating beam sweeps once across the sky, briefly illuminating what it passes over, then it sinks back below the edge like the coast was never watched"],
   ["v0.175.0", "periscope — every ~2-4 min a submarine periscope rises from the bottom of the page, sweeps slowly across the room with a lens glint while a sonar blip prints in the console, then sinks back below the edge like the coast was never watched"],
