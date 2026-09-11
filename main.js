@@ -2556,6 +2556,55 @@ addEventListener("mousemove", e => {
   setTimeout(flight, 35000 + Math.random() * 60000);
 })();
 
+// shooting star — every ~2-4 min a meteor streaks diagonally across the sky
+// with a glowing head and a trail that burns out behind it, then the night is
+// quiet again like nothing was wished on
+(function shootingStar() {
+  const star = document.createElement("div");
+  star.style.cssText = "position:fixed;z-index:3;top:0;left:0;pointer-events:none;will-change:transform,opacity;opacity:0;";
+  star.innerHTML =
+    '<svg width="90" height="90" viewBox="0 0 90 90" style="display:block">' +
+      // trail — a tapered streak pointing back from the head
+      '<defs><linearGradient id="ss-trail" x1="0" y1="0" x2="1" y2="0">' +
+        '<stop offset="0" stop-color="rgba(255,250,230,0)"/>' +
+        '<stop offset="1" stop-color="rgba(255,250,230,.9)"/>' +
+      '</linearGradient></defs>' +
+      '<polygon points="4,44 82,46 4,48" fill="url(#ss-trail)"/>' +
+      // glowing head
+      '<circle cx="84" cy="46" r="2.6" fill="rgba(255,252,240,.95)"/>' +
+      '<circle cx="84" cy="46" r="5.5" fill="rgba(255,250,230,.25)"/>' +
+    '</svg>';
+  document.body.appendChild(star);
+  const svg = star.firstElementChild;
+
+  function fly() {
+    const fromTop = Math.random() < .7;
+    const x0 = Math.random() * innerWidth * .8 + innerWidth * .1;
+    const y0 = fromTop ? -30 : -30;
+    const ang = (35 + Math.random() * 25) * Math.PI / 180; // down-right diagonal
+    const dist = 320 + Math.random() * 280;
+    const dur = 900 + Math.random() * 500;
+    const flip = Math.random() < .5 ? -1 : 1; // sometimes streak leftward
+    star.style.opacity = "1";
+
+    let t0 = null;
+    (function frame(now) {
+      if (t0 === null) t0 = now;
+      const t = Math.min(1, (now - t0) / dur);
+      const d = dist * t;
+      const x = x0 + Math.cos(ang) * d * flip;
+      const y = y0 + Math.sin(ang) * d;
+      const flicker = .75 + Math.random() * .25;
+      star.style.transform = "translate(" + x + "px," + y + "px) rotate(" + (flip < 0 ? 180 - ang * 180 / Math.PI : ang * 180 / Math.PI) + "deg) scaleX(" + (.7 + t * .6) + ")";
+      star.style.opacity = flicker * (1 - t * t);
+      svg.style.filter = "drop-shadow(0 0 " + (3 + t * 5) + "px rgba(255,250,220,.8))";
+      if (t < 1) requestAnimationFrame(frame);
+      else { star.style.opacity = "0"; setTimeout(fly, 120000 + Math.random() * 120000); }
+    })(performance.now());
+  }
+  setTimeout(fly, 30000 + Math.random() * 60000);
+})();
+
 // garden snail — every ~3-6 min a tiny snail crosses the bottom of the page
 // at a glacial pace, leaving a slowly fading slime trail behind it, antennae
 // twitching as it goes, then vanishes like the garden was never crossed
@@ -3864,6 +3913,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.222.0", "shooting star — every ~2-4 min a meteor streaks diagonally across the sky, glowing head flickering with a tapering trail that burns out behind it, then the night is quiet again like nothing was wished on"],
   ["v0.221.0", "paper airplane — every ~2-4 min a folded paper airplane glides in from a screen edge, bobbing on the air with banking wobbles, does one loop mid-flight and veers off the far edge like the note was never thrown"],
   ["v0.220.0", "paper lantern — every ~2-4 min a glowing paper lantern lifts off from the bottom of the page and drifts upward on the warm air, swaying and flickering as it rises, then gutters out mid-sky like the wish was never made"],
   ["v0.219.0", "kite — every ~2-4 min a small kite swoops in from a screen edge and glides across the upper sky on a bobbing path, banked into the wind with its tail trailing and fluttering behind it, then drifts off the far edge like the wind was never flying it"],
