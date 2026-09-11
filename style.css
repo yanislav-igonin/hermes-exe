@@ -2698,3 +2698,59 @@ body.synthwave .firefly { background: rgba(255,196,140,.95); box-shadow: 0 0 8px
   0%, 100% { transform: rotate(9deg); }
   50%      { transform: rotate(-9deg) scaleY(1.06); }
 }
+/* periscope — v0.175.0 */
+.periscope {
+  position: fixed;
+  left: var(--ps-x, 50vw);
+  bottom: -140px;
+  width: 26px; height: 150px;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  animation: ps-rise var(--ps-dur, 18000ms) ease-in-out forwards;
+}
+.ps-tube {
+  position: absolute;
+  left: 9px; bottom: 0;
+  width: 8px; height: 120px;
+  background: linear-gradient(90deg, #4a5568, #718096 45%, #2d3748);
+  border-radius: 4px 4px 0 0;
+  box-shadow: 0 0 8px rgba(160, 220, 255, .25);
+  transform-origin: 50% 100%;
+  animation: ps-sweep var(--ps-dur, 18000ms) ease-in-out forwards;
+}
+.ps-head {
+  position: absolute;
+  left: -4px; top: -14px;
+  width: 16px; height: 16px;
+  background: linear-gradient(180deg, #a0c8e8, #4a5568);
+  border-radius: 50% 50% 30% 30%;
+  box-shadow: 0 0 10px rgba(160, 220, 255, .4);
+}
+.ps-glint {
+  position: absolute;
+  left: 3px; top: 3px;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #eaffff;
+  box-shadow: 0 0 8px rgba(220, 250, 255, .9);
+  animation: ps-glint-blink 2.4s ease-in-out infinite;
+}
+@keyframes ps-rise {
+  0%   { transform: translateY(0); opacity: 0; }
+  8%   { opacity: 1; }
+  12%  { transform: translateY(-150px); opacity: 1; }
+  82%  { transform: translateY(-150px); opacity: 1; }
+  94%  { transform: translateY(-160px); opacity: .6; }
+  100% { transform: translateY(-40px); opacity: 0; }
+}
+@keyframes ps-sweep {
+  0%   { transform: rotate(calc(var(--ps-sweep, 0deg) / 2)); }
+  30%  { transform: rotate(calc(var(--ps-sweep, 0deg) / -2)); }
+  62%  { transform: rotate(calc(var(--ps-sweep, 0deg) / 2)); }
+  100% { transform: rotate(calc(var(--ps-sweep, 0deg) / -2)); }
+}
+@keyframes ps-glint-blink {
+  0%, 100% { opacity: .25; }
+  50%      { opacity: 1; }
+}

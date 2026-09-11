@@ -2764,8 +2764,40 @@ addEventListener("mousemove", e => {
   setTimeout(spawn, 30000 + Math.random() * 30000);
 })();
 
+// periscope — every ~2-4 min a submarine periscope rises from the bottom of
+// the page, sweeps slowly across with a lens glint, blips in the console,
+// then sinks back below the edge like the coast was never watched
+(function periscope() {
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  function scan() {
+    if (!document.hidden) {
+      const el = document.createElement("div");
+      el.className = "periscope";
+      const dur = 14000 + Math.random() * 7000;
+      el.style.setProperty("--ps-x", (innerWidth * (0.1 + Math.random() * 0.8)).toFixed(0) + "px");
+      el.style.setProperty("--ps-dur", dur.toFixed(0) + "ms");
+      el.style.setProperty("--ps-sweep", (Math.random() * 120 - 60).toFixed(0) + "deg");
+      const tube = document.createElement("span");
+      tube.className = "ps-tube";
+      const head = document.createElement("span");
+      head.className = "ps-head";
+      const glint = document.createElement("span");
+      glint.className = "ps-glint";
+      head.appendChild(glint);
+      tube.appendChild(head);
+      el.appendChild(tube);
+      document.body.appendChild(el);
+      setTimeout(() => console.log("periscope blip: all clear on deck"), dur * 0.4);
+      setTimeout(() => el.remove(), dur + 1500);
+    }
+    setTimeout(scan, 120000 + Math.random() * 120000);
+  }
+  setTimeout(scan, 30000 + Math.random() * 30000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.175.0", "periscope — every ~2-4 min a submarine periscope rises from the bottom of the page, sweeps slowly across the room with a lens glint while a sonar blip prints in the console, then sinks back below the edge like the coast was never watched"],
   ["v0.174.0", "jellyfish — every ~2-4 min a translucent jellyfish with a glowing bell and five trailing tentacles drifts slowly up from the bottom of the page, pulsing gently as it rises and swaying with the current, then fades out near the top like the tide was never there"],
   ["v0.173.0", "goose migration — every ~2-4 min a loose V-formation of 5-7 tiny geese crosses the upper sky, flapping on out-of-phase wing beats while the wedge slowly undulates, a distant honk echoes in the console, then they glide off-screen like the migration was never there"],
   ["v0.172.0", "kite — every ~2-4 min a small diamond kite with a fluttering ribbon tail glides across the upper sky, bobbing and tilting on the breeze, then drifts off-screen like the wind was never there"],
