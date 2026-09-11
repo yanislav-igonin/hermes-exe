@@ -2928,8 +2928,64 @@ addEventListener("mousemove", e => {
   requestAnimationFrame(tick);
 })();
 
+// comet streak — every ~2-4 min a comet with a long glowing tail crosses the
+// sky on a shallow diagonal, its tail streaming and fading behind the head,
+// then it burns out past the far edge like the comet was never sighted
+(function cometStreak() {
+  let comet = null;
+  let nextAt = performance.now() + 120000 * (.7 + Math.random() * .6);
+  function spawn() {
+    const speed = 9 + Math.random() * 5;
+    const dir = Math.random() < .5 ? 1 : -1;
+    comet = {
+      x: dir > 0 ? -30 : canvas.width + 30,
+      y: Math.random() * canvas.height * .28,
+      vx: speed * dir, vy: speed * (.22 + Math.random() * .15),
+      life: 1
+    };
+  }
+  function tick(now) {
+    if (!comet && now > nextAt) {
+      spawn();
+      setTimeout(() => console.log("a comet crosses the night sky, trailing light"), 5200);
+    }
+    if (comet) {
+      comet.x += comet.vx; comet.y += comet.vy; comet.life -= .0035;
+      const c = comet;
+      const n = Math.hypot(c.vx, c.vy);
+      const tx = -c.vx / n, ty = -c.vy / n;
+      // tapering glowing tail drawn as several segments shrinking behind the head
+      for (let s = 0; s < 9; s++) {
+        const f = s / 9;
+        const a = (1 - f) * .55 * c.life;
+        if (a <= 0) break;
+        ctx.beginPath();
+        ctx.moveTo(c.x + tx * f * 90, c.y + ty * f * 90);
+        ctx.lineTo(c.x + tx * (f + 1 / 9) * 90, c.y + ty * (f + 1 / 9) * 90);
+        ctx.lineWidth = 2.6 * (1 - f) + .4;
+        ctx.strokeStyle = `rgba(200,225,255,${a})`;
+        ctx.stroke();
+      }
+      // bright ice-blue head with a soft halo
+      const g = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, 9);
+      g.addColorStop(0, `rgba(240,248,255,${.9 * c.life})`);
+      g.addColorStop(1, 'rgba(240,248,255,0)');
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, 9, 0, 7);
+      ctx.fillStyle = g;
+      ctx.fill();
+      if (c.life <= 0 || c.x < -110 || c.x > canvas.width + 110 || c.y > canvas.height) {
+        comet = null; nextAt = now + 120000 * (.7 + Math.random() * .6);
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
 // changelog
 const changelog = [
+  ["v0.182.0", "comet streak — every ~2-4 min a comet with a long tapering glowing tail crosses the sky on a shallow diagonal, its ice-blue head haloed and its tail streaming and fading behind it, then it burns out past the far edge like the comet was never sighted"],
   ["v0.181.0", "hot air balloon — every ~2-4 min a small striped hot air balloon with a softly glowing basket drifts slowly across the upper sky, bobbing gently on the breeze, then sails off-screen like the flight was never there"],
   ["v0.180.0", "prowling shadow — every ~2-4 min a soft blurred dark shape slinks low across the whole page on a slight diagonal, stretching and skewing as it passes, then melts away like the shadow was never there"],
   ["v0.179.0", "satellite pass — every ~2-4 min a tiny satellite with glinting solar panels and a blinking beacon crosses the high sky on a slow, deliberate orbit, then slips past the far edge like the orbit was never there"],
