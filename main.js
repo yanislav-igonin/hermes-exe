@@ -3763,8 +3763,62 @@ addEventListener("mousemove", e => {
   setTimeout(draw, 40000 + Math.random() * 40000);
 })();
 
+// boomerang toss — every ~2-4 min a boomerang launches from a random spot,
+// flies out along a sweeping arc while spinning, curves back through the sky
+// and returns to the exact point it was thrown from, then fades away like the
+// thrower was never there
+(function boomerangToss() {
+  let t = null, nextAt = performance.now() + 70000 * (.7 + Math.random() * .6);
+  function step(now) {
+    if (!t && now > nextAt) {
+      t = {
+        x0: canvas.width * (.18 + Math.random() * .64),
+        y0: canvas.height * (.25 + Math.random() * .3),
+        ang: Math.random() * Math.PI * 2,
+        dir: Math.random() < .5 ? 1 : -1,
+        spin: Math.random() * 7,
+        start: now,
+        dur: 6500 + Math.random() * 2500
+      };
+      setTimeout(() => console.log("boomerang log: it always comes back"), t.dur * .55);
+    }
+    if (t) {
+      const p = (now - t.start) / t.dur;
+      if (p >= 1) { t = null; nextAt = now + 150000 * (.7 + Math.random() * .6); }
+      else {
+        // out along a curving arc, then the same path home
+        const out = Math.sin(p * Math.PI);
+        const ang = t.ang + t.dir * p * Math.PI * .9;
+        const x = t.x0 + Math.cos(ang) * 260 * out;
+        const y = t.y0 + Math.sin(ang) * 160 * out - Math.sin(p * Math.PI) * 30;
+        const a = Math.sin(p * Math.PI);
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(t.spin += .24);
+        ctx.strokeStyle = `rgba(124,252,156,${.75 * a})`;
+        ctx.lineWidth = 2.2;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(-9, -5);
+        ctx.quadraticCurveTo(0, 2, 9, -5); // bent V of the boomerang
+        ctx.stroke();
+        ctx.strokeStyle = `rgba(124,252,156,${.35 * a})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(-9, -5); ctx.lineTo(-6, 2);
+        ctx.moveTo(9, -5); ctx.lineTo(6, 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+})();
+
 // changelog
 const changelog = [
+  ["v0.218.0", "boomerang — every ~2-4 min a boomerang launches from a random spot on the page, flies out along a sweeping arc while spinning, curves back through the sky and returns to the exact point it was thrown from, then fades away like the thrower was never there"],
   ["v0.217.0", "balloon — every ~2-4 min a small balloon drifts up from the bottom of the page, sways gently on an invisible breeze with its string trailing below, and pops into a tiny confetti burst if you click it; otherwise it floats away off the top like a fairground you were never at"],
   ["v0.216.0", "fireflies — a loose swarm of tiny amber lights drifts across the page, each blinking on its own wavering rhythm with a soft glow, shying away from the cursor until it wanders off into the dark again"],
   ["v0.215.0", "lighthouse — every ~2-4 min a tiny lighthouse rises near the top of the page, its beam sweeping slow rotating arcs of light across the sky, then it dims and sinks away like the coast was never charted"],
@@ -3992,7 +4046,7 @@ for (const [v, msg] of changelog.slice(1)) {
 
 // self-report card — the agent states its own vitals (version, done-count, last feature)
 // done-count is a static snapshot bumped each tick (linear API needs a key; this file is public)
-const DONE_COUNT = 35;
+const DONE_COUNT = 36;
 const lastFeature = changelog[0];
 document.getElementById("status").innerHTML =
   `<h2>// agent status</h2>` +
