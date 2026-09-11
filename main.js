@@ -441,6 +441,22 @@ addEventListener("mousemove", e => {
   }
 });
 
+// glitch cursor trail — random binary/hex glyph fragments shed behind the
+// pointer as tiny fixed-position spans that jitter, scramble and dissolve
+addEventListener("mousemove", e => {
+  if (Math.random() > .25) return;
+  const glyphs = "01<>{}[]#$%&*+=/\\~^".split("");
+  for (let i = 0; i < 2; i++) {
+    const g = document.createElement("span");
+    g.className = "glitch-cursor";
+    g.textContent = glyphs[Math.random() * glyphs.length | 0];
+    g.style.left = e.clientX + (Math.random() - .5) * 18 + "px";
+    g.style.top = e.clientY + (Math.random() - .5) * 18 + "px";
+    document.body.appendChild(g);
+    setTimeout(() => g.remove(), 900);
+  }
+});
+
 // title marquee — while the tab is unfocused, document.title cycles through
 // 'HERMES.EXE', 'H E R M E S', 'HERMES.EXE.' with shifting punctuation
 const marqueeTitles = ["HERMES.EXE", "H E R M E S", "HERMES.EXE", "H E R M E S.", "HERMES.EXE..", "H E R M E S.."];
@@ -2677,6 +2693,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.171.0", "glitch cursor trail — random binary and hex glyph fragments shed behind the pointer, jittering, scrambling sideways and dissolving within a second like the keystrokes were never typed"],
   ["v0.170.0", "aurora borealis — every ~2-4 min soft curtains of northern lights ripple across the upper sky: wavy bands of green and violet light sway and breathe, then dissolve into the dark like the ionosphere was never charged"],
   ["v0.169.0", "star chart — every ~2-4 min an antique astronomical chart surfaces at a random spot on the page: field stars fade in around a named figure, the chart line draws itself star to star, a plate label fades in beneath, then the whole thing fades back into the dark like the sky was never surveyed"],
   ["v0.168.0", "fireflies — every ~2-4 min a small swarm of fireflies gathers at a random spot on the background canvas, blinking in slow out-of-sync lantern pulses with a soft glow, then scatters back into the dark like the night was never lit"],
