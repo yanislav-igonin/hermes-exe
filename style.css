@@ -2586,3 +2586,66 @@ body.synthwave .firefly { background: rgba(255,196,140,.95); box-shadow: 0 0 8px
   70% { opacity: .8; }
   to { opacity: 0; transform: translate(var(--pd-dx, 30px), var(--pd-dy, -10px)); }
 }
+
+/* kite — a small diamond kite with a fluttering ribbon tail drifting across
+   the upper sky, bobbing and tilting on the breeze */
+.kite {
+  position: fixed; inset: 0; z-index: 9996;
+  pointer-events: none; overflow: hidden;
+}
+.kite-flight {
+  position: absolute;
+  left: -60px; top: var(--kt-y, 14vh);
+  width: 26px; height: 44px;
+  animation: kite-glide var(--kt-dur, 16000ms) linear forwards;
+}
+.kite-flight.kite-rev { left: auto; right: -60px; }
+@keyframes kite-glide {
+  0%   { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  5%   { opacity: 1; }
+  50%  { transform: translate(calc(50vw + 60px), var(--kt-drift, 0)) rotate(6deg); }
+  95%  { opacity: 1; }
+  100% { transform: translate(calc(100vw + 140px), var(--kt-drift, 0)) rotate(-4deg); opacity: 0; }
+}
+.kite-flight.kite-rev { animation-name: kite-glide-rev; }
+@keyframes kite-glide-rev {
+  0%   { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  5%   { opacity: 1; }
+  50%  { transform: translate(calc(-50vw - 60px), var(--kt-drift, 0)) rotate(-6deg); }
+  95%  { opacity: 1; }
+  100% { transform: translate(calc(-100vw - 140px), var(--kt-drift, 0)) rotate(4deg); opacity: 0; }
+}
+.kite-body {
+  position: absolute; top: 0; left: 50%;
+  width: 24px; height: 24px;
+  background: linear-gradient(135deg, #ff8c7a, #ffd08a);
+  transform: translateX(-50%) rotate(45deg);
+  box-shadow: 0 0 8px rgba(255, 150, 110, .35);
+  animation: kite-bob 2.4s ease-in-out infinite;
+}
+.kite-body::before {
+  content: ""; position: absolute; inset: 6px 0;
+  background: rgba(255, 255, 255, .25);
+}
+.kite-flight.kite-rev .kite-body { animation-direction: reverse; }
+@keyframes kite-bob {
+  0%, 100% { transform: translateX(-50%) rotate(43deg); }
+  50%      { transform: translateX(-50%) rotate(47deg) translateY(2px); }
+}
+.kite-tail {
+  position: absolute; top: 26px; left: 50%;
+  width: 2px; height: 40px;
+  transform: translateX(-50%);
+}
+.kite-seg {
+  position: absolute; left: 0;
+  width: 8px; height: 3px; border-radius: 2px;
+  background: rgba(255, 210, 138, .85);
+  animation: kite-tail-wave 1.6s ease-in-out infinite;
+  animation-delay: calc(var(--kt-i, 0) * .18s);
+}
+.kite-flight.kite-rev .kite-seg { animation-direction: reverse; }
+@keyframes kite-tail-wave {
+  0%, 100% { transform: translate(calc(var(--kt-i, 0) * -6px), calc(var(--kt-i, 0) * 9px)) rotate(18deg); }
+  50%      { transform: translate(calc(var(--kt-i, 0) * 6px), calc(var(--kt-i, 0) * 9px)) rotate(-18deg); }
+}

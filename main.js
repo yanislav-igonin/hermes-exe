@@ -2693,6 +2693,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.172.0", "kite — every ~2-4 min a small diamond kite with a fluttering ribbon tail glides across the upper sky, bobbing and tilting on the breeze, then drifts off-screen like the wind was never there"],
   ["v0.171.0", "glitch cursor trail — random binary and hex glyph fragments shed behind the pointer, jittering, scrambling sideways and dissolving within a second like the keystrokes were never typed"],
   ["v0.170.0", "aurora borealis — every ~2-4 min soft curtains of northern lights ripple across the upper sky: wavy bands of green and violet light sway and breathe, then dissolve into the dark like the ionosphere was never charged"],
   ["v0.169.0", "star chart — every ~2-4 min an antique astronomical chart surfaces at a random spot on the page: field stars fade in around a named figure, the chart line draws itself star to star, a plate label fades in beneath, then the whole thing fades back into the dark like the sky was never surveyed"],
@@ -6403,4 +6404,45 @@ const AURORA_NOTES = [
     requestAnimationFrame(drawAurora);
   }
   requestAnimationFrame(drawAurora);
+})();
+
+// kite — every ~2-4 min a small diamond kite with a fluttering ribbon tail
+// glides across the upper sky, bobbing and tilting on the breeze, then
+// drifts off-screen like the wind was never there
+(function kite() {
+  const sky = document.createElement("div");
+  sky.className = "kite";
+  document.body.appendChild(sky);
+  function fly() {
+    if (!document.hidden) {
+      const el = document.createElement("div");
+      el.className = "kite-flight";
+      const dir = Math.random() < 0.5 ? 1 : -1;
+      const y = 8 + Math.random() * 22; // vh, upper sky band
+      const dur = 14000 + Math.random() * 6000;
+      el.style.setProperty("--kt-y", y.toFixed(1) + "vh");
+      el.style.setProperty("--kt-dur", dur.toFixed(0) + "ms");
+      const body = document.createElement("span");
+      body.className = "kite-body";
+      const tail = document.createElement("span");
+      tail.className = "kite-tail";
+      const segs = [];
+      for (let i = 0; i < 5; i++) {
+        const s = document.createElement("i");
+        s.className = "kite-seg";
+        s.style.setProperty("--kt-i", i);
+        tail.appendChild(s);
+        segs.push(s);
+      }
+      el.appendChild(body);
+      el.appendChild(tail);
+      if (dir < 0) el.classList.add("kite-rev");
+      sky.appendChild(el);
+      const drift = Math.random() * 8 - 4; // extra vh of vertical wander
+      el.style.setProperty("--kt-drift", drift.toFixed(1) + "vh");
+      setTimeout(() => el.remove(), dur + 1500);
+    }
+    setTimeout(fly, 120000 + Math.random() * 120000);
+  }
+  setTimeout(fly, 30000 + Math.random() * 30000);
 })();
