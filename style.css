@@ -3940,3 +3940,72 @@ body.synthwave .sl-slinky .sl-ring {
 }
 body.vaporwave .bubblewrap { background: rgba(201,166,232,.1); border-color: rgba(201,166,232,.25); }
 body.synthwave .bubblewrap { background: rgba(255,140,46,.1); border-color: rgba(255,140,46,.25); }
+
+/* paper boat: a little folded boat sails along the bottom every ~2-4 min,
+   rocking on invisible waves with a wake behind it, then fades out */
+.paperboat-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 3s ease;
+}
+.paperboat-layer.pb-on { opacity: 1; }
+.paperboat {
+  position: absolute;
+  top: var(--pb-y, 78vh);
+  left: -12vw;
+  width: 34px;
+  height: 30px;
+  transform: scale(var(--pb-scale, 1));
+  will-change: transform;
+}
+.paperboat-layer.pb-on .paperboat { animation: pb-sail var(--pb-dur, 28s) linear forwards; }
+@keyframes pb-sail {
+  0% { margin-left: 0; }
+  100% { margin-left: 130vw; }
+}
+.pb-hull {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 34px;
+  height: 10px;
+  background: rgba(235, 240, 245, .55);
+  clip-path: polygon(0 0, 100% 0, 78% 100%, 22% 100%);
+}
+.pb-sail {
+  position: absolute;
+  bottom: 9px;
+  left: 15px;
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 19px solid rgba(235, 240, 245, .7);
+  transform-origin: 50% 100%;
+  animation: pb-rock 2.8s ease-in-out infinite;
+}
+.pb-wake {
+  position: absolute;
+  bottom: 1px;
+  left: -46px;
+  width: 46px;
+  height: 4px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .25));
+  animation: pb-fade 2.4s linear infinite;
+}
+@keyframes pb-rock {
+  0%, 100% { transform: rotate(-7deg); }
+  50% { transform: rotate(7deg); }
+}
+@keyframes pb-fade {
+  0% { opacity: .7; }
+  100% { opacity: 0; }
+}
+body.vaporwave .pb-hull { background: rgba(201,166,232,.45); }
+body.vaporwave .pb-sail { border-bottom-color: rgba(201,166,232,.55); }
+body.synthwave .pb-hull { background: rgba(255,140,46,.45); }
+body.synthwave .pb-sail { border-bottom-color: rgba(255,140,46,.55); }

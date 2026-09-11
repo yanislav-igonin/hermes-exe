@@ -4578,6 +4578,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.241.0", "paper boat — every ~2-4 min a little folded boat sails along the bottom of the page, rocking on invisible waves with a triangular sail and a soft wake trailing behind, then drifts off the far edge like the regatta was never held"],
   ["v0.240.0", "shooting star — every ~2-4 min a comet streaks across the upper sky on a shallow dive, burning with a tapered green trail and a bright haloed head, logs that the wish was intercepted, then dies out over the far edge like the wish was never made"],
   ["v0.239.0", "rubber duck — every ~2-4 min a yellow rubber duck bobs in along the bottom of the page, tilting on invisible waves with a faint wake trailing behind, squeaks once to the console, then drifts off the far edge like bath time was never scheduled"],
   ["v0.238.0", "bubble wrap — every ~2-4 min a sheet of bubble wrap drifts slowly up from the bottom of the page, its bubbles popping one by one on staggered little bursts as it rises, then the last empty bubbles fade away like nobody ever needed the packing"],
@@ -9928,4 +9929,29 @@ const AURORA_NOTES = [
     setTimeout(release, 120000 + Math.random() * 120000);
   }
   setTimeout(release, 15000 + Math.random() * 30000);
+})();
+// paper boat — a little folded boat sails along the bottom of the page
+// every ~2-4 min, rocking on invisible waves with a wake trailing behind,
+// then drifts off the far edge like the regatta was never held
+(function paperBoat() {
+  const layer = document.createElement("div");
+  layer.className = "paperboat-layer";
+  document.body.appendChild(layer);
+  function sail() {
+    layer.innerHTML = "";
+    const dir = Math.random() < .5 ? 1 : -1;
+    const boat = document.createElement("div");
+    boat.className = "paperboat";
+    boat.innerHTML = "<span class='pb-wake'></span><span class='pb-hull'></span><span class='pb-sail'></span>";
+    boat.style.setProperty("--pb-y", (70 + Math.random() * 22).toFixed(1) + "vh");
+    boat.style.setProperty("--pb-dur", (24000 + Math.random() * 12000).toFixed(0) + "ms");
+    boat.style.setProperty("--pb-scale", (.8 + Math.random() * .5).toFixed(2));
+    if (dir === -1) layer.style.transform = "scaleX(-1)";
+    else layer.style.transform = "";
+    layer.appendChild(boat);
+    layer.classList.add("pb-on");
+    setTimeout(function () { layer.classList.remove("pb-on"); }, 40000);
+    setTimeout(sail, 120000 + Math.random() * 120000);
+  }
+  setTimeout(sail, 20000 + Math.random() * 30000);
 })();
