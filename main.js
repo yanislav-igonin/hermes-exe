@@ -3469,8 +3469,98 @@ addEventListener("mousemove", e => {
   requestAnimationFrame(tick);
 })();
 
+// worms after rain — every ~2-4 min a brief drizzle sweeps the page, then a
+// few earthworms surface from the bottom edge and wriggle across before
+// burrowing back down like the soil was never disturbed
+(function wormsAfterRain() {
+  const drizzle = document.createElement("div");
+  drizzle.style.cssText = "position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0;transition:opacity 1.5s ease-in-out;";
+  document.body.appendChild(drizzle);
+  const drops = [];
+  for (let i = 0; i < 46; i++) {
+    const d = document.createElement("div");
+    d.style.cssText =
+      "position:absolute;top:-40px;width:1px;border-radius:1px;" +
+      "background:linear-gradient(rgba(160,210,255,0),rgba(160,210,255,.5));" +
+      "height:" + (10 + Math.random() * 16).toFixed(0) + "px;left:" + (Math.random() * 100).toFixed(2) + "%;";
+    drizzle.appendChild(d);
+    drops.push({ el: d, speed: .38 + Math.random() * .3, phase: Math.random() * 2000, drift: .04 + Math.random() * .05 });
+  }
+
+  function makeWorm() {
+    const worm = document.createElement("div");
+    worm.style.cssText = "position:fixed;z-index:3;left:0;top:0;pointer-events:none;will-change:transform;";
+    worm.innerHTML =
+      '<svg width="64" height="28" viewBox="0 0 64 28" style="display:block">' +
+        '<path id="worm-body" d="" fill="none" stroke="rgba(198,152,120,.9)" stroke-width="4.5" stroke-linecap="round"/>' +
+      "</svg>";
+    document.body.appendChild(worm);
+    return worm;
+  }
+
+  function crawl(worm) {
+    const body = worm.querySelector("#worm-body");
+    const dir = Math.random() < .5 ? 1 : -1;
+    const scale = .85 + Math.random() * .4;
+    const y0 = innerHeight - 26 * scale - 1;
+    const fromX = dir > 0 ? -70 : innerWidth + 70;
+    const toX = dir > 0 ? innerWidth + 70 : -70;
+    const dur = 22000 + Math.random() * 14000;
+
+    (function frame(now) {
+      const p = Math.min(1, (now % 1e7) / dur); // progress across the page
+      const x = fromX + (toX - fromX) * p;
+      // peristaltic undulation: sine wave travelling down the body
+      const phase = now / 260;
+      let dPath = "";
+      for (let i = 0; i <= 12; i++) {
+        const sx = 6 + i * 4.5;
+        const sy = 16 + Math.sin(phase + i * .62) * 5.5;
+        dPath += (i === 0 ? "M" : "L") + sx.toFixed(1) + " " + sy.toFixed(1);
+      }
+      body.setAttribute("d", dPath);
+      worm.style.transform =
+        "translate(" + x + "px," + y0 + "px) scaleX(" + (dir * scale) + ") scaleY(" + scale + ")";
+      if (p < 1) requestAnimationFrame(frame);
+      else {
+        // burrow back down: slip below the bottom edge and vanish
+        worm.style.transition = "transform 2.2s ease-in, opacity 2.2s ease-in";
+        worm.style.opacity = "0";
+        worm.style.transform =
+          "translate(" + x + "px," + (y0 + 34) + "px) scaleX(" + (dir * scale) + ") scaleY(" + scale + ")";
+        setTimeout(() => worm.remove(), 2400);
+      }
+    })(performance.now());
+  }
+
+  function cycle() {
+    const now = performance.now();
+    // the drizzle: streaks fall for ~7s, slanting slightly on the wind
+    drizzle.style.opacity = "1";
+    let t0 = null;
+    (function rain(ts) {
+      if (t0 === null) t0 = ts;
+      const t = ts - t0;
+      for (const dr of drops) {
+        const y = (t * dr.speed + dr.phase) % (innerHeight + 60) - 40;
+        dr.el.style.transform = "translate(" + (t * dr.drift) + "px," + y + "px)";
+      }
+      if (t < 7000) requestAnimationFrame(rain);
+      else {
+        drizzle.style.opacity = "0";
+        // the worms surface once the ground is wet enough
+        const n = 2 + Math.floor(Math.random() * 2);
+        for (let i = 0; i < n; i++) setTimeout(() => crawl(makeWorm()), 1500 + i * (3500 + Math.random() * 2500));
+        setTimeout(cycle, 150000 + Math.random() * 150000);
+      }
+    })(now);
+  }
+  setTimeout(cycle, 50000 + Math.random() * 40000);
+})();
+
 // changelog
 const changelog = [
+  ["v0.209.0", "worms after rain — every ~2-4 min a brief drizzle sweeps the page, then 2-3 earthworms surface from the bottom edge and wriggle across it with a peristaltic ripple, then burrow back down like the soil was never disturbed"],
   ["v0.208.0", "dandelion seed — every ~2-4 min a single dandelion seed drifts across the page on the breeze, tumbling slowly while its silky bristles sway, then it floats off the far edge like the wind never counted it"],
   ["v0.207.0", "paper airplane — every ~2-3 min a folded paper airplane glides across the page on a swaying path, launched from a screen edge, wobbling on the breeze with a gentle bank, then vanishes off the far edge like the flight was never logged"],
   ["v0.206.0", "fireflies at dusk — every ~2-4 min a small swarm of fireflies drifts up from the lower sky, each pulsing softly in and out of the dark, then the swarm scatters and the night is still like nobody saw them"],
