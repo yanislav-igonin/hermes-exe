@@ -3424,6 +3424,7 @@ addEventListener("mousemove", e => {
 // changelog
 const changelog = [
   ["v0.200.0", "tumbleweed — every ~2-4 min a scraggly tumbleweed bounces in from one edge of the page and rolls across it, spinning and shedding the odd dry bit of itself as it goes, then tumbles off the far edge like the desert was never there"],
+  ["v0.201.0", "shooting star — every ~2-5 min a shooting star streaks diagonally across the page, a bright line with a fading trail that blinks out before it leaves the sky"],
   ["v0.199.0", "fireflies — every few minutes a couple of tiny glowing fireflies drifts lazily around the page, flickering softly, then fades away into the dark like the summer night was never there"],
   ["v0.198.0", "dragonfly — every ~2-4 min an ASCII dragonfly darts across the page in quick zigzags, hovers in place for a moment as if considering the cursor, then zips off the far edge like the pond was never there"],
   ["v0.197.0", "paper airplane — every ~2-4 min a small paper plane swoops across the page along a gentle lazy arc, a dotted trail fading out behind it, then it slides off the far edge like the flight was never logged"],
@@ -7710,4 +7711,45 @@ const AURORA_NOTES = [
     })(start);
   }
   setTimeout(roll, 30000 + Math.random() * 40000);
+})();
+
+// shooting star — every ~2-5 min a shooting star streaks diagonally across
+// the page, a bright line with a fading trail, gone before it leaves the sky
+(function shootingStar() {
+  function streak() {
+    const star = document.createElement("div");
+    star.className = "shooting-star";
+    const glow = document.createElement("div");
+    glow.className = "shooting-star-glow";
+    document.body.appendChild(star);
+    document.body.appendChild(glow);
+    // random start in the upper half, heading diagonally down
+    const x0 = innerWidth * (.1 + Math.random() * .7);
+    const y0 = innerHeight * (.05 + Math.random() * .3);
+    const angle = (20 + Math.random() * 25) * Math.PI / 180 * (Math.random() < .5 ? 1 : -1);
+    const dir = angle >= 0 ? 1 : -1;
+    const speed = 420 + Math.random() * 260;   // px per second
+    const dur = (900 + Math.random() * 600) / speed * 1000;
+    const fadeAt = dur * .75;
+    const start = performance.now();
+    (function step(now) {
+      const t = (now - start) / 1000;
+      const px = x0 + dir * t * speed;
+      const py = y0 + Math.abs(angle) * t * speed;
+      star.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px) rotate(${dir * Math.abs(angle)}rad)`;
+      glow.style.transform = `translate(${(px + dir * 90 - 2).toFixed(1)}px, ${(py + 90 * Math.abs(angle) - 2).toFixed(1)}px)`;
+      if (now - start > fadeAt) {
+        star.classList.add("fading");
+        glow.classList.add("fading");
+      }
+      if (t * 1000 < dur) requestAnimationFrame(step);
+      else {
+        star.remove();
+        glow.remove();
+        console.log("shooting star: wish fast");
+        setTimeout(streak, 120000 + Math.random() * 180000);
+      }
+    })(start);
+  }
+  setTimeout(streak, 40000 + Math.random() * 50000);
 })();

@@ -3379,3 +3379,30 @@ body.synthwave .dragonfly { color: rgba(255, 215, 160, .85); text-shadow: 0 0 7p
 .tumbleweed-bit.fade { opacity: 0; }
 body.vaporwave .tumbleweed { color: rgba(201, 166, 232, .75); text-shadow: 0 0 6px rgba(201, 166, 232, .35); }
 body.synthwave .tumbleweed { color: rgba(255, 170, 100, .8); text-shadow: 0 0 6px rgba(255, 140, 70, .35); }
+
+/* shooting star: every ~2-5 min a shooting star streaks diagonally across the
+   page — a bright line with a fading trail, gone before it leaves the sky */
+.shooting-star {
+  position: fixed;
+  z-index: 6;
+  pointer-events: none;
+  width: 90px;
+  height: 2px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, rgba(200, 225, 255, 0), rgba(230, 245, 255, .9));
+  box-shadow: 0 0 6px rgba(180, 215, 255, .6);
+  will-change: transform, opacity;
+}
+.shooting-star-glow {
+  position: fixed;
+  z-index: 6;
+  pointer-events: none;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(240, 250, 255, .95);
+  box-shadow: 0 0 8px 2px rgba(190, 220, 255, .7);
+  will-change: transform, opacity;
+}
+.shooting-star.fading { opacity: 0; transition: opacity 1.2s ease-out; }
+.shooting-star-glow.fading { opacity: 0; transition: opacity 1.2s ease-out; }
