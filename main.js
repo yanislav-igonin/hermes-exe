@@ -81,6 +81,10 @@ let tumbleweed = null, nextTumbleweedAt = performance.now() + 180000 * (.7 + Mat
 // edge like the meadow was never there
 let butterfly = null, nextButterflyAt = performance.now() + 180000 * (.7 + Math.random() * .6);
 
+// satellite pass state — a tiny satellite slowly crosses the upper sky with
+// glinting solar panels and a blinking light, then passes over the horizon
+let satellite = null, nextSatelliteAt = performance.now() + 200000 * (.7 + Math.random() * .6);
+
 (function tick(now) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawNoise(now);
@@ -828,6 +832,62 @@ const geese = [];
         ctx.quadraticCurveTo(wx * 7 * s * flap, wy * 9 * s * flap - 1, wx * 3 * s * flap, wy * 8.5 * s * flap);
         ctx.quadraticCurveTo(wx * 1.2 * s * flap, wy * 5 * s * flap, 0, 0);
         ctx.fill(); ctx.stroke();
+      }
+      ctx.restore();
+    }
+  }
+  // satellite pass — every ~3-5 min a tiny satellite drifts across the upper
+  // sky, solar panels glinting, a small light blinking steadily, then it
+  // passes over the horizon like the orbit was never noticed (state above)
+  if (!satellite && now > nextSatelliteAt) {
+    const dir = Math.random() < .5 ? 1 : -1;
+    satellite = {
+      dir, t: 0,
+      x: dir > 0 ? -40 : canvas.width + 40,
+      y: canvas.height * (.05 + Math.random() * .12),
+      blink: 0
+    };
+    setTimeout(() => console.log("satellite log: orbit nominal, wave if you like"), 9000);
+  }
+  if (satellite) {
+    const sat = satellite;
+    sat.t += .016; sat.blink += .1;
+    sat.x += .9 * sat.dir;
+    sat.y += Math.sin(sat.t * .8) * .15; // gentle orbital wobble
+    if (sat.x < -50 || sat.x > canvas.width + 50) { satellite = null; nextSatelliteAt = now + 200000 * (.7 + Math.random() * .6); }
+    else {
+      ctx.save();
+      ctx.translate(sat.x, sat.y);
+      ctx.rotate(Math.sin(sat.t * .5) * .08); // slight tumble on its axis
+      // solar panels — two rectangles glinting as the angle shifts
+      const glint = .35 + Math.abs(Math.sin(sat.t * 1.4)) * .4;
+      ctx.fillStyle = `rgba(90,160,255,${glint})`;
+      ctx.strokeStyle = "rgba(150,200,255,.6)";
+      ctx.lineWidth = .6;
+      for (const side of [-1, 1]) {
+        ctx.beginPath();
+        ctx.rect(side * 9 - 5, -3, 10, 6);
+        ctx.fill(); ctx.stroke();
+        // panel cell lines
+        ctx.strokeStyle = `rgba(150,200,255,${glint * .7})`;
+        ctx.beginPath();
+        ctx.moveTo(side * 9 - 5, 0); ctx.lineTo(side * 9 + 5, 0);
+        ctx.moveTo(side * 9, -3); ctx.lineTo(side * 9, 3);
+        ctx.stroke();
+        ctx.strokeStyle = "rgba(150,200,255,.6)";
+      }
+      // body — small central bus
+      ctx.fillStyle = "rgba(200,220,235,.8)";
+      ctx.fillRect(-4, -3.5, 8, 7);
+      // blinking beacon light
+      const on = Math.sin(sat.blink) > .4;
+      ctx.fillStyle = on ? "rgba(255,80,80,.95)" : "rgba(255,80,80,.15)";
+      ctx.beginPath();
+      ctx.arc(0, -5, 1.4, 0, 7);
+      ctx.fill();
+      if (on) { // faint halo while lit
+        ctx.fillStyle = "rgba(255,80,80,.12)";
+        ctx.beginPath(); ctx.arc(0, -5, 3.6, 0, 7); ctx.fill();
       }
       ctx.restore();
     }
@@ -4078,6 +4138,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.227.0", "satellite pass — every ~3-5 min a tiny satellite drifts across the upper sky, solar panels glinting and a small light blinking steadily, then it passes over the horizon like the orbit was never noticed"],
   ["v0.226.0", "zeppelin — every ~3-5 min a small airship glides slowly across the upper sky, its envelope swaying on the breeze with the gondola dangling beneath, then it sails off the far edge like the crossing was never booked"],
   ["v0.225.0", "butterfly — every ~2-4 min a butterfly flutters in from a screen edge on a lazy bobbing path, wings opening and closing as it goes, then drifts off the far edge like the meadow was never there"],
   ["v0.224.0", "tumbleweed — every ~2-4 min a dry tangled tumbleweed rolls in from a screen edge and bounces along the bottom of the page, shedding stray twigs on its hardest landings, then tumbles off the far edge like the prairie was never fenced"],
