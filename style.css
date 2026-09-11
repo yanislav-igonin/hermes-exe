@@ -2905,3 +2905,56 @@ body.synthwave .firefly { background: rgba(255,196,140,.95); box-shadow: 0 0 8px
   85%  { opacity: .7; }
   100% { transform: translate(calc(130vw + var(--sh-x)), calc(-1.6 * var(--sh-lift))) skewX(20deg); opacity: 0; }
 }
+
+.hot-air-balloon {
+  position: fixed;
+  top: var(--hab-y);
+  left: var(--hab-x0);
+  z-index: 4;
+  pointer-events: none;
+  width: 34px;
+  height: 42px;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.hot-air-balloon::before {
+  /* striped envelope */
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 34px;
+  height: 38px;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 46% 46%;
+  background:
+    repeating-linear-gradient(90deg,
+      #e8863c 0 6px, #d9d3c8 6px 12px, #b8543a 12px 17px, #d9d3c8 17px 23px);
+  box-shadow:
+    inset -6px -4px 8px rgba(0,0,0,.35),
+    inset 4px 3px 6px rgba(255,214,150,.35);
+}
+.hot-air-balloon::after {
+  /* glowing basket hanging below */
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 9px;
+  height: 7px;
+  transform: translateX(-50%);
+  background: #6b4a2f;
+  border-radius: 2px;
+  box-shadow: 0 0 10px 3px rgba(255, 186, 100, .45), 0 0 3px 1px rgba(255, 210, 140, .6);
+}
+.hot-air-balloon.rtl { transform: scaleX(-1); }
+.hot-air-balloon.is-running { animation: hotAirBalloon var(--hab-dur) ease-in-out forwards; }
+@keyframes hotAirBalloon {
+  0%   { transform: translate(0, 0) scale(var(--hab-scale)); opacity: 0; }
+  8%   { opacity: 1; }
+  25%  { transform: translate(calc((var(--hab-x1) - var(--hab-x0)) * .25), var(--hab-bob)) scale(var(--hab-scale)); }
+  50%  { transform: translate(calc((var(--hab-x1) - var(--hab-x0)) * .5), 0) scale(var(--hab-scale)); }
+  75%  { transform: translate(calc((var(--hab-x1) - var(--hab-x0)) * .75), calc(-1 * var(--hab-bob))) scale(var(--hab-scale)); }
+  92%  { opacity: 1; }
+  100% { transform: translate(calc(var(--hab-x1) - var(--hab-x0)), 0) scale(var(--hab-scale)); opacity: 0; }
+}

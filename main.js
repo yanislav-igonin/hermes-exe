@@ -2930,6 +2930,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.181.0", "hot air balloon — every ~2-4 min a small striped hot air balloon with a softly glowing basket drifts slowly across the upper sky, bobbing gently on the breeze, then sails off-screen like the flight was never there"],
   ["v0.180.0", "prowling shadow — every ~2-4 min a soft blurred dark shape slinks low across the whole page on a slight diagonal, stretching and skewing as it passes, then melts away like the shadow was never there"],
   ["v0.179.0", "satellite pass — every ~2-4 min a tiny satellite with glinting solar panels and a blinking beacon crosses the high sky on a slow, deliberate orbit, then slips past the far edge like the orbit was never there"],
   ["v0.178.0", "meteor streak — every ~2-4 min an occasional shooting star crosses the upper sky, shedding a trail of small fading ember particles behind it as it burns, then the sky goes quiet again like the star was never there"],
@@ -6741,4 +6742,36 @@ const AURORA_NOTES = [
     setTimeout(pass, 120000 + Math.random() * 120000);
   }
   setTimeout(pass, 40000 + Math.random() * 40000);
+})();
+
+// hot air balloon — every ~2-4 min a small striped hot air balloon with a
+// softly glowing basket drifts slowly across the upper sky, bobbing gently
+// on the breeze, then sails off-screen like the flight was never there
+(function balloon() {
+  function drift() {
+    if (!document.hidden) {
+      const el = document.createElement("div");
+      el.className = "hot-air-balloon";
+      const dur = 26000 + Math.random() * 12000;
+      const startX = -12 + Math.random() * 20; // could start just off either edge
+      const rightToLeft = Math.random() < 0.5;
+      el.style.setProperty("--hab-dur", dur.toFixed(0) + "ms");
+      el.style.setProperty("--hab-y", (6 + Math.random() * 14).toFixed(1) + "vh");
+      el.style.setProperty("--hab-bob", (1.2 + Math.random() * 1.4).toFixed(1) + "vh");
+      el.style.setProperty("--hab-scale", (0.7 + Math.random() * 0.5).toFixed(2));
+      if (rightToLeft) {
+        el.classList.add("rtl");
+        el.style.setProperty("--hab-x0", (108 - startX) + "vw");
+        el.style.setProperty("--hab-x1", (-20 - startX) + "vw");
+      } else {
+        el.style.setProperty("--hab-x0", (startX - 20) + "vw");
+        el.style.setProperty("--hab-x1", (startX + 108) + "vw");
+      }
+      el.classList.add("is-running");
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), dur + 1500);
+    }
+    setTimeout(drift, 120000 + Math.random() * 120000);
+  }
+  setTimeout(drift, 35000 + Math.random() * 45000);
 })();
