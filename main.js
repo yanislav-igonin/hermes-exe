@@ -4423,6 +4423,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.236.0", "tumbleweed — every ~2-4 min a scraggly tumbleweed rolls across the bottom of the page, bouncing over invisible ruts and spinning as it goes, sheds a couple of twigs that drop behind it, then tumbles off the far edge like the prairie was never there"],
   ["v0.235.0", "slinky — every ~2-4 min a metal slinky flops over the top edge of the page and walks its way down step by stretchy step, top coils stretching out while the bunched bottom coils catch up, then it pools into a squat pile on the floor and fades away like nobody ever had stairs"],
   ["v0.234.0", "yo-yo — every ~2-4 min a tiny yo-yo on a string drops from the top of the page near a random spot, idles spinning and bobbing for a moment like someone got bored of the trick, then reels back up and vanishes like the trick was never shown"],
   ["v0.233.0", "ice cream truck — every ~3-5 min a tiny ice cream truck rolls along the bottom of the page jingling a little tune note by note, drops a single scoop of ice cream onto the pavement mid-route, then trundles off the far edge like the tune was never for sale"],
@@ -9690,4 +9691,52 @@ const AURORA_NOTES = [
     setTimeout(flight, 120000 + Math.random() * 180000);
   }
   setTimeout(flight, 15000 + Math.random() * 30000);
+})();
+
+// tumbleweed — every 2-4 min a scraggly tumbleweed rolls across the bottom of
+// the page, bouncing over invisible ruts, spinning as it goes and shedding a
+// couple of twigs that drop behind it, then tumbles off the far edge
+(function tumbleweed() {
+  const layer = document.createElement("div");
+  layer.className = "tumbleweed-layer";
+  document.body.appendChild(layer);
+  function roll() {
+    layer.innerHTML = "";
+    const tw = document.createElement("span");
+    tw.className = "tumbleweed";
+    const core = document.createElement("span");
+    core.className = "tw-core";
+    core.style.position = "absolute";
+    core.style.inset = "0";
+    const ball = document.createElement("span");
+    ball.className = "tw-ball";
+    core.appendChild(ball);
+    for (let i = 0; i < 4; i++) {
+      const twig = document.createElement("span");
+      twig.className = "tw-twig";
+      core.appendChild(twig);
+    }
+    tw.appendChild(core);
+    const dir = Math.random() < .5 ? 1 : -1;
+    for (let i = 0; i < 2; i++) {
+      const shed = document.createElement("span");
+      shed.className = "tw-shed";
+      shed.style.setProperty("--sh-delay", (2 + Math.random() * 6).toFixed(1) + "s");
+      shed.style.setProperty("--sh-dx", ((Math.random() - .5) * 8).toFixed(1) + "vw");
+      shed.style.setProperty("--sh-rot", ((Math.random() - .5) * 720).toFixed(0) + "deg");
+      tw.appendChild(shed);
+    }
+    tw.style.setProperty("--tw-dir", dir);
+    tw.style.setProperty("--tw-y", (72 + Math.random() * 18).toFixed(1) + "vh");
+    tw.style.setProperty("--tw-scale", (.8 + Math.random() * .5).toFixed(2));
+    tw.style.setProperty("--tw-dur", (15000 + Math.random() * 8000).toFixed(0) + "ms");
+    tw.style.setProperty("--tw-spin", (2.6 + Math.random() * 1.6).toFixed(1) + "s");
+    if (dir === -1) layer.style.transform = "scaleX(-1)";
+    else layer.style.transform = "";
+    layer.appendChild(tw);
+    layer.classList.add("t-on");
+    setTimeout(() => layer.classList.remove("t-on"), 30000);
+    setTimeout(roll, 120000 + Math.random() * 120000);
+  }
+  setTimeout(roll, 20000 + Math.random() * 30000);
 })();

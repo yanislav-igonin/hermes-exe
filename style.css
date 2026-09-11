@@ -3674,6 +3674,76 @@ body.synthwave .firefly { background: radial-gradient(circle, #ffe9cf 0%, #ffb45
 body.vaporwave .paper-dart { color: rgba(235,220,255,.8); text-shadow: 0 0 6px rgba(201,166,232,.35); }
 body.synthwave .paper-dart { color: rgba(255,205,150,.8); text-shadow: 0 0 6px rgba(255,140,46,.35); }
 
+/* tumbleweed: every ~2-4 min a scraggly tumbleweed rolls across the bottom
+   of the page, bouncing over invisible ruts and shedding twigs as it goes */
+.tumbleweed-layer {
+  position: fixed; inset: 0;
+  z-index: 9993; pointer-events: none; overflow: hidden;
+}
+.tumbleweed {
+  position: absolute; left: 0; top: 0;
+  width: 46px; height: 46px;
+  opacity: 0;
+  will-change: transform;
+}
+.tumbleweed .tw-ball {
+  position: absolute; inset: 2px;
+  border-radius: 50%;
+  border: 1.6px dashed rgba(124,252,156,.75);
+  box-shadow: inset 0 0 6px rgba(124,252,156,.12);
+}
+.tumbleweed .tw-ball::before {
+  content: ""; position: absolute; inset: 7px;
+  border-radius: 50%;
+  border: 1.2px dashed rgba(124,252,156,.5);
+}
+.tumbleweed .tw-twig {
+  position: absolute; left: 50%; top: 50%;
+  width: 26px; height: 1.4px;
+  background: rgba(124,252,156,.6);
+  transform-origin: 0 50%;
+  border-radius: 1px;
+}
+.tumbleweed .tw-twig:nth-child(2) { transform: rotate(40deg); }
+.tumbleweed .tw-twig:nth-child(3) { transform: rotate(115deg); }
+.tumbleweed .tw-twig:nth-child(4) { transform: rotate(200deg); width: 20px; }
+.tumbleweed .tw-twig:nth-child(5) { transform: rotate(290deg); width: 17px; }
+.tumbleweed-layer.t-on .tumbleweed { animation: tw-roll var(--tw-dur, 18s) linear forwards; }
+.tumbleweed-layer.t-on .tumbleweed .tw-core { animation: tw-spin var(--tw-spin, 3.2s) linear infinite; }
+@keyframes tw-roll {
+  0%   { transform: translate(calc(var(--tw-dir) * -10vw), calc(var(--tw-y) + 2vh)) scale(var(--tw-scale, 1)); opacity: 0; }
+  6%   { opacity: .85; }
+  14%  { transform: translate(calc(var(--tw-dir) * 12vw), calc(var(--tw-y) - 2.5vh)) scale(var(--tw-scale, 1)); }
+  26%  { transform: translate(calc(var(--tw-dir) * 26vw), calc(var(--tw-y) + 2.5vh)) scale(var(--tw-scale, 1)); }
+  38%  { transform: translate(calc(var(--tw-dir) * 42vw), calc(var(--tw-y) - 3vh)) scale(calc(var(--tw-scale, 1) * .95)); }
+  52%  { transform: translate(calc(var(--tw-dir) * 58vw), calc(var(--tw-y) + 3vh)) scale(calc(var(--tw-scale, 1) * .92)); }
+  66%  { transform: translate(calc(var(--tw-dir) * 74vw), calc(var(--tw-y) - 2vh)) scale(calc(var(--tw-scale, 1) * .88)); }
+  82%  { transform: translate(calc(var(--tw-dir) * 90vw), calc(var(--tw-y) + 2vh)) scale(calc(var(--tw-scale, 1) * .85)); opacity: .6; }
+  100% { transform: translate(calc(var(--tw-dir) * 114vw), calc(var(--tw-y) + 4vh)) scale(calc(var(--tw-scale, 1) * .8)); opacity: 0; }
+}
+@keyframes tw-spin {
+  0%   { transform: rotate(calc(var(--tw-dir) * 0deg)); }
+  100% { transform: rotate(calc(var(--tw-dir) * 1440deg)); }
+}
+.tumbleweed .tw-shed {
+  position: absolute; left: 50%; top: 50%;
+  width: 5px; height: 1.4px;
+  background: rgba(124,252,156,.55);
+  opacity: 0;
+}
+.tumbleweed-layer.t-on .tw-shed { animation: tw-shed-fall var(--tw-dur, 18s) linear forwards; animation-delay: var(--sh-delay, 5s); }
+@keyframes tw-shed-fall {
+  0%, 20% { opacity: 0; }
+  24%     { opacity: .8; }
+  100%    { transform: translate(var(--sh-dx, 3vw), 14vh) rotate(var(--sh-rot, 200deg)); opacity: 0; }
+}
+body.vaporwave .tumbleweed .tw-ball { border-color: rgba(201,166,232,.8); box-shadow: inset 0 0 6px rgba(201,166,232,.15); }
+body.vaporwave .tumbleweed .tw-ball::before { border-color: rgba(201,166,232,.5); }
+body.vaporwave .tumbleweed .tw-twig, body.vaporwave .tumbleweed .tw-shed { background: rgba(201,166,232,.6); }
+body.synthwave .tumbleweed .tw-ball { border-color: rgba(255,140,46,.8); box-shadow: inset 0 0 6px rgba(255,140,46,.15); }
+body.synthwave .tumbleweed .tw-ball::before { border-color: rgba(255,140,46,.5); }
+body.synthwave .tumbleweed .tw-twig, body.synthwave .tumbleweed .tw-shed { background: rgba(255,140,46,.6); }
+
 /* the ink blot: every ~2-5 min a drop of ink falls from above the page,
    splats against it and blooms into a lopsided blot with torn edges,
    which slowly spreads, darkens at the rim and fades away */
