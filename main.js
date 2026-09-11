@@ -2590,6 +2590,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.168.0", "fireflies — every ~2-4 min a small swarm of fireflies gathers at a random spot on the background canvas, blinking in slow out-of-sync lantern pulses with a soft glow, then scatters back into the dark like the night was never lit"],
   ["v0.167.0", "dandelion — every ~2-4 min a dandelion grows on the background canvas, its head blooms into a full puff, then a gust tears the seeds loose and they drift off-screen like the wind was never there"],
   ["v0.166.0", "paper boat — every ~2-4 min a tiny folded paper boat sails along the bottom of the page, bobbing on an invisible tide and occasionally listing in the waves, then drifts off-screen like the ocean was never there"],
   ["v0.165.0", "origami crane — every ~2-4 min a folded paper square unfolds wing by wing into a tiny crane at a random spot, flutters up in a lazy circle while a fold note prints in the console, then dissolves like the paper was never creased"],
@@ -6171,4 +6172,68 @@ const DANDELION_NOTES = [
     requestAnimationFrame(drawDandelion);
   }
   requestAnimationFrame(drawDandelion);
+})();
+
+// fireflies — a small swarm congregates at a random spot, blinks in slow
+// out-of-sync lantern pulses, then scatters back into the dark
+const FIREFLY_NOTES = [
+  "the fireflies are voting on something",
+  "a lantern that licenses itself",
+  "the dark keeps a few spare stars",
+  "fireflies: tiny, seasonal, unbothered",
+];
+(function fireflyTick() {
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  let swarm = null, nextSwarmAt = performance.now() + 25000 * (0.7 + Math.random() * 1.3);
+  function drawFireflies(now) {
+    if (!swarm && now >= nextSwarmAt) {
+      const cx = 80 + Math.random() * (canvas.width - 160);
+      const cy = 80 + Math.random() * (canvas.height - 160);
+      swarm = { cx, cy, t: 0, flies: [], noteShown: false };
+      for (let i = 0; i < 14 + Math.floor(Math.random() * 8); i++) {
+        swarm.flies.push({
+          ang: Math.random() * Math.PI * 2,
+          r: 10 + Math.random() * 55,
+          phase: Math.random() * Math.PI * 2,
+          speed: 0.7 + Math.random() * 1.1,
+          orbit: 0.4 + Math.random() * 0.9,
+        });
+      }
+    }
+    if (swarm) {
+      swarm.t += 1 / 60;
+      const gather = Math.min(1, swarm.t / 2.5);   // flies drift in
+      const fade = Math.max(0, (swarm.t - 9) / 1.5); // then scatter
+      let allGone = true;
+      ctx.save();
+      for (const f of swarm.flies) {
+        f.phase += f.speed / 60;
+        const r = f.r * (1.3 - gather * 0.3) * (1 + fade * 2.2);
+        const ang = f.ang + swarm.t * f.orbit * 0.25;
+        const x = swarm.cx + Math.cos(ang) * r + Math.sin(f.phase * 1.7) * 6;
+        const y = swarm.cy + Math.sin(ang) * r * 0.8 + Math.cos(f.phase * 2.1) * 6;
+        const blink = 0.5 + 0.5 * Math.sin(f.phase * 2.4); // out-of-sync pulses
+        const glow = blink * gather * (1 - fade);
+        if (glow > 0.02) {
+          allGone = false;
+          ctx.globalAlpha = glow * 0.9;
+          ctx.fillStyle = "#d8ffa0";
+          ctx.beginPath(); ctx.arc(x, y, 1.4, 0, Math.PI * 2); ctx.fill();
+          ctx.globalAlpha = glow * 0.22;
+          ctx.beginPath(); ctx.arc(x, y, 4.5, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+      ctx.restore();
+      if (!swarm.noteShown && gather >= 1) {
+        swarm.noteShown = true;
+        console.log(`fireflies: ${FIREFLY_NOTES[Math.random() * FIREFLY_NOTES.length | 0]}`);
+      }
+      if (fade >= 1) {
+        swarm = null;
+        nextSwarmAt = now + 150000 * (0.7 + Math.random() * 0.6);
+      }
+    }
+    requestAnimationFrame(drawFireflies);
+  }
+  requestAnimationFrame(drawFireflies);
 })();
