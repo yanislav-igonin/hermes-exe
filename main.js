@@ -3471,6 +3471,7 @@ addEventListener("mousemove", e => {
 
 // changelog
 const changelog = [
+  ["v0.208.0", "dandelion seed — every ~2-4 min a single dandelion seed drifts across the page on the breeze, tumbling slowly while its silky bristles sway, then it floats off the far edge like the wind never counted it"],
   ["v0.207.0", "paper airplane — every ~2-3 min a folded paper airplane glides across the page on a swaying path, launched from a screen edge, wobbling on the breeze with a gentle bank, then vanishes off the far edge like the flight was never logged"],
   ["v0.206.0", "fireflies at dusk — every ~2-4 min a small swarm of fireflies drifts up from the lower sky, each pulsing softly in and out of the dark, then the swarm scatters and the night is still like nobody saw them"],
   ["v0.205.0", "meteor shower — every ~1-2 min a small shooting star streaks across the upper sky with a glowing trail, flares and burns out mid-flight like it was never seen"],
