@@ -3644,3 +3644,32 @@ body.synthwave .firefly { background: radial-gradient(circle, #ffe9cf 0%, #ffb45
   0%   { margin-left: 0; }
   100% { margin-left: var(--b-sway, 40px); }
 }
+
+/* paper dart: a folded paper dart swoops in on a wobbling zigzag descent,
+   dips hard as its lift runs out, then glides off-screen */
+.paper-dart {
+  position: fixed; left: 0; top: 0;
+  z-index: 9992; pointer-events: none;
+  margin: 0;
+  font-size: 20px; line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.25));
+  will-change: transform;
+  opacity: 0;
+}
+.paper-dart-layer {
+  position: fixed; inset: 0;
+  z-index: 9992; pointer-events: none;
+}
+.paper-dart-layer.p-on .paper-dart { animation: dart-flight var(--pd-dur, 16s) ease-in-out forwards; }
+@keyframes dart-flight {
+  0%   { transform: translate(calc(var(--pd-dir) * -8vw), calc(var(--pd-top) - 4vh)) rotate(calc(var(--pd-dir) * -14deg)); opacity: 0; }
+  8%   { opacity: .9; }
+  25%  { transform: translate(calc(var(--pd-dir) * 22vw), calc(var(--pd-top) + 2vh)) rotate(calc(var(--pd-dir) * 10deg)); }
+  45%  { transform: translate(calc(var(--pd-dir) * 46vw), calc(var(--pd-top) + 7vh)) rotate(calc(var(--pd-dir) * -12deg)); }
+  62%  { transform: translate(calc(var(--pd-dir) * 64vw), calc(var(--pd-top) + 16vh)) rotate(calc(var(--pd-dir) * 18deg)); opacity: .85; }
+  74%  { transform: translate(calc(var(--pd-dir) * 78vw), calc(var(--pd-top) + var(--pd-dip, 26vh))) rotate(calc(var(--pd-dir) * 30deg)); }
+  92%  { opacity: .5; }
+  100% { transform: translate(calc(var(--pd-dir) * 112vw), calc(var(--pd-top) + var(--pd-dip, 26vh) + 6vh)) rotate(calc(var(--pd-dir) * 34deg)); opacity: 0; }
+}
+body.vaporwave .paper-dart { color: rgba(235,220,255,.8); text-shadow: 0 0 6px rgba(201,166,232,.35); }
+body.synthwave .paper-dart { color: rgba(255,205,150,.8); text-shadow: 0 0 6px rgba(255,140,46,.35); }

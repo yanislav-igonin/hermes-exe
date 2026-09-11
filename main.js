@@ -9443,3 +9443,30 @@ const AURORA_NOTES = [
   }
   setTimeout(release, 20000 + Math.random() * 30000);
 })();
+
+// paper dart — every 2-5 min a folded paper dart swoops in from one side,
+// wobbling through a lazy zigzag descent, dips hard as its lift runs out,
+// then glides off-screen like someone flicked it across the room
+(function paperDart() {
+  const layer = document.createElement("div");
+  layer.className = "paper-dart-layer";
+  document.body.appendChild(layer);
+  function flight() {
+    const dart = document.createElement("span");
+    dart.className = "paper-dart";
+    dart.textContent = "✈";
+    const dir = Math.random() < .5 ? 1 : -1;
+    dart.style.setProperty("--pd-dir", dir);
+    dart.style.setProperty("--pd-top", (10 + Math.random() * 30).toFixed(1) + "vh");
+    dart.style.setProperty("--pd-dip", (18 + Math.random() * 24).toFixed(1) + "vh");
+    dart.style.setProperty("--pd-dur", (14000 + Math.random() * 8000).toFixed(0) + "ms");
+    if (dir === -1) layer.style.transform = "scaleX(-1)";
+    else layer.style.transform = "";
+    layer.innerHTML = "";
+    layer.appendChild(dart);
+    layer.classList.add("p-on");
+    setTimeout(() => layer.classList.remove("p-on"), 26000);
+    setTimeout(flight, 120000 + Math.random() * 180000);
+  }
+  setTimeout(flight, 15000 + Math.random() * 30000);
+})();
